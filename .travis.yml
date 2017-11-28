@@ -16,8 +16,8 @@ before_install:
   - sudo apt-get install python-pip python-dev build-essential
   - sudo pip install --upgrade pip
   - sudo pip install awscli --upgrade
-  - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-  - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-  - aws configure set default.region $AWS_REGION
+  - mkdir ~/.aws
+  - printf "[kms]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY > ~/.aws/credentials
+  - printf "[kms]\nregion="$AWS_REGION"\noutput=json" > .aws/confi
 
 script: ./travis-script.sh
