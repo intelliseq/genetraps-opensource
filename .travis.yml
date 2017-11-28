@@ -7,8 +7,8 @@ services:
 
 before_install:
   - sudo apt-get -qq update
-  - apt-get install python-pip python-dev build-essential
-  - pip install --upgrade pip
-  - pip install awscli --upgrade
+  - sudo apt-get install python-pip python-dev build-essential
+  - sudo pip install --upgrade pip
+  - sudo pip install awscli --upgrade
 
 script: ./travis-script.sh
