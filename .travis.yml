@@ -18,6 +18,6 @@ before_install:
   - sudo pip install awscli --upgrade
   - mkdir ~/.aws
   - printf "[kms]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY > ~/.aws/credentials
-  - printf "[kms]\nregion="$AWS_REGION"\noutput=json" > .aws/confi
+  - printf "[profile kms]\nregion="$AWS_REGION"\noutput=json" > ~/.aws/config
 
 script: ./travis-script.sh
