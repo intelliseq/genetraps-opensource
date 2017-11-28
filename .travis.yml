@@ -1,6 +1,12 @@
+sudo: required
+
 language: java
+
 jdk:
   - oraclejdk8
+
+python:
+  - 3.4
 
 services:
   - docker
@@ -9,8 +15,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install python-pip python-dev build-essential
   - sudo pip install --upgrade pip
-  - pip install awscli --upgrade
-  - pip install awsebcli --upgrade
+  - sudo pip install awscli --upgrade
   - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
   - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
   - aws configure set default.region $AWS_REGION
