@@ -6,7 +6,7 @@ echo "Starting"
 echo "token"`echo $DNANEXUS_TOKEN | cut -c1-5`
 source scripts/get-secrets.sh kms-store
 echo "token"`echo $DNANEXUS_TOKEN | cut -c1-5`
-dx login --token $DNANEXUS_TOKEN --noprojects
+printf "0\n" | dx login --token $DNANEXUS_TOKEN
 echo `dx ls`
 
 ### BUILDING API_DX ###
