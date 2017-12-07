@@ -3,6 +3,13 @@ package pl.intelliseq.genetraps.api.dx;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,11 +32,42 @@ public class ApiDxApplicationTests {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
+
+	@Autowired
+	private FilesManager filesManager;
 	
 	@Test
 	public void contextLoads() {
 	}
-	
+
+	@Test
+	public void mkdirTest() throws InterruptedException {
+		class MkDirRunnable implements Runnable{
+			private int id;
+
+			public MkDirRunnable(int id){
+				this.id = id;
+			}
+
+			@Override
+			public void run() {
+				log.info(id);
+				filesManager.mkdir();
+			}
+		}
+
+		ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+
+		IntStream.range(0,100).forEach(i -> threadPoolExecutor.execute(new MkDirRunnable(i)));
+
+		while (threadPoolExecutor.getTaskCount()!=threadPoolExecutor.getCompletedTaskCount()){
+			System.err.println("count="+threadPoolExecutor.getTaskCount()+","+threadPoolExecutor.getCompletedTaskCount());
+			Thread.sleep(5000);
+		}
+		threadPoolExecutor.shutdown();
+		threadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS);
+	}
+
 	@Test
 	public void testVep() {
 		
