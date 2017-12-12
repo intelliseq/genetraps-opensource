@@ -10,10 +10,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
 
@@ -21,6 +19,9 @@ import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
 public class TouchController {
 
 	Logger log = Logger.getLogger(TouchController.class);
+
+	@Autowired
+	private FilesManager filesManager;
 	
     @RequestMapping("/hello")
     public String hello() {
@@ -41,6 +42,14 @@ public class TouchController {
 			return e.toString();
 		}
     }
+
+
+    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
+	@ResponseBody public String mkDir(
+//			@RequestParam(value="owner", required = true) String owner
+	){
+		return String.format("{\"response\":%s}", filesManager.mkdir());
+	}
     
     
     private String touch() throws IOException, InterruptedException {

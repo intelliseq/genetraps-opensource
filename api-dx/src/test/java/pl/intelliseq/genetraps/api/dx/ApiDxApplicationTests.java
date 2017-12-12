@@ -1,28 +1,25 @@
 package pl.intelliseq.genetraps.api.dx;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import pl.intelliseq.genetraps.api.dx.parser.DxJob;
-import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+import pl.intelliseq.genetraps.api.dx.parser.DxJob;
+import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
+
+import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -56,9 +53,11 @@ public class ApiDxApplicationTests {
 			}
 		}
 
+		Integer size = filesManager.getNumericDirectories().size();
+
 		ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
 
-		IntStream.range(0,100).forEach(i -> threadPoolExecutor.execute(new MkDirRunnable(i)));
+		IntStream.range(0,10).forEach(i -> threadPoolExecutor.execute(new MkDirRunnable(i)));
 
 		while (threadPoolExecutor.getTaskCount()!=threadPoolExecutor.getCompletedTaskCount()){
 			System.err.println("count="+threadPoolExecutor.getTaskCount()+","+threadPoolExecutor.getCompletedTaskCount());
@@ -66,6 +65,26 @@ public class ApiDxApplicationTests {
 		}
 		threadPoolExecutor.shutdown();
 		threadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS);
+
+        assertEquals(filesManager.getNumericDirectories().size() - size, 10);
+
+	}
+
+	@Test
+	public void retrieveLastDirIndex(){
+        Integer lowest = filesManager.getLowestFreeIndex();
+        if(lowest > 1){
+            Integer selected = lowest/2;
+            filesManager.resetCounter();
+            log.info(String.format("Lowest: %d Selected: %d", lowest, selected));
+            DxRunner.runCommand("dx rmdir "+selected);
+            log.info("Check if lowest index is "+selected);
+            assertEquals(filesManager.getLowestFreeIndex(), selected);
+            assertEquals(filesManager.mkdir(), selected);
+            log.info("Check if lowest index is back "+lowest);
+            assertEquals(filesManager.getLowestFreeIndex(), lowest);
+        }
+
 	}
 
 	@Test

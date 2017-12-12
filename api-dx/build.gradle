@@ -38,8 +38,10 @@ repositories {
 
 
 dependencies {
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
 	compile('org.springframework.boot:spring-boot-starter-web')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 docker {
