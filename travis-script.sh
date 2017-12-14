@@ -30,6 +30,7 @@ echo $(curl localhost:8080/touch)
 
 ### BUILDING CLINET_EXPLORARE ###
 echo $LOG_PREFIX"client-explorare: compiling..."
+mkdir ./client-explorare/dist
 npm --prefix ./client-explorare install ./client-explorare
 echo $LOG_PREFIX"clien-explorare: testing..."
 npm --prefix client-explorare run test
