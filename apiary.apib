@@ -1,80 +1,51 @@
-FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
-
-# genetrapsopensource
-
-Polls is a simple API allowing consumers to view polls and vote in them.
-
-## Questions Collection [/questions]
-
-### List All Questions [GET]
-
-+ Response 200 (application/json)
-
-        [
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
-            }
-        ]
-
-### Create a New Question [POST]
-
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
-
-+ Request (application/json)
-
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
-
-+ Response 201 (application/json)
-
-    + Headers
-
-            Location: /questions/2
-
-    + Body
-
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
-            }
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: "genetraps"
+  description: Api for genetraps-opensource
+  contact:
+    name: intelliseq sp. z o.o.
+    email: contact@intelliseq.pl
+    url: http://intelliseq.pl/
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /hello:
+    get:
+      description: The basic hook to check if server is alive
+      responses:
+        200:
+          description: Response "ok" whes server is up
+          schema: 
+            $ref: '#/definitions/Status'
+  /touch:
+    get:
+      description: touch
+      responses:
+        200:
+          description: desc
+  /mkdir:
+    get:
+      description: Creates directory and returns it's name
+      responses:
+        200:
+          description: The name of the directory
+          schema: 
+            $ref: '#/definitions/Mkdir'
+definitions:
+  Status:
+    properties:
+      status: 
+        type: string
+  Mkdir:
+    properties:
+      response:
+        type: integer
+        format: int64
