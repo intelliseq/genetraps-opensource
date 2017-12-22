@@ -16,5 +16,5 @@ for KEY in `aws s3 ls s3://$BUCKET | tr -s ' ' | cut -d " " -f 4`
 do
     echo $KEY
     VALUE=`aws kms decrypt --ciphertext-blob fileb://<(aws s3 cp s3://kms-store/$KEY -) --output text --query Plaintext | base64 -$o`
-    eval "$KEY=$VALUE"
+    eval "export $KEY=$VALUE"
 done

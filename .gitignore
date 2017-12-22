@@ -3,6 +3,8 @@
 RemoteSystemsTempFiles/
 .metadata/
 
+docker-compose.yml
+
 # Compiled class file
 *.class
 

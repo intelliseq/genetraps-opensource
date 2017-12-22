@@ -1,0 +1,12 @@
+version: '2'
+services:
+  client-explorare:
+    image: clientExplorareImageTag
+    ports:
+      - "8081:8081"
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: GENETRAPS_DEV_LOG_GROUP
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: clientexplorare
