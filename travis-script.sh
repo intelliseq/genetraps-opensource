@@ -50,6 +50,7 @@ check
 echo $LOG_PREFIX "pushing to AWS"
 ecs-cli configure profile --profile-name genetraps --access-key $ECS_CLI_GENETRAPS_DEV_KEY_ID --secret-key $ECS_CLI_GENETRAPS_DEV_ACCESS_KEY
 ecs-cli configure --cluster GENETRAPS-DEV --default-launch-type FARGATE --region us-east-1 --config-name ECS_CLI_GENETRAPS_DEV_CONF
+mkdir ~/.aws/
 printf "[genetraps]\naws_access_key_id="$ECS_CLI_GENETRAPS_DEV_KEY_ID"\naws_secret_access_key="$ECS_CLI_GENETRAPS_DEV_ACCESS_KEY >> ~/.aws/credentials
 printf "[profile genetraps]\nregion="$AWS_REGION"\noutput=json" >> ~/.aws/config
 echo "ecs cli"
