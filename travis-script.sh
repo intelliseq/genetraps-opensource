@@ -54,9 +54,12 @@ mkdir ~/.aws/
 printf "[genetraps]\naws_access_key_id="$ECS_CLI_GENETRAPS_DEV_KEY_ID"\naws_secret_access_key="$ECS_CLI_GENETRAPS_DEV_ACCESS_KEY >> ~/.aws/credentials
 printf "[profile genetraps]\nregion="$AWS_REGION"\noutput=json" >> ~/.aws/config
 echo "ecs cli"
-cat ~/.aws/credentials | cut -c -26 | echo
+cat ~/.aws/credentials | cut -c -26
+cat ~/.aws/credentials | wc -l
+ls -la ~/.aws/
 aws ecr get-login --profile genetraps | echo
 `aws ecr get-login --profile genetraps`
+echo `ecs-cli ps --ecs-profile genetraps`
 echo `ecs-cli ps --aws-profile genetraps`
 
 TAG_API_DX=`ls -alR --full-time api-dx/ -Ibin -Ibuild -I.* | sha1sum | cut -d " " -f1`
