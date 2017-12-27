@@ -11,8 +11,8 @@ TAG_API_DX=$AWS_ACCOUNT_ID".dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:"$T
 TAG_CLIENT_EXPLORARE=$AWS_ACCOUNT_ID".dkr.ecr.us-east-1.amazonaws.com/genetraps-client-explorare:"$TAG_CLIENT_EXPLORARE
 docker tag $IMAGE_API_DX $TAG_API_DX
 docker tag $IMAGE_CLIENT_EXPLORARE $TAG_CLIENT_EXPLORARE
-ecs-cli push $TAG_API_DX
-ecs-cli push $TAG_CLIENT_EXPLORARE
+ecs-cli push $TAG_API_DX --ecs-profile genetraps
+ecs-cli push $TAG_CLIENT_EXPLORARE --ecs-profile genetraps
 #echo $TAG_CLIENT_EXPLORARE 
 cat aws-conf/docker-compose-template.yml | sed 's@clientExplorareImageTag@'"$TAG_CLIENT_EXPLORARE"'@' > docker-compose.yml
-ecs-cli compose --project-name genetraps-client-explorare -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:"$AWS_ACCOUNT_ID":targetgroup/genetraps-explorare-client/"$AWS_GENETRAPS_TARGET_GROUP --container-name client-explorare --container-port 8081
+ecs-cli compose --project-name genetraps-client-explorare -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:"$AWS_ACCOUNT_ID":targetgroup/genetraps-explorare-client/"$AWS_GENETRAPS_TARGET_GROUP --container-name client-explorare --container-port 8081 --ecs-profile genetraps
