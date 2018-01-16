@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2013-2016 DNAnexus, Inc.
+#
+# This file is part of dx-toolkit (DNAnexus platform client libraries).
+#
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License. You may obtain a copy
+#   of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#   License for the specific language governing permissions and limitations
+#   under the License.
+
+'''
+Redirects stdin to a DNAnexus log socket in the execution environment.
+
+Valid logging levels:
+
+┌─────────────────────────┬────────────────┬────────────┐
+│ --source                │ --level        │ Appears as │
+├─────────────────────────┼────────────────┼────────────┤
+│ DX_APP_STREAM (default) │ info (default) │ STDOUT     │
+│ DX_APP_STREAM (default) │ error          │ STDERR     │
+├─────────────────────────┼────────────────┼────────────┤
+│ DX_APP                  │ debug          │ DEBUG      │
+│ DX_APP                  │ info (default) │ INFO       │
+│ DX_APP                  │ warning        │ WARNING    │
+│ DX_APP                  │ error          │ ERROR      │
+│ DX_APP                  │ critical       │ CRITICAL   │
+└─────────────────────────┴────────────────┴────────────┘
+'''
+
+from __future__ import print_function
+
+import sys, logging, argparse
+
+USING_PYTHON2 = True if sys.version_info < (3, 0) else False
+
+logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+
+parser = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("-l", "--level", help="Logging level to use", default='info',
+                    choices=['critical', 'error', 'warning', 'info', 'debug'])
+parser.add_argument("-s", "--source", help="Source ID to use", default='DX_APP_STREAM',
+                    choices=['DX_APP', 'DX_APP_STREAM'])
+args = parser.parse_args()
+
+if not USING_PYTHON2:
+    print("dx-log-stream: This script is not compatible with Python 3", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    log_function = logging.__dict__[args.level]
+except:
+    log_function = logging.info
+
+import dxpy
+logger = logging.getLogger()
+logger.handlers = []
+logger.addHandler(dxpy.DXLogHandler(source=args.source))
+
+while True:
+    line = sys.stdin.readline()
+    if line == '':
+        break
+    # print "Logging line:", line.rstrip("\n"), "to log handler w/level", args.level
+    log_function(line.rstrip("\n"))

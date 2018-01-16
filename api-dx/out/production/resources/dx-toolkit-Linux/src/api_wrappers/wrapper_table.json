@@ -1,0 +1,1533 @@
+[
+    [
+        "/analysis-xxxx/addTags",
+        "analysisAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fanalysis-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/analysis-xxxx/describe",
+        "analysisDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fanalysis-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/analysis-xxxx/removeTags",
+        "analysisRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fanalysis-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/analysis-xxxx/setProperties",
+        "analysisSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fanalysis-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/analysis-xxxx/terminate",
+        "analysisTerminate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fanalysis-xxxx%2Fterminate"
+        }
+    ],
+    [
+        "/app-xxxx/addAuthorizedUsers",
+        "appAddAuthorizedUsers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/addAuthorizedUsers"
+        }
+    ],
+    [
+        "/app-xxxx/addCategories",
+        "appAddCategories(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/addCategories"
+        }
+    ],
+    [
+        "/app-xxxx/addDevelopers",
+        "appAddDevelopers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/addDevelopers"
+        }
+    ],
+    [
+        "/app-xxxx/addTags",
+        "appAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/addTags"
+        }
+    ],
+    [
+        "/app-xxxx/delete",
+        "appDelete(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/delete"
+        }
+    ],
+    [
+        "/app-xxxx/describe",
+        "appDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/describe"
+        }
+    ],
+    [
+        "/app-xxxx/get",
+        "appGet(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/get"
+        }
+    ],
+    [
+        "/app-xxxx/install",
+        "appInstall(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/install"
+        }
+    ],
+    [
+        "/app-xxxx/listAuthorizedUsers",
+        "appListAuthorizedUsers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/listAuthorizedUsers"
+        }
+    ],
+    [
+        "/app-xxxx/listCategories",
+        "appListCategories(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/listCategories"
+        }
+    ],
+    [
+        "/app-xxxx/listDevelopers",
+        "appListDevelopers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/listDevelopers"
+        }
+    ],
+    [
+        "/app-xxxx/publish",
+        "appPublish(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/publish"
+        }
+    ],
+    [
+        "/app-xxxx/removeAuthorizedUsers",
+        "appRemoveAuthorizedUsers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/removeAuthorizedUsers"
+        }
+    ],
+    [
+        "/app-xxxx/removeCategories",
+        "appRemoveCategories(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/removeCategories"
+        }
+    ],
+    [
+        "/app-xxxx/removeDevelopers",
+        "appRemoveDevelopers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/removeDevelopers"
+        }
+    ],
+    [
+        "/app-xxxx/removeTags",
+        "appRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/removeTags"
+        }
+    ],
+    [
+        "/app-xxxx/run",
+        "appRun(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/run",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/app-xxxx/uninstall",
+        "appUninstall(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/uninstall"
+        }
+    ],
+    [
+        "/app-xxxx/update",
+        "appUpdate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app-xxxx%5B/yyyy%5D/update"
+        }
+    ],
+    [
+        "/app/new",
+        "appNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Apps#API-method:-/app/new",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/applet-xxxx/addTags",
+        "appletAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/applet-xxxx/describe",
+        "appletDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fapplet-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/applet-xxxx/get",
+        "appletGet(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fapplet-xxxx%2Fget"
+        }
+    ],
+    [
+        "/applet-xxxx/getDetails",
+        "appletGetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FgetDetails"
+        }
+    ],
+    [
+        "/applet-xxxx/listProjects",
+        "appletListProjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2FlistProjects"
+        }
+    ],
+    [
+        "/applet-xxxx/removeTags",
+        "appletRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/applet-xxxx/rename",
+        "appletRename(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Name#API-method%3A-%2Fclass-xxxx%2Frename"
+        }
+    ],
+    [
+        "/applet-xxxx/run",
+        "appletRun(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fapplet-xxxx%2Frun",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/applet-xxxx/setProperties",
+        "appletSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Properties#API-method%3A-%2Fclass-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/applet/new",
+        "appletNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fapplet%2Fnew",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/container-xxxx/clone",
+        "containerClone(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2Fclone"
+        }
+    ],
+    [
+        "/container-xxxx/describe",
+        "containerDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Containers-for-Execution#API-method%3A-%2Fcontainer-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/container-xxxx/destroy",
+        "containerDestroy(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/container-xxxx/listFolder",
+        "containerListFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FlistFolder"
+        }
+    ],
+    [
+        "/container-xxxx/move",
+        "containerMove(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2Fmove"
+        }
+    ],
+    [
+        "/container-xxxx/newFolder",
+        "containerNewFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FnewFolder"
+        }
+    ],
+    [
+        "/container-xxxx/removeFolder",
+        "containerRemoveFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FremoveFolder"
+        }
+    ],
+    [
+        "/container-xxxx/removeObjects",
+        "containerRemoveObjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FremoveObjects"
+        }
+    ],
+    [
+        "/container-xxxx/renameFolder",
+        "containerRenameFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FrenameFolder"
+        }
+    ],
+    [
+        "/file-xxxx/addTags",
+        "fileAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/file-xxxx/addTypes",
+        "fileAddTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FaddTypes"
+        }
+    ],
+    [
+        "/file-xxxx/close",
+        "fileClose(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Files#API-method%3A-%2Ffile-xxxx%2Fclose"
+        }
+    ],
+    [
+        "/file-xxxx/describe",
+        "fileDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Files#API-method%3A-%2Ffile-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/file-xxxx/download",
+        "fileDownload(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Files#API-method%3A-%2Ffile-xxxx%2Fdownload"
+        }
+    ],
+    [
+        "/file-xxxx/getDetails",
+        "fileGetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FgetDetails"
+        }
+    ],
+    [
+        "/file-xxxx/listProjects",
+        "fileListProjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2FlistProjects"
+        }
+    ],
+    [
+        "/file-xxxx/removeTags",
+        "fileRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/file-xxxx/removeTypes",
+        "fileRemoveTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FremoveTypes"
+        }
+    ],
+    [
+        "/file-xxxx/rename",
+        "fileRename(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Name#API-method%3A-%2Fclass-xxxx%2Frename"
+        }
+    ],
+    [
+        "/file-xxxx/setDetails",
+        "fileSetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FsetDetails"
+        }
+    ],
+    [
+        "/file-xxxx/setProperties",
+        "fileSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Properties#API-method%3A-%2Fclass-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/file-xxxx/setVisibility",
+        "fileSetVisibility(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Visibility#API-method%3A-%2Fclass-xxxx%2FsetVisibility"
+        }
+    ],
+    [
+        "/file-xxxx/upload",
+        "fileUpload(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Files#API-method%3A-%2Ffile-xxxx%2Fupload"
+        }
+    ],
+    [
+        "/file/new",
+        "fileNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Files#API-method%3A-%2Ffile%2Fnew",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/gtable-xxxx/addRows",
+        "gtableAddRows(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/GenomicTables#API-method%3A-%2Fgtable-xxxx%2FaddRows"
+        }
+    ],
+    [
+        "/gtable-xxxx/addTags",
+        "gtableAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/gtable-xxxx/addTypes",
+        "gtableAddTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FaddTypes"
+        }
+    ],
+    [
+        "/gtable-xxxx/close",
+        "gtableClose(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/GenomicTables#API-method%3A-%2Fgtable-xxxx%2Fclose"
+        }
+    ],
+    [
+        "/gtable-xxxx/describe",
+        "gtableDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/GenomicTables#API-method%3A-%2Fgtable-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/gtable-xxxx/get",
+        "gtableGet(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/GenomicTables#API-method%3A-%2Fgtable-xxxx%2Fget"
+        }
+    ],
+    [
+        "/gtable-xxxx/getDetails",
+        "gtableGetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FgetDetails"
+        }
+    ],
+    [
+        "/gtable-xxxx/listProjects",
+        "gtableListProjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2FlistProjects"
+        }
+    ],
+    [
+        "/gtable-xxxx/nextPart",
+        "gtableNextPart(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/GenomicTables#API-method%3A-%2Fgtable-xxxx%2FnextPart"
+        }
+    ],
+    [
+        "/gtable-xxxx/removeTags",
+        "gtableRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/gtable-xxxx/removeTypes",
+        "gtableRemoveTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FremoveTypes"
+        }
+    ],
+    [
+        "/gtable-xxxx/rename",
+        "gtableRename(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Name#API-method%3A-%2Fclass-xxxx%2Frename"
+        }
+    ],
+    [
+        "/gtable-xxxx/setDetails",
+        "gtableSetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FsetDetails"
+        }
+    ],
+    [
+        "/gtable-xxxx/setProperties",
+        "gtableSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Properties#API-method%3A-%2Fclass-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/gtable-xxxx/setVisibility",
+        "gtableSetVisibility(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Visibility#API-method%3A-%2Fclass-xxxx%2FsetVisibility"
+        }
+    ],
+    [
+        "/gtable/new",
+        "gtableNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/GenomicTables#API-method%3A-%2Fgtable%2Fnew"
+        }
+    ],
+    [
+        "/job-xxxx/addTags",
+        "jobAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/job-xxxx/describe",
+        "jobDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/job-xxxx/getLog",
+        "jobGetLog(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob-xxxx%2FgetLog"
+        }
+    ],
+    [
+        "/job-xxxx/removeTags",
+        "jobRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/job-xxxx/setProperties",
+        "jobSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/job-xxxx/terminate",
+        "jobTerminate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob-xxxx%2Fterminate"
+        }
+    ],
+    [
+        "/job/new",
+        "jobNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Applets-and-Entry-Points#API-method%3A-%2Fjob%2Fnew",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/notifications/get",
+        "notificationsGet(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/notifications/markRead",
+        "notificationsMarkRead(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/org-xxxx/describe",
+        "orgDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/org-xxxx/findMembers",
+        "orgFindMembers(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2FfindMembers"
+        }
+    ],
+    [
+        "/org-xxxx/findProjects",
+        "orgFindProjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2FfindProjects"
+        }
+    ],
+    [
+        "/org-xxxx/findApps",
+        "orgFindApps(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2FfindApps"
+        }
+    ],
+    [
+        "/org-xxxx/invite",
+        "orgInvite(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2Finvite"
+        }
+    ],
+    [
+        "/org-xxxx/removeMember",
+        "orgRemoveMember(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2FremoveMember"
+        }
+    ],
+    [
+        "/org-xxxx/setMemberAccess",
+        "orgSetMemberAccess(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2FsetMemberAccess"
+        }
+    ],
+    [
+        "/org-xxxx/update",
+        "orgUpdate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg-xxxx%2Fupdate"
+        }
+    ],
+    [
+        "/org/new",
+        "orgNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Organizations#API-method%3A-%2Forg%2Fnew",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/project-xxxx/addTags",
+        "projectAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/project-xxxx/clone",
+        "projectClone(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2Fclone"
+        }
+    ],
+    [
+        "/project-xxxx/decreasePermissions",
+        "projectDecreasePermissions(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Project-Permissions-and-Sharing#API-method%3A-%2Fproject-xxxx%2FdecreasePermissions"
+        }
+    ],
+    [
+        "/project-xxxx/describe",
+        "projectDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/project-xxxx/destroy",
+        "projectDestroy(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2Fdestroy"
+        }
+    ],
+    [
+        "/project-xxxx/invite",
+        "projectInvite(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Project-Permissions-and-Sharing#API-method%3A-%2Fproject-xxxx%2Finvite"
+        }
+    ],
+    [
+        "/project-xxxx/leave",
+        "projectLeave(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Project-Permissions-and-Sharing#API-method%3A-%2Fproject-xxxx%2Fleave"
+        }
+    ],
+    [
+        "/project-xxxx/listFolder",
+        "projectListFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FlistFolder"
+        }
+    ],
+    [
+        "/project-xxxx/move",
+        "projectMove(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2Fmove"
+        }
+    ],
+    [
+        "/project-xxxx/newFolder",
+        "projectNewFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FnewFolder"
+        }
+    ],
+    [
+        "/project-xxxx/removeFolder",
+        "projectRemoveFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FremoveFolder"
+        }
+    ],
+    [
+        "/project-xxxx/removeObjects",
+        "projectRemoveObjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FremoveObjects"
+        }
+    ],
+    [
+        "/project-xxxx/removeTags",
+        "projectRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/project-xxxx/renameFolder",
+        "projectRenameFolder(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Folders-and-Deletion#API-method%3A-%2Fclass-xxxx%2FrenameFolder"
+        }
+    ],
+    [
+        "/project-xxxx/setProperties",
+        "projectSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/project-xxxx/transfer",
+        "projectTransfer(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Project-Permissions-and-Sharing#API-method%3A-%2Fproject-xxxx%2Ftransfer"
+        }
+    ],
+    [
+        "/project-xxxx/update",
+        "projectUpdate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2Fupdate"
+        }
+    ],
+    [
+        "/project-xxxx/updateSponsorship",
+        "projectUpdateSponsorship(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject-xxxx%2FupdateSponsorship"
+        }
+    ],
+    [
+        "/project/new",
+        "projectNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Projects#API-method%3A-%2Fproject%2Fnew"
+        }
+    ],
+    [
+        "/record-xxxx/addTags",
+        "recordAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/record-xxxx/addTypes",
+        "recordAddTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FaddTypes"
+        }
+    ],
+    [
+        "/record-xxxx/close",
+        "recordClose(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Data-Object-Lifecycle#API-method%3A-%2Fclass-xxxx%2Fclose"
+        }
+    ],
+    [
+        "/record-xxxx/describe",
+        "recordDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Records#API-method%3A-%2Frecord-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/record-xxxx/getDetails",
+        "recordGetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FgetDetails"
+        }
+    ],
+    [
+        "/record-xxxx/listProjects",
+        "recordListProjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2FlistProjects"
+        }
+    ],
+    [
+        "/record-xxxx/removeTags",
+        "recordRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/record-xxxx/removeTypes",
+        "recordRemoveTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FremoveTypes"
+        }
+    ],
+    [
+        "/record-xxxx/rename",
+        "recordRename(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Name#API-method%3A-%2Fclass-xxxx%2Frename"
+        }
+    ],
+    [
+        "/record-xxxx/setDetails",
+        "recordSetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FsetDetails"
+        }
+    ],
+    [
+        "/record-xxxx/setProperties",
+        "recordSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Properties#API-method%3A-%2Fclass-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/record-xxxx/setVisibility",
+        "recordSetVisibility(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Visibility#API-method%3A-%2Fclass-xxxx%2FsetVisibility"
+        }
+    ],
+    [
+        "/record/new",
+        "recordNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Records#API-method%3A-%2Frecord%2Fnew",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/system/describeDataObjects",
+        "systemDescribeDataObjects(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/System-Methods#API-method:-/system/describeDataObjects"
+        }
+    ],
+    [
+        "/system/describeExecutions",
+        "systemDescribeExecutions(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/System-Methods#API-method:-/system/describeExecutions"
+        }
+    ],
+    [
+        "/system/describeProjects",
+        "systemDescribeProjects(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/System-Methods#API-method:-/system/describeProjects"
+        }
+    ],
+    [
+        "/system/findAffiliates",
+        "systemFindAffiliates(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/system/findApps",
+        "systemFindApps(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindApps"
+        }
+    ],
+    [
+        "/system/findDataObjects",
+        "systemFindDataObjects(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindDataObjects"
+        }
+    ],
+    [
+        "/system/resolveDataObjects",
+        "systemResolveDataObjects(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/System-Methods#API-method:-/system/resolveDataObjects"
+        }
+    ],
+    [
+        "/system/findExecutions",
+        "systemFindExecutions(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindExecutions"
+        }
+    ],
+    [
+        "/system/findAnalyses",
+        "systemFindAnalyses(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindAnalyses"
+        }
+    ],
+    [
+        "/system/findJobs",
+        "systemFindJobs(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindJobs"
+        }
+    ],
+    [
+        "/system/findProjects",
+        "systemFindProjects(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindProjects"
+        }
+    ],
+    [
+        "/system/findUsers",
+        "systemFindUsers(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method%3A-%2Fsystem%2FfindUsers"
+        }
+    ],
+    [
+        "/system/findProjectMembers",
+        "systemFindProjectMembers(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method:-/system/findProjectMembers"
+        }
+    ],
+    [
+        "/system/findOrgs",
+        "systemFindOrgs(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method:-/system/findOrgs"
+        }
+    ],
+    [
+        "/system/globalSearch",
+        "systemGlobalSearch(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Search#API-method:-/system/globalSearch"
+        }
+    ],
+    [
+        "/system/greet",
+        "systemGreet(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/system/headers",
+        "systemHeaders(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/system/shortenURL",
+        "systemShortenURL(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/system/whoami",
+        "systemWhoami(req)",
+        {
+            "objectMethod": false,
+            "retryable": true,
+            "wikiLink": null
+        }
+    ],
+    [
+        "/user-xxxx/describe",
+        "userDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Users#API-method%3A-%2Fuser-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/user-xxxx/update",
+        "userUpdate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Users#API-method%3A-%2Fuser-xxxx%2Fupdate"
+        }
+    ],
+    [
+        "/workflow-xxxx/addStage",
+        "workflowAddStage(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FaddStage"
+        }
+    ],
+    [
+        "/workflow-xxxx/addTags",
+        "workflowAddTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FaddTags"
+        }
+    ],
+    [
+        "/workflow-xxxx/addTypes",
+        "workflowAddTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FaddTypes"
+        }
+    ],
+    [
+        "/workflow-xxxx/close",
+        "workflowClose(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Data-Object-Lifecycle#API-method%3A-%2Fclass-xxxx%2Fclose"
+        }
+    ],
+    [
+        "/workflow-xxxx/describe",
+        "workflowDescribe(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2Fdescribe"
+        }
+    ],
+    [
+        "/workflow-xxxx/dryRun",
+        "workflowDryRun(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FdryRun"
+        }
+    ],
+    [
+        "/workflow-xxxx/getDetails",
+        "workflowGetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FgetDetails"
+        }
+    ],
+    [
+        "/workflow-xxxx/isStageCompatible",
+        "workflowIsStageCompatible(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FisStageCompatible"
+        }
+    ],
+    [
+        "/workflow-xxxx/listProjects",
+        "workflowListProjects(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Cloning#API-method%3A-%2Fclass-xxxx%2FlistProjects"
+        }
+    ],
+    [
+        "/workflow-xxxx/moveStage",
+        "workflowMoveStage(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FmoveStage"
+        }
+    ],
+    [
+        "/workflow-xxxx/overwrite",
+        "workflowOverwrite(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2Foverwrite"
+        }
+    ],
+    [
+        "/workflow-xxxx/removeStage",
+        "workflowRemoveStage(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FremoveStage"
+        }
+    ],
+    [
+        "/workflow-xxxx/removeTags",
+        "workflowRemoveTags(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Tags#API-method%3A-%2Fclass-xxxx%2FremoveTags"
+        }
+    ],
+    [
+        "/workflow-xxxx/removeTypes",
+        "workflowRemoveTypes(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Types#API-method%3A-%2Fclass-xxxx%2FremoveTypes"
+        }
+    ],
+    [
+        "/workflow-xxxx/rename",
+        "workflowRename(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Name#API-method%3A-%2Fclass-xxxx%2Frename"
+        }
+    ],
+    [
+        "/workflow-xxxx/run",
+        "workflowRun(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2Frun",
+            "acceptNonce": true
+        }
+    ],
+    [
+        "/workflow-xxxx/setDetails",
+        "workflowSetDetails(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Details-and-Links#API-method%3A-%2Fclass-xxxx%2FsetDetails"
+        }
+    ],
+    [
+        "/workflow-xxxx/setProperties",
+        "workflowSetProperties(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Properties#API-method%3A-%2Fclass-xxxx%2FsetProperties"
+        }
+    ],
+    [
+        "/workflow-xxxx/setStageInputs",
+        "workflowSetStageInputs(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FsetStageInputs"
+        }
+    ],
+    [
+        "/workflow-xxxx/setVisibility",
+        "workflowSetVisibility(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Visibility#API-method%3A-%2Fclass-xxxx%2FsetVisibility"
+        }
+    ],
+    [
+        "/workflow-xxxx/update",
+        "workflowUpdate(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2Fupdate"
+        }
+    ],
+    [
+        "/workflow-xxxx/updateStageExecutable",
+        "workflowUpdateStageExecutable(req, objectId)",
+        {
+            "objectMethod": true,
+            "retryable": true,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow-xxxx%2FupdateStageExecutable"
+        }
+    ],
+    [
+        "/workflow/new",
+        "workflowNew(req)",
+        {
+            "objectMethod": false,
+            "retryable": false,
+            "wikiLink": "https://wiki.dnanexus.com/API-Specification-v1.0.0/Workflows-and-Analyses#API-method%3A-%2Fworkflow%2Fnew",
+            "acceptNonce": true
+        }
+    ]
+]

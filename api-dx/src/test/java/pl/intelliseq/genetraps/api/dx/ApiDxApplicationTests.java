@@ -12,6 +12,7 @@ import pl.intelliseq.genetraps.api.dx.parser.DxJob;
 import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

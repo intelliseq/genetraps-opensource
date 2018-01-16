@@ -1,0 +1,17 @@
+[console_scripts]
+dx = dxpy.scripts.dx:main
+dx-app-wizard = dxpy.scripts.dx_app_wizard:main
+dx-build-app = dxpy.scripts.dx_build_app:main
+dx-build-applet = dxpy.scripts.dx_build_applet:main
+dx-build-asset = dxpy.scripts.dx_build_asset:main
+dx-build-report-html = dxpy.scripts.dx_build_report_html:main
+dx-genes-to-gff = dxpy.scripts.dx_genes_to_gff:main
+dx-genes-to-gtf = dxpy.scripts.dx_genes_to_gtf:main
+dx-gtable-to-csv = dxpy.scripts.dx_gtable_to_csv:main
+dx-gtable-to-tsv = dxpy.scripts.dx_gtable_to_tsv:main
+dx-mappings-to-fastq = dxpy.scripts.dx_mappings_to_fastq:main
+dx-mappings-to-sam = dxpy.scripts.dx_mappings_to_sam:main
+dx-reads-to-fastq = dxpy.scripts.dx_reads_to_fastq:main
+dx-spans-to-bed = dxpy.scripts.dx_spans_to_bed:main
+dx-variants-to-vcf = dxpy.scripts.dx_variants_to_vcf:main
+

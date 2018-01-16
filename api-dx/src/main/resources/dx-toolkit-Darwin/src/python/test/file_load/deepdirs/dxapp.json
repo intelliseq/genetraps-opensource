@@ -1,0 +1,22 @@
+{ "name": "deepdirs",
+  "title": "deepdirs",
+  "summary" : "uploading deep directories in the output",
+  "runSpec": {
+    "file": "run.sh",
+    "interpreter": "bash",
+    "distribution": "Ubuntu",
+    "release": "14.04"
+  },
+  "inputSpec": [
+    {"name": "seq", "class": "file", "optional": true}
+  ],
+  "outputSpec": [
+    {"name": "genes", "class": "array:file"},
+    {"name": "phenotypes", "class": "array:file"},
+    {"name": "report", "class": "file"},
+    {"name": "helix", "class": "file"}
+  ],
+  "access": {
+    "network": ["*"]
+  }
+}

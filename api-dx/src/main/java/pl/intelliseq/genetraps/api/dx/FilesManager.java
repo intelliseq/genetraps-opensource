@@ -3,6 +3,7 @@ package pl.intelliseq.genetraps.api.dx;
 import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +34,7 @@ public class FilesManager {
         String command = "dx ls --folders | grep -Eo \"^([0-9]+)\"";
         String response = DxRunner.runCommand(command);
         if(response.equals("")){
-            return null;
+            return new LinkedList<>();
         }
         List<Integer> list = Arrays.stream(response.split("\n")).map(Integer::valueOf).sorted().collect(Collectors.toList());
         return list;
