@@ -12,11 +12,13 @@ import java.util.Map;
 public class UrlFetcherJob {
 
     private String url;
+    private String sampleNumber;
     private String id;
 
-    public UrlFetcherJob(String url)  {
+    public UrlFetcherJob(String url, String sampleNumber)  {
         this.url = url;
-        this.id = RunUrlFetcherApp(this.url);
+        this.sampleNumber = sampleNumber;
+        this.id = RunUrlFetcherApp(url);
     }
 
     public String RunUrlFetcherApp(String url) {
@@ -24,7 +26,7 @@ public class UrlFetcherJob {
         String id = null;
         String scriptPath = Paths.RUN_URL_FETCHER.getPath();
 
-        ProcessBuilder pb = new ProcessBuilder(scriptPath, url);
+        ProcessBuilder pb = new ProcessBuilder(scriptPath, url, sampleNumber);
         Map<String, String> env = pb.environment();
         
         try {

@@ -16,8 +16,8 @@ public class UploadController {
 	private FilesManager filesManager;
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam String url){
-        UrlFetcherJob urlFetcherJob = new UrlFetcherJob(url);
+    public String upload(@RequestParam String url, @RequestParam String sampleNumber){
+        UrlFetcherJob urlFetcherJob = new UrlFetcherJob(url, sampleNumber);
         return "{\"id\":\""+urlFetcherJob.getId()+"\"}";
     }
 
