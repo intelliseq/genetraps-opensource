@@ -13,16 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import pl.intelliseq.genetraps.api.dx.parser.DxJob;
-import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
 
-import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 

@@ -1,4 +1,4 @@
-package pl.intelliseq.genetraps.api.dx.parser;
+package pl.intelliseq.genetraps.api.dx.exceptions;
 
 @SuppressWarnings("serial")
 public class DxRunnerException extends RuntimeException {

@@ -18,12 +18,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import pl.intelliseq.genetraps.api.dx.enums.JobStates;
+import pl.intelliseq.genetraps.api.dx.exceptions.IseqParseException;
+import pl.intelliseq.genetraps.api.dx.models.IseqJSON;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(SpringRunner.class)
@@ -70,13 +69,22 @@ public class UploadTests {
 
         try{
             JobStates jobState;
+            IseqJSON iseqJSON;
             do {
-                response = this.restTemplate.getForObject("/state/{jobId}", String.class, jobId);
-                String state = (String) ((JSONObject) jsonParser.parse(response)).get("state");
+                response = this.restTemplate.getForObject("/describe/{id}", String.class, jobId);
+                iseqJSON = new IseqJSON(response);
+                String state = iseqJSON.getString("state");
                 jobState = JobStates.getEnum(state);
                 Thread.sleep(5000);
-            }while (jobState != JobStates.DONE) ;
-        }catch (InterruptedException | ParseException e){
+            }while (jobState != JobStates.DONE);
+            String fileId = iseqJSON.getIseqJSON("output").getIseqJSON("file").getString("$dnanexus_link");
+            response = this.restTemplate.getForObject("/describe/{id}", String.class, fileId);
+            try{
+                new IseqJSON(response);
+            } catch (IseqParseException e){
+                fail("File don't exists");
+            }
+        }catch (InterruptedException e){
             throw new RuntimeException(e);
         }
 

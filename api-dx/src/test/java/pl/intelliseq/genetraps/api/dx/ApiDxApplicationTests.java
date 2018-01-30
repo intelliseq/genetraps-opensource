@@ -8,18 +8,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.intelliseq.genetraps.api.dx.parser.DxJob;
-import pl.intelliseq.genetraps.api.dx.parser.DxRunner;
+import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
+import pl.intelliseq.genetraps.api.dx.helpers.ProcessManager;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SpringRunner.class)
@@ -33,7 +32,10 @@ public class ApiDxApplicationTests {
 
 	@Autowired
 	private FilesManager filesManager;
-	
+
+	@Autowired
+	private ProcessManager processManager;
+
 	@Test
 	public void contextLoads() {
 	}
@@ -61,7 +63,7 @@ public class ApiDxApplicationTests {
 		IntStream.range(0,10).forEach(i -> threadPoolExecutor.execute(new MkDirRunnable(i)));
 
 		while (threadPoolExecutor.getTaskCount()!=threadPoolExecutor.getCompletedTaskCount()){
-			System.err.println("count="+threadPoolExecutor.getTaskCount()+","+threadPoolExecutor.getCompletedTaskCount());
+			log.debug("count="+threadPoolExecutor.getTaskCount()+","+threadPoolExecutor.getCompletedTaskCount());
 			Thread.sleep(5000);
 		}
 		threadPoolExecutor.shutdown();
@@ -78,7 +80,7 @@ public class ApiDxApplicationTests {
             Integer selected = lowest/2;
             filesManager.resetCounter();
             log.info(String.format("Lowest: %d Selected: %d", lowest, selected));
-            DxRunner.runCommand("dx rmdir "+selected);
+            processManager.runCommand("dx rmdir "+selected);
             log.info("Check if lowest index is "+selected);
             assertEquals(filesManager.getLowestFreeIndex(), selected);
             assertEquals(filesManager.mkdir(), selected);
@@ -100,35 +102,35 @@ public class ApiDxApplicationTests {
 		assertThat(body.contains("Job ID"));
 	}
 	
-	//@Test
-	public void dxTest() throws IOException, InterruptedException {
-    	String result = DxRunner.runCommand("printf \"Y\\n\" | dx run touch -iname=test");
-    	
-    	//log.info("Result: " + result);
-    	//log.info("Result: " + this.getJobId(result + "\ntadam"));
-    	
-    	String jobId = this.getJobId(result);
-    	
-    	//log.info(DxJob.getDxJobById(jobId)); 
-    	
-    	for (int i = 1; i <= 30; i++) {
-    		log.info("i: " + i);
-    		Thread.sleep(500);
-    		log.info(DxJob.getDxJobById(jobId));
-    	}
-	}
-
-	private String getJobId(String result) {
-		try {
-			int indexOfJobId = result.indexOf("Job ID") + 8;
-			int endIndexOfJobId = result.substring(indexOfJobId).indexOf("\n");
-			if (endIndexOfJobId == -1) {
-				return result.substring(indexOfJobId);
-			}
-			return result.substring(indexOfJobId, indexOfJobId + endIndexOfJobId);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+//	//@Test
+//	public void dxTest() throws IOException, InterruptedException {
+//    	String result = processManager.runCommand("printf \"Y\\n\" | dx run touch -iname=test");
+//
+//    	//log.info("Result: " + result);
+//    	//log.info("Result: " + this.getJobId(result + "\ntadam"));
+//
+//    	String jobId = this.getJobId(result);
+//
+//    	//log.info(DxJob.getDxJobById(jobId));
+//
+//    	for (int i = 1; i <= 30; i++) {
+//    		log.info("i: " + i);
+//    		Thread.sleep(500);
+//    		log.info(DxJob.getDxJobById(jobId));
+//    	}
+//	}
+//
+//	private String getJobId(String result) {
+//		try {
+//			int indexOfJobId = result.indexOf("Job ID") + 8;
+//			int endIndexOfJobId = result.substring(indexOfJobId).indexOf("\n");
+//			if (endIndexOfJobId == -1) {
+//				return result.substring(indexOfJobId);
+//			}
+//			return result.substring(indexOfJobId, indexOfJobId + endIndexOfJobId);
+//		} catch (Exception e) {
+//			return null;
+//		}
+//	}
 	
 }

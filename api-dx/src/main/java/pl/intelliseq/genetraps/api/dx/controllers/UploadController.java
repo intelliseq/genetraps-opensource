@@ -3,29 +3,28 @@ package pl.intelliseq.genetraps.api.dx.controllers;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.intelliseq.genetraps.api.dx.FilesManager;
-import pl.intelliseq.genetraps.api.dx.models.UrlFetcherJob;
-import pl.intelliseq.genetraps.api.dx.models.UrlFetcherState;
+import pl.intelliseq.genetraps.api.dx.helpers.ProcessManager;
+import pl.intelliseq.genetraps.api.dx.models.IseqJSON;
 
 @RestController
 public class UploadController {
 
-	Logger log = Logger.getLogger(UploadController.class);
+	private Logger log = Logger.getLogger(UploadController.class);
 
 	@Autowired
-	private FilesManager filesManager;
+    private ProcessManager processManager;
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String upload(@RequestParam String url, @RequestParam String sampleNumber){
-        UrlFetcherJob urlFetcherJob = new UrlFetcherJob(url, sampleNumber);
-        return "{\"id\":\""+urlFetcherJob.getId()+"\"}";
+    public String upload(
+            @RequestParam String url,
+            @RequestParam String sampleNumber,
+            @RequestParam(required = false) String tag){
+        return new IseqJSON("id", processManager.runUrlFetch(url, sampleNumber, tag)).toString();
     }
 
-    @RequestMapping(value = "/state/{jobId}", method = RequestMethod.GET)
-    public String state(@PathVariable String jobId){
-        log.info("Controller Job id:"+jobId);
-        UrlFetcherState urlFetcherState = new UrlFetcherState(jobId);
-        return "{\"state\":\""+urlFetcherState.getState()+"\"}";
+    @RequestMapping(value = "/describe/{id}", method = RequestMethod.GET)
+    public String describe(@PathVariable String id){
+        return processManager.runJSONDescribe(id).toString();
 
     }
     
