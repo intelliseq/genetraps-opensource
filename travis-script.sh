@@ -78,8 +78,8 @@ echo `ecs-cli ps --ecs-profile genetraps`
 echo `ecs-cli ps --aws-profile genetraps`
 
 TAG_API_DX=`ls -alR --full-time api-dx/ -Ibin -Ibuild -I.* | sha1sum | cut -d " " -f1`
-TAG_CLIENT_EXPLORARE=`ls -alR --full-time client-explorare/ -Inode_modules -Idist -Ietc -I.* | sha1sum | cut -d " " -f1`
-TAG_CLIENT_DNATOKEN=`ls -alR --full-time client-dnatoken/ -Inode_modules -Idist -Ietc -I.* | sha1sum | cut -d " " -f1`
+TAG_CLIENT_EXPLORARE=`ls -alR --full-time client-explorare/ -Inode_modules -Idist -Ietc -I.* | tr -s ' ' | cut -f1-5,9 | sha1sum | cut -d " " -f1`
+TAG_CLIENT_DNATOKEN=`ls -alR --full-time client-dnatoken/ -Inode_modules -Idist -Ietc -I.* | tr -s ' ' | cut -f1-5,9 | sha1sum | cut -d " " -f1`
 #echo $TAG_API_DX
 #echo $TAG_CLIENT_EXPLORARE
 IMAGE_API_DX=pl.intelliseq.genetraps.api.dx/api-dx:latest
@@ -97,9 +97,9 @@ ecs-cli push $TAG_CLIENT_EXPLORARE --ecs-profile genetraps
 ecs-cli push $TAG_CLIENT_DNATOKEN --ecs-profile genetraps
 #echo $TAG_CLIENT_EXPLORARE 
 cat aws-conf/docker-compose-template.yml | sed 's@clientExplorareImageTag@'"$TAG_CLIENT_EXPLORARE"'@' > docker-compose.yml
-ecs-cli compose --project-name genetraps-client-explorare -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:"$AWS_ACCOUNT_ID":targetgroup/genetraps-explorare-client/"$AWS_GENETRAPS_TARGET_GROUP --container-name client-explorare --container-port 8081 --ecs-profile genetraps
+ecs-cli compose --project-name genetraps-client-explorare -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:"$AWS_ACCOUNT_ID":targetgroup/genetraps-explorare-client/"$AWS_CLIENT_EXPLORAE_TARGET_GROUP --container-name client-explorare --container-port 8081 --ecs-profile genetraps
 cat aws-conf/docker-compose-template.yml | sed 's@clientDnatokenImageTag@'"$TAG_CLIENT_DNATOKEN"'@' > docker-compose.yml
-ecs-cli compose --project-name genetraps-client-dnatoken -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:"$AWS_ACCOUNT_ID":targetgroup/genetraps-dnatoken-client/"$AWS_GENETRAPS_TARGET_GROUP --container-name client-dnatoken --container-port 8083 --ecs-profile genetraps
+ecs-cli compose --project-name genetraps-client-dnatoken -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:"$AWS_ACCOUNT_ID":targetgroup/genetraps-dnatoken-client/"$AWS_CLIENT_DNATOKEN_TARGET_GROUP --container-name client-dnatoken --container-port 8083 --ecs-profile genetraps
 
 #./scripts/update-repo.sh
 
