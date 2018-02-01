@@ -10,3 +10,13 @@ services:
         awslogs-group: GENETRAPS_DEV_LOG_GROUP
         awslogs-region: us-east-1
         awslogs-stream-prefix: clientexplorare
+  client-dnatoken:
+    image: clientDnatokenImageTag
+    ports:
+      - "8083:8083"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: GENETRAPS_DEV_LOG_GROUP
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: clientdnatoken
