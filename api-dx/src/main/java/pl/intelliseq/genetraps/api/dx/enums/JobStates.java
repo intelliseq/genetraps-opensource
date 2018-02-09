@@ -1,5 +1,7 @@
 package pl.intelliseq.genetraps.api.dx.enums;
 
+import org.apache.log4j.Logger;
+
 public enum JobStates {
     IDLE("idle"),
     RUNNABLE("runnable"),
@@ -7,6 +9,8 @@ public enum JobStates {
     DONE("done"),
     WAITING_ON_INPUT("waiting_for_input"),
     WAITING_ON_OUTPUT("waiting_on_output");
+
+    private static Logger log = Logger.getLogger(JobStates.class);
 
     private String name;
 
@@ -25,6 +29,7 @@ public enum JobStates {
                 return jobStates;
             }
         }
+        log.error("IllegalArgumentException: "+name);
         throw new IllegalArgumentException();
     }
 }

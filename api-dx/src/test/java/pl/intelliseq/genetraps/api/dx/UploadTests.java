@@ -34,39 +34,11 @@ public class UploadTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-    public String sampleUrl = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeGencodeV11/supplemental/gencode.v11.tRNAs.gtf.gz";
+    public String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
+    public String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
 
-    @Test
-    public void upload(){
-        JSONParser jsonParser = new JSONParser();
-
-
-        HttpHeaders uploadHeaders = new HttpHeaders();
-        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
-        uploadValueMap.add("url", sampleUrl);
-        uploadValueMap.add("sampleNumber", "1");
-
-        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
-
-        String response = this.restTemplate.postForObject("/upload", uploadEntity, String.class);
-        System.out.println(response);
-//        String jobId = response.substring(7,response.length()-2);
-
-        String jobId = null;
-        try {
-            jobId = (String) ((JSONObject) jsonParser.parse(response)).get("id");
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
-
-        /**
-         * Check state
-         */
-
+    public IseqJSON waitUntilJobIsDone(String jobId){
+        String response;
         try{
             JobStates jobState;
             IseqJSON iseqJSON;
@@ -77,17 +49,83 @@ public class UploadTests {
                 jobState = JobStates.getEnum(state);
                 Thread.sleep(5000);
             }while (jobState != JobStates.DONE);
-            String fileId = iseqJSON.getIseqJSON("output").getIseqJSON("file").getString("$dnanexus_link");
-            response = this.restTemplate.getForObject("/describe/{id}", String.class, fileId);
-            try{
-                new IseqJSON(response);
-            } catch (IseqParseException e){
-                fail("File don't exists");
-            }
+            return iseqJSON;
         }catch (InterruptedException e){
             throw new RuntimeException(e);
         }
+    }
 
+    public IseqJSON upload(String sampleUrl, Integer sampleNumber, String... tags){
+        HttpHeaders uploadHeaders = new HttpHeaders();
+        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
+        uploadValueMap.add("url", sampleUrl);
+        uploadValueMap.add("sampleNumber", sampleNumber.toString());
+        for(String tag:tags){
+            uploadValueMap.add("tags", tag);
+        }
+
+        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
+
+        String response = this.restTemplate.postForObject("/upload", uploadEntity, String.class);
+        String jobId = new IseqJSON(response).getString("id");
+
+        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
+
+        IseqJSON jobResponse = waitUntilJobIsDone(jobId);
+
+        String fileId = jobResponse.getIseqJSON("output").getIseqJSON("file").getString("$dnanexus_link");
+        return new IseqJSON(this.restTemplate.getForObject("/describe/{id}", String.class, fileId));
+    }
+
+    public IseqJSON fastqc(String fileId){
+        HttpHeaders uploadHeaders = new HttpHeaders();
+        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
+        uploadValueMap.add("fileId", fileId);
+
+        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
+
+        String response = this.restTemplate.postForObject("/fastqc", uploadEntity, String.class);
+        String jobId = new IseqJSON(response).getString("id");
+
+        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
+
+        return waitUntilJobIsDone(jobId);
+    }
+
+    public IseqJSON bwa(String left, String right, String outputFolder){
+        HttpHeaders uploadHeaders = new HttpHeaders();
+        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
+        uploadValueMap.add("left", left);
+        uploadValueMap.add("right", right);
+        uploadValueMap.add("outputFolder", outputFolder);
+
+        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
+
+        String response = this.restTemplate.postForObject("/bwa", uploadEntity, String.class);
+        String jobId = new IseqJSON(response).getString("id");
+
+        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
+
+        return waitUntilJobIsDone(jobId);
+    }
+
+    @Test
+    public void upload(){
+        IseqJSON file1 = upload(sampleLeft, 1, "left");
+        String file1Id = file1.getString("id");
+        String file1Folder = file1.getString("folder").replace("/rawdata", "");
+        String file2Id = upload(sampleRight, 1, "right").getString("id");
+
+        log.info(bwa(file1Id, file2Id, file1Folder));
+
+        log.info(fastqc(file1Id));
+        log.info(fastqc(file2Id));
     }
 
 
