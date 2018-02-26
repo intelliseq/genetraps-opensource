@@ -16,19 +16,19 @@
 
 curl localhost:8080/hello
 
-curl -X POST localhost:8080/upload?url=http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz&tag=left
-**To check job id, and get file id**
+curl -X POST localhost:8080/upload?url=http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz&tag=left \
+**To check job id, and get file id** \
 curl localhost:8080/describe/{**job1id**}
 
-curl -X POST localhost:8080/upload?url=http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz&tag=right
+curl -X POST localhost:8080/upload?url=http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz&tag=right \
 curl localhost:8080/describe/{**job2id**}
 
-curl -X POST localhost:8080/fastqc?fileId=**file1id**
+curl -X POST localhost:8080/fastqc?fileId=**file1id** \
 curl localhost:8080/describe/{**job3id**}
 
-curl -X POST localhost:8080/fastqc?fileId=**file2id**
+curl -X POST localhost:8080/fastqc?fileId=**file2id** \
 curl localhost:8080/describe/{**job4id**}
 
-**To get output folder, get folder json from describe, and delete "/rawdata" at the end**
-curl localhost:8080/describe/{**file1id**}
+**To get output folder, get folder json from describe, and delete "/rawdata" at the end** \
+curl localhost:8080/describe/{**file1id**} \
 curl -X POST localhost:8080/bwa?left=**file1id**&right=**file2id**&outputFolder=**outputFolder**
