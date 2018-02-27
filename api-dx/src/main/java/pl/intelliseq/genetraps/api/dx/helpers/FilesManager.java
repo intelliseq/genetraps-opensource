@@ -32,7 +32,7 @@ public class FilesManager {
     }
 
     public List<Integer> getNumericDirectories(){
-        String command = "dx ls --folders | grep -Eo \"^([0-9]+)\"";
+        String command = "dx ls --folders samples | grep -Eo \"^([0-9]+)\"";
         String response = processManager.runCommand(command);
         if(response.equals("")){
             return new LinkedList<>();
@@ -42,7 +42,7 @@ public class FilesManager {
 
     public Integer getLowestFreeIndex(){
         List<Integer> intList = getNumericDirectories();
-        if(intList == null){
+        if(intList == null || intList.size() == 0){
             return 0;
         } else if(intList.size() == intList.get(intList.size()-1)){
             return intList.size() +1;

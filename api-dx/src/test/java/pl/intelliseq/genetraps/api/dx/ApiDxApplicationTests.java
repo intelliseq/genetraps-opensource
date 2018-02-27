@@ -80,7 +80,7 @@ public class ApiDxApplicationTests {
             Integer selected = lowest/2;
             filesManager.resetCounter();
             log.info(String.format("Lowest: %d Selected: %d", lowest, selected));
-            processManager.runCommand("dx rmdir "+selected);
+            processManager.runCommand("dx rmdir samples/"+selected);
             log.info("Check if lowest index is "+selected);
             assertEquals(filesManager.getLowestFreeIndex(), selected);
             assertEquals(filesManager.mkdir(), selected);

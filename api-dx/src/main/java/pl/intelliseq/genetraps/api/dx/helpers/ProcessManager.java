@@ -35,6 +35,7 @@ public class ProcessManager {
 
     public String runCommand(String command) {
         ProcessBuilder builder = new ProcessBuilder();
+        log.info("Command:\t"+command);
         builder.command("sh", "-c", command);
         Process p;
         String result;
@@ -59,7 +60,7 @@ public class ProcessManager {
     }
 
     public String runMkdir(String args){
-        return runCommand("dx mkdir "+args);
+        return runCommand("dx mkdir samples/"+args);
     }
 
     public IseqJSON runJSONDescribe(String args){
