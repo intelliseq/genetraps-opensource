@@ -25,6 +25,17 @@ paths:
           description: Response "ok" whes server is up
           schema: 
             $ref: '#/definitions/Status'
+    post:
+      description: The basic hook to check if server is alive. Response with given name.
+      parameters:
+        - in: query
+          name: name
+          type: string
+          required: true
+          description: the name to be returned
+      responses:
+        200:
+          description: Hello %name
   /touch:
     get:
       description: touch
@@ -39,6 +50,83 @@ paths:
           description: The name of the directory
           schema: 
             $ref: '#/definitions/Mkdir'
+  /upload:
+    post:
+      description: Upload a file on the server.
+      parameters:
+        - in: query
+          name: url
+          type: string
+          required: true
+          description: Url of file to download
+        - in: query
+          name: sampleNumber
+          type: string
+          required: true
+          description: Sample number
+        - in: query
+          name: force
+          type: boolean
+          description: ingore regex
+        - in: query
+          name: tags
+          type: string
+          description: tags to the sample
+      responses:
+        200:
+          description: id of job
+          schema:
+            $ref: '#/definitions/JobId'
+  /describe/{id}:
+    get:
+      description: Returns a JSON description of job/file
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: id of file or job.
+      responses:
+        200:
+          description: JSON with results
+  /fastqc:
+    post:
+      description: Make fastqc analysis
+      parameters: 
+        - in: query
+          name: id
+          type: string
+          required: true
+          description: Id of file
+      responses:
+        200:
+          description: id of job
+          schema:
+            $ref: '#/definitions/JobId'
+  /bwa:
+    post:
+      description: Run bwa app on given file
+      parameters:
+        - in: query
+          name: left
+          type: string
+          required: true
+          description: Id of left file
+        - in: query
+          name: right
+          type: string
+          required: true
+          description: Id of right file
+        - in: query
+          name: outputFolder
+          type: string
+          required: true
+          description: path to output folder
+      responses:
+        200:
+          description: id of job
+          schema:
+            $ref: '#/definitions/JobId'
 definitions:
   Status:
     properties:
@@ -49,3 +137,7 @@ definitions:
       response:
         type: integer
         format: int64
+  JobId:
+    properties:
+      response:
+        type: string
