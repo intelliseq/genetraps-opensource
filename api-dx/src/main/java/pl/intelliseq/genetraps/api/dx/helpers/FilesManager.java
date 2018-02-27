@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -16,14 +17,19 @@ public class FilesManager {
     @Autowired
     private ProcessManager processManager;
 
+    private Logger log = Logger.getLogger(FilesManager.class);
+
     private AtomicInteger counter = new AtomicInteger(1);
 
     public synchronized Integer mkdir(){
-        String response = processManager.runMkdir(String.valueOf(counter.get()));
+        log.info("Counter: "+counter);
+        String response = processManager.runCommand("dx ls --folders samples | grep -Eo "+counter);
+        log.info("Response: "+response);
         if(!response.equals("")) {
             counter.set(getLowestFreeIndex());
             processManager.runMkdir(String.valueOf(counter.get()));
         }
+        processManager.runMkdir(String.valueOf(counter.get()));
         return counter.getAndIncrement();
     }
 
@@ -41,15 +47,20 @@ public class FilesManager {
     }
 
     public Integer getLowestFreeIndex(){
+        log.info("Getting lowest free index");
         List<Integer> intList = getNumericDirectories();
         if(intList == null || intList.size() == 0){
-            return 0;
+            log.info("Lowest index: "+1);
+            return 1;
         } else if(intList.size() == intList.get(intList.size()-1)){
+            log.info("Lowest index: "+(intList.size()+1));
             return intList.size() +1;
         }
         /**
          * Bierzemy najniższy
          */
-        return IntStream.rangeClosed(1, intList.size()).filter(i -> !intList.contains(i)).sorted().boxed().collect(Collectors.toList()).get(0);
+        Integer index = IntStream.rangeClosed(1, intList.size()).filter(i -> !intList.contains(i)).sorted().boxed().collect(Collectors.toList()).get(0);
+        log.info("Lowest index: "+index);
+        return index;
     }
 }

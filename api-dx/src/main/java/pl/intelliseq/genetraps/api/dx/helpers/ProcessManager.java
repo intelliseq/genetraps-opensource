@@ -60,7 +60,7 @@ public class ProcessManager {
     }
 
     public String runMkdir(String args){
-        return runCommand("dx mkdir samples/"+args);
+        return runCommand("dx mkdir -p samples/"+args);
     }
 
     public IseqJSON runJSONDescribe(String args){
@@ -74,7 +74,7 @@ public class ProcessManager {
 
     public String runUrlFetch(String inputUrl, String sampleNumber, String... tags){
         //TODO: tag
-        log.info(tags);
+//        log.info(tags);
         StringBuilder command = new StringBuilder("dx run url_fetcher");
         for(String tag:tags){
             command.append(" -i tags=").append(tag);
