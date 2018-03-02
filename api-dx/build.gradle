@@ -23,7 +23,7 @@ apply plugin: 'com.palantir.docker'
 
 group = 'pl.intelliseq.genetraps.api.dx'
 version = 'latest'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.9
 
 jar {
 	baseName = 'api-dx'
@@ -39,9 +39,11 @@ repositories {
 
 dependencies {
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
-	compile('org.springframework.boot:spring-boot-starter-web')
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    compile('org.springframework.boot:spring-boot-starter-web')
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 }
 
 docker {
