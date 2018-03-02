@@ -32,3 +32,12 @@ curl localhost:8080/describe/{**job4id**}
 **To get output folder, get folder json from describe, and delete "/rawdata" at the end** \
 curl localhost:8080/describe/{**file1id**} \
 curl -X POST localhost:8080/bwa?left=**file1id**&right=**file2id**&outputFolder=**outputFolder**
+
+# Project Setup
+## Set environment variables
+```
+AWS_ACCESS_KEY_ID  
+AWS_PROFILE  
+AWS_REGION  
+AWS_SECRET_ACCESS_KEY
+```
