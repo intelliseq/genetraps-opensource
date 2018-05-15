@@ -80,6 +80,7 @@ public class ProcessManager {
             command.append(" -i tags=").append(tag);
         }
         command.append(String.format(" -i url=\"%s\" --folder=\"samples/%s/rawdata\"", inputUrl, sampleNumber));
+        log.info(command);
         return runCommandAndGetJobId(command.toString());
     }
 

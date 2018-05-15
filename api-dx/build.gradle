@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M6'
+		springBootVersion = '2.0.2.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -10,7 +10,7 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.13.0')
+		classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.19.2')
 	}
 }
 
@@ -44,6 +44,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+	compile group: 'log4j', name: 'log4j', version: '1.2.16'
 }
 
 docker {

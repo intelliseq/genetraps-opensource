@@ -122,10 +122,10 @@ public class UploadTests {
         String file1Folder = file1.getString("folder").replace("/rawdata", "");
         String file2Id = upload(sampleRight, 1, "right").getString("id");
 
-        log.info(bwa(file1Id, file2Id, file1Folder));
+//        log.info(bwa(file1Id, file2Id, file1Folder));
 
-        log.info(fastqc(file1Id));
-        log.info(fastqc(file2Id));
+//        log.info(fastqc(file1Id));
+//        log.info(fastqc(file2Id));
     }
 
 
