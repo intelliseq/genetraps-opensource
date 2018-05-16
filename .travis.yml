@@ -16,6 +16,7 @@ before_install:
   - sudo apt-get install python-pip python-dev build-essential
   - sudo -H pip install pip --upgrade
   - sudo -H pip install awscli --upgrade
+  - sudo -H pip install 'requests[security]'
   - sudo -H pip install dxpy --upgrade
   - mkdir ~/.aws
   - printf "[kms]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY > ~/.aws/credentials
