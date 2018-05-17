@@ -11,7 +11,7 @@ workflow fastqc {
     }
 }
 
-task run_fastqc {
+task iseq_fastqc {
     File fastq_file
     command <<<
     mkdir /tmp/fastqc
@@ -21,7 +21,7 @@ task run_fastqc {
     unzip -p /tmp/fastqc/*.zip */fastqc_data.txt > summary_txt
     >>>
     runtime {
-        docker: "alexcoppe/fastqc"
+        docker: "intelliseq/fastqc"
     }
     output {
         File summary_html = "summary_html"
