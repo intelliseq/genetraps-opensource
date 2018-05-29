@@ -23,7 +23,7 @@ apply plugin: 'com.palantir.docker'
 
 group = 'pl.intelliseq.genetraps.api.dx'
 version = 'latest'
-sourceCompatibility = 1.9
+sourceCompatibility = 10
 
 jar {
 	baseName = 'api-dx'
@@ -45,6 +45,10 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 	compile group: 'log4j', name: 'log4j', version: '1.2.16'
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+	compile group: 'commons-io', name: 'commons-io', version: '2.5'
+	compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
+	compile group: 'com.google.guava', name: 'guava', version: '18.0'
 }
 
 docker {

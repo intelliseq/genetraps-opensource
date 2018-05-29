@@ -1,6 +1,7 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
 import org.apache.log4j.Logger;
+import pl.intelliseq.genetraps.api.dx.IProcessManager;
 import pl.intelliseq.genetraps.api.dx.exceptions.DxRunnerException;
 import pl.intelliseq.genetraps.api.dx.models.IseqJSON;
 
@@ -11,7 +12,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
-public class ProcessManager {
+
+public class ProcessManager implements IProcessManager {
     private Logger log = Logger.getLogger(ProcessManager.class);
 
     private void dumpProcessInfo(ProcessHandle ph){
@@ -85,7 +87,7 @@ public class ProcessManager {
     }
 
     public String runBwa(String left, String right, String outputFolder){
-        String command = String.format("dx run bwa_mem_fastq_read_mapper -i reads_fastqgz=%s -i reads2_fastqgz=%s -i genomeindex_targz=project-BQpp3Y804Y0xbyG4GJPQ01xv:file-BFBy4G805pXZKqV1ZVGQ0FG8 --destination %s", left, right, outputFolder);
+        String command = String.format("dx run bwa_mem_fastq_read_mapper -i reads_fastqgzs=%s -i reads2_fastqgzs=%s -i genomeindex_targz=project-BQpp3Y804Y0xbyG4GJPQ01xv:file-BFBy4G805pXZKqV1ZVGQ0FG8 --destination %s", left, right, outputFolder);
         return runCommandAndGetJobId(command);
     }
 }

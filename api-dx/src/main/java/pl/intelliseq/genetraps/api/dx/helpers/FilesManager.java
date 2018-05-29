@@ -33,6 +33,10 @@ public class FilesManager {
         return counter.getAndIncrement();
     }
 
+    public Integer getAndIncrement(){
+        return counter.getAndIncrement();
+    }
+
     public void resetCounter(){
         counter.set(1);
     }
