@@ -2,6 +2,7 @@ package pl.intelliseq.genetraps.api.dx;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 import pl.intelliseq.genetraps.api.dx.helpers.ProcessManager;
 
@@ -16,4 +17,8 @@ public class BeansConfiguration {
     }
     @Bean
     ProcessManager processManager(){ return new ProcessManager(); }
+    @Bean
+    DxApiProcessManager dxApiProcessManager(){
+        return new DxApiProcessManager();
+    }
 }
