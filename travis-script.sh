@@ -2,12 +2,15 @@ LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 
 echo $LOG_PREFIX"Starting travis script"
-source scripts/get-secrets.sh kms-store
-echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN | cut -c1-5`
-printf "0\n" | dx login --token $DNANEXUS_TOKEN
-dx rm -r -a /
-ls dx-apps/ | xargs -I {} bash -c "dx build dx-apps/{}"
-#echo `dx ls`
+source scripts/get-secrets.sh
+echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
+printf "0\n" | dx login --token $DNANEXUS_TOKEN_TEST
+
+
+echo $LOG_PREFIX"Cleaning DNANEXUS test space"
+#dx rm -r -a /
+#ls dx-apps/ | xargs -I {} bash -c "dx build dx-apps/{}"
+echo `dx ls`
 
 ### checking for errors
 function check {
@@ -24,13 +27,15 @@ LOG_APP="api-dx: "
 echo $LOG_PREFIX $LOG_APP "building..."
 gradle build docker -p api-dx/
 echo $LOG_PREFIX $LOG_APP "running docker..."
-docker run -d -p 8080:8080 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN -t pl.intelliseq.genetraps.api.dx/api-dx:latest
+docker run -d -p 8080:8080 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/api-dx:latest
 echo $LOG_PREFIX $LOG_APP "waiting for service..."
 ./scripts/wait-for-service.sh localhost:8080/hello 60
 echo $LOG_PREFIX $LOG_APP "checking for error..."
 check
 echo $LOG_PREFIX $LOG_APP "testing..."
 echo $(curl localhost:8080/touch)
+
+exit 0
 
 ### BUILDING CLIENT_EXPLORARE ###
 LOG_APP="client-explorare: "
