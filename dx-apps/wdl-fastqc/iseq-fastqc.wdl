@@ -1,16 +1,3 @@
-workflow fastqc {
-    File fastq_file
-
-    call run_fastqc {
-        input :
-               fastq_file = fastq_file
-    }
-    output {
-        File run1 = run_fastqc.summary_html
-        File run2 = run_fastqc.summary_txt
-    }
-}
-
 task iseq_fastqc {
     File fastq_file
     command <<<
