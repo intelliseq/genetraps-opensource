@@ -1,0 +1,74 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+ 
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart',
+                   'Implementation-Version': version
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	// spring boot
+	compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-devtools")
+    compile("org.springframework.boot:spring-boot-starter-test")
+    
+    // gradle quickstart
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    
+    // opennlp
+    compile group: 'org.apache.opennlp', name: 'opennlp-tools', version: '1.6.0'
+    
+    // testing
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    
+    // angularjs
+    compile group: 'org.webjars', name: 'angularjs', version: '2.0.0-alpha.22'
+    
+    //string similarity
+    compile group: 'info.debatty', name: 'java-string-similarity', version: '0.18'
+
+	//string utils
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    
+    //io utils
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    
+}
+
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
+
+springBoot {
+    mainClass = "pl.intelliseq.explorare.ExplorareServer"
+}

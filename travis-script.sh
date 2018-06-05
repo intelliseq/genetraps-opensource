@@ -23,19 +23,19 @@ fi
 }
 
 ### BUILDING API_DX ###
-LOG_APP="api-dx: "
-echo $LOG_PREFIX $LOG_APP "building..."
-gradle build docker -p api-dx/
-echo $LOG_PREFIX $LOG_APP "running docker..."
-docker run -d -p 8080:8080 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/api-dx:latest
-echo $LOG_PREFIX $LOG_APP "waiting for service..."
-./scripts/wait-for-service.sh localhost:8080/hello 60
-echo $LOG_PREFIX $LOG_APP "checking for error..."
-check
-echo $LOG_PREFIX $LOG_APP "testing..."
-echo $(curl localhost:8080/touch)
+#LOG_APP="api-dx: "
+#echo $LOG_PREFIX $LOG_APP "building..."
+#gradle build docker -p api-dx/
+#echo $LOG_PREFIX $LOG_APP "running docker..."
+#docker run -d -p 8080:8080 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/api-dx:latest
+#echo $LOG_PREFIX $LOG_APP "waiting for service..."
+#./scripts/wait-for-service.sh localhost:8080/hello 60
+#echo $LOG_PREFIX $LOG_APP "checking for error..."
+#check
+#echo $LOG_PREFIX $LOG_APP "testing..."
+#echo $(curl localhost:8080/touch)
 
-exit 0
+#exit 0
 
 ### BUILDING CLIENT_EXPLORARE ###
 LOG_APP="client-explorare: "
