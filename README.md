@@ -3,6 +3,11 @@
 ## Build status
 [![Build Status](https://travis-ci.org/marpiech/genetraps-opensource.svg?branch=master)](https://travis-ci.org/marpiech/genetraps-opensource)
 
+## development philosophy
+# API dx
+Project id should be determined by token.
+As docker image port should be set to 8086.
+
 ## genetraps system
 # docker ports
 8081 - client explorare

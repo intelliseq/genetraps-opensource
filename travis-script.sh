@@ -8,9 +8,9 @@ printf "0\n" | dx login --token $DNANEXUS_TOKEN_TEST
 
 
 echo $LOG_PREFIX"Cleaning DNANEXUS test space"
-#dx rm -r -a /
+dx rm -r -a /samples/
 #ls dx-apps/ | xargs -I {} bash -c "dx build dx-apps/{}"
-echo `dx ls`
+#echo `dx ls`
 
 ### checking for errors
 function check {
@@ -54,20 +54,20 @@ echo $LOG_PREFIX $LOG_APP "checking for error..."
 check
 
 ### BUILDING CLIENT_DNATOKEN ###
-LOG_APP="client-dnatoken: "
-echo $LOG_PREFIX $LOG_APP "compiling..."
-mkdir ./client-dnatoken/dist
-npm --prefix ./client-dnatoken install ./client-dnatoken
-echo $LOG_PREFIX $LOG_APP "testing..."
-npm --prefix client-dnatoken run test
-echo $LOG_PREFIX $LOG_APP "dockerizing..."
-docker build -t pl.intelliseq.genetraps.client.dnatoken/client-dnatoken:latest client-dnatoken
-echo $LOG_PREFIX $LOG_APP "running docker..."
-docker run -d -p 8083:8083 pl.intelliseq.genetraps.client.dnatoken/client-dnatoken:latest
-echo $LOG_PREFIX $LOG_APP "waiting for service..."
-./scripts/wait-for-service.sh localhost:8083/hello 60
-echo $LOG_PREFIX $LOG_APP "checking for error..."
-check
+#LOG_APP="client-dnatoken: "
+#echo $LOG_PREFIX $LOG_APP "compiling..."
+#mkdir ./client-dnatoken/dist
+#npm --prefix ./client-dnatoken install ./client-dnatoken
+#echo $LOG_PREFIX $LOG_APP "testing..."
+#npm --prefix client-dnatoken run test
+#echo $LOG_PREFIX $LOG_APP "dockerizing..."
+#docker build -t pl.intelliseq.genetraps.client.dnatoken/client-dnatoken:latest client-dnatoken
+#echo $LOG_PREFIX $LOG_APP "running docker..."
+#docker run -d -p 8083:8083 pl.intelliseq.genetraps.client.dnatoken/client-dnatoken:latest
+#echo $LOG_PREFIX $LOG_APP "waiting for service..."
+#./scripts/wait-for-service.sh localhost:8083/hello 60
+#echo $LOG_PREFIX $LOG_APP "checking for error..."
+#check
 
 echo $LOG_PREFIX "pushing to AWS"
 ecs-cli configure profile --profile-name genetraps --access-key $ECS_CLI_GENETRAPS_DEV_KEY_ID --secret-key $ECS_CLI_GENETRAPS_DEV_ACCESS_KEY
