@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx;
 
+import com.dnanexus.DXContainer;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,14 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
-import pl.intelliseq.genetraps.api.dx.helpers.ProcessManager;
 
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,7 @@ public class ApiDxApplicationTests {
 	private FilesManager filesManager;
 
 	@Autowired
-	private ProcessManager processManager;
+	private Environment env;
 
 	@Test
 	public void contextLoads() {
@@ -72,65 +73,5 @@ public class ApiDxApplicationTests {
         assertEquals(filesManager.getNumericDirectories().size() - size, 10);
 
 	}
-
-	@Test
-	public void retrieveLastDirIndex(){
-        Integer lowest = filesManager.getLowestFreeIndex();
-        if(lowest > 1){
-            Integer selected = lowest/2;
-            filesManager.resetCounter();
-            log.info(String.format("Lowest: %d Selected: %d", lowest, selected));
-            processManager.runCommand("dx rmdir samples/"+selected);
-            log.info("Check if lowest index is "+selected);
-            assertEquals(filesManager.getLowestFreeIndex(), selected);
-            assertEquals(filesManager.mkdir(), selected);
-            log.info("Check if lowest index is back "+lowest);
-            assertEquals(filesManager.getLowestFreeIndex(), lowest);
-        }
-
-	}
-
-	//@Test
-	public void testVep() {
-		
-		//MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-		//map.add("variant", "rs669");
-		
-		//String body = this.restTemplate.getForObject("/touch", String.class);
-		//String body = this.restTemplate.postForObject("/touch", map, String.class);
-		//System.out.println(body);
-		//assertThat(body.contains("Job ID"));
-	}
-	
-//	//@Test
-//	public void dxTest() throws IOException, InterruptedException {
-//    	String result = processManager.runCommand("printf \"Y\\n\" | dx run touch -iname=test");
-//
-//    	//log.info("Result: " + result);
-//    	//log.info("Result: " + this.getJobId(result + "\ntadam"));
-//
-//    	String jobId = this.getJobId(result);
-//
-//    	//log.info(DxJob.getDxJobById(jobId));
-//
-//    	for (int i = 1; i <= 30; i++) {
-//    		log.info("i: " + i);
-//    		Thread.sleep(500);
-//    		log.info(DxJob.getDxJobById(jobId));
-//    	}
-//	}
-//
-//	private String getJobId(String result) {
-//		try {
-//			int indexOfJobId = result.indexOf("Job ID") + 8;
-//			int endIndexOfJobId = result.substring(indexOfJobId).indexOf("\n");
-//			if (endIndexOfJobId == -1) {
-//				return result.substring(indexOfJobId);
-//			}
-//			return result.substring(indexOfJobId, indexOfJobId + endIndexOfJobId);
-//		} catch (Exception e) {
-//			return null;
-//		}
-//	}
 	
 }

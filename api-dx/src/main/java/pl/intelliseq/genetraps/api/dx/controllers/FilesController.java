@@ -1,11 +1,11 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
+import com.dnanexus.DXJob;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.exceptions.DxRunnerException;
-import pl.intelliseq.genetraps.api.dx.helpers.ProcessManager;
-import pl.intelliseq.genetraps.api.dx.models.IseqJSON;
+import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -21,7 +21,7 @@ public class FilesController {
 
 
 	@Autowired
-    private ProcessManager processManager;
+    private DxApiProcessManager processManager;
 
 
 	private String matchFileAndGetName(String filename, String regex) {
@@ -43,10 +43,10 @@ public class FilesController {
         String leftName = matchFileAndGetName(left, leftRegex);
         String rightName = matchFileAndGetName(right, rightRegex);
         if(leftName != null && leftName.equals(rightName)){
-            String leftId = processManager.runUrlFetch(left, sampleNumber, tags);
-            String rightId = processManager.runUrlFetch(right, sampleNumber, tags);
+            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tags);
+            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tags);
 
-            return new IseqJSON("id", String.format("[\"%s\",\"%s\"]", leftId, rightId)).toString();
+            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
         } else {
             throw new DxRunnerException("Incompatible files");
         }
@@ -60,27 +60,18 @@ public class FilesController {
             @RequestParam(required = false) String... tags){
         log.info(Arrays.toString(tags));
 
-        return new IseqJSON("id", processManager.runUrlFetch(url, sampleNumber, tags)).toString();
+        return processManager.runUrlFetch(url, sampleNumber, tags).getId();
     }
 
     @RequestMapping(value = "/describe/{id}", method = RequestMethod.GET)
     public String describe(@PathVariable String id){
-        return processManager.runJSONDescribe(id).toString();
+        return processManager.JSONDescribe(id).toString();
 
     }
 
     @RequestMapping(value = "/fastqc", method = RequestMethod.POST)
     public String fastqc(@RequestParam String fileId){
-        return new IseqJSON("id", processManager.runFastqc(fileId)).toString();
-    }
-
-    @RequestMapping(value = "/bwa", method = RequestMethod.POST)
-    public String bwa(
-            @RequestParam String left,
-            @RequestParam String right,
-            @RequestParam String outputFolder
-    ){
-        return new IseqJSON("id", processManager.runBwa(left, right, outputFolder)).toString();
+        return processManager.runFastqc(fileId).getId();
     }
     
 }

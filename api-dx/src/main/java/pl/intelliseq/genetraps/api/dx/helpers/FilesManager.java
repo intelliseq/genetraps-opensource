@@ -1,9 +1,11 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import com.dnanexus.DXContainer;
+import com.dnanexus.exceptions.ResourceNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,21 +17,20 @@ import java.util.stream.IntStream;
  */
 public class FilesManager {
     @Autowired
-    private ProcessManager processManager;
+    private DxApiProcessManager processManager;
+
+    @Autowired
+    private Environment env;
 
     private Logger log = Logger.getLogger(FilesManager.class);
 
     private AtomicInteger counter = new AtomicInteger(1);
 
     public synchronized Integer mkdir(){
-        log.info("Counter: "+counter);
-        String response = processManager.runCommand("dx ls --folders samples | grep -Eo "+counter);
-        log.info("Response: "+response);
-        if(!response.equals("")) {
+        if(getNumericDirectories().contains(counter.get())) {
             counter.set(getLowestFreeIndex());
-            processManager.runMkdir(String.valueOf(counter.get()));
         }
-        processManager.runMkdir(String.valueOf(counter.get()));
+        processManager.runMkDir(counter.get());
         return counter.getAndIncrement();
     }
 
@@ -42,17 +43,23 @@ public class FilesManager {
     }
 
     public List<Integer> getNumericDirectories(){
-        String command = "dx ls --folders samples | grep -Eo \"^([0-9]+)\"";
-        String response = processManager.runCommand(command);
-        if(response.equals("")){
+        try {
+            return DXContainer.getInstance(env.getProperty("dx-project"))
+                    .listFolder("/samples")
+                    .getSubfolders()
+                    .stream()
+                    .map(s -> Integer.parseInt(s.substring(9)))
+                    .sorted()
+                    .collect(Collectors.toList());
+        }catch (ResourceNotFoundException e){
             return new LinkedList<>();
         }
-        return Arrays.stream(response.split("\n")).map(Integer::valueOf).sorted().collect(Collectors.toList());
     }
 
     public Integer getLowestFreeIndex(){
         log.info("Getting lowest free index");
         List<Integer> intList = getNumericDirectories();
+        System.out.println(intList);
         if(intList == null || intList.size() == 0){
             log.info("Lowest index: "+1);
             return 1;

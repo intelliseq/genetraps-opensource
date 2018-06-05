@@ -1,10 +1,10 @@
 package pl.intelliseq.genetraps.api.dx;
 
+import com.dnanexus.DXJob;
+import com.dnanexus.JobState;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import pl.intelliseq.genetraps.api.dx.enums.JobStates;
-import pl.intelliseq.genetraps.api.dx.exceptions.IseqParseException;
-import pl.intelliseq.genetraps.api.dx.models.IseqJSON;
+import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 
 @RunWith(SpringRunner.class)
@@ -34,28 +31,28 @@ public class UploadTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-    public String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
-    public String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
+	@Autowired
+    private DxApiProcessManager processManager;
 
-    public IseqJSON waitUntilJobIsDone(String jobId){
-        String response;
+    private String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
+    private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
+
+    private DXJob.Describe waitUntilJobIsDone(String jobId){
         try{
-            JobStates jobState;
-            IseqJSON iseqJSON;
+            JobState jobState;
+            DXJob.Describe describe;
             do {
-                response = this.restTemplate.getForObject("/describe/{id}", String.class, jobId);
-                iseqJSON = new IseqJSON(response);
-                String state = iseqJSON.getString("state");
-                jobState = JobStates.getEnum(state);
+                describe = processManager.JSONDescribe(jobId);
+                jobState = describe.getState();
                 Thread.sleep(5000);
-            }while (jobState != JobStates.DONE);
-            return iseqJSON;
+            }while (jobState != JobState.DONE);
+            return describe;
         }catch (InterruptedException e){
             throw new RuntimeException(e);
         }
     }
 
-    public IseqJSON upload(String sampleUrl, Integer sampleNumber, String... tags){
+    private DXJob.Describe upload(String sampleUrl, Integer sampleNumber, String... tags){
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -69,17 +66,12 @@ public class UploadTests {
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
 
         String response = this.restTemplate.postForObject("/upload", uploadEntity, String.class);
-        String jobId = new IseqJSON(response).getString("id");
+        assertThat(response, Matchers.matchesPattern("job-\\w*"));
 
-        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
-
-        IseqJSON jobResponse = waitUntilJobIsDone(jobId);
-
-        String fileId = jobResponse.getIseqJSON("output").getIseqJSON("file").getString("$dnanexus_link");
-        return new IseqJSON(this.restTemplate.getForObject("/describe/{id}", String.class, fileId));
+        return waitUntilJobIsDone(response);
     }
 
-    public IseqJSON fastqc(String fileId){
+    private DXJob.Describe fastqc(String fileId){
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -89,40 +81,18 @@ public class UploadTests {
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
 
         String response = this.restTemplate.postForObject("/fastqc", uploadEntity, String.class);
-        String jobId = new IseqJSON(response).getString("id");
+        assertThat(response, Matchers.matchesPattern("job-\\w*"));
 
-        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
-
-        return waitUntilJobIsDone(jobId);
+        return waitUntilJobIsDone(response);
     }
 
-    public IseqJSON bwa(String left, String right, String outputFolder){
-        HttpHeaders uploadHeaders = new HttpHeaders();
-        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
-        uploadValueMap.add("left", left);
-        uploadValueMap.add("right", right);
-        uploadValueMap.add("outputFolder", outputFolder);
-
-        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
-
-        String response = this.restTemplate.postForObject("/bwa", uploadEntity, String.class);
-        String jobId = new IseqJSON(response).getString("id");
-
-        assertThat(jobId, Matchers.matchesPattern("job-\\w*"));
-
-        return waitUntilJobIsDone(jobId);
-    }
 
     @Test
     public void upload(){
-        IseqJSON file1 = upload(sampleLeft, 1, "left");
-        String file1Id = file1.getString("id");
-        String file1Folder = file1.getString("folder").replace("/rawdata", "");
-        String file2Id = upload(sampleRight, 1, "right").getString("id");
+        DXJob.Describe upload1 = upload(sampleLeft, 1, "left");
+        String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
-        log.info(bwa(file1Id, file2Id, file1Folder));
+        String file2Id = upload(sampleRight, 1, "right").getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
         log.info(fastqc(file1Id));
         log.info(fastqc(file2Id));

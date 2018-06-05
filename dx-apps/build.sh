@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### VERSIONS ###
-ISEQ_FASTQC_VERSION=0.1
+ISEQ_FASTQC_VERSION=0.11
 
 ### FUNCTIONS ###
 function docker_tag_exists() {
@@ -20,7 +20,7 @@ fi
 
 if docker_tag_exists intelliseq/fastqc $ISEQ_FASTQC_VERSION; then
     echo "Fastqc without changes..."
-else 
+else
     cat fastqc/Dockerfile | docker build - -t intelliseq/fastqc:$ISEQ_FASTQC_VERSION
     docker tag intelliseq/fastqc:$ISEQ_FASTQC_VERSION intelliseq/fastqc:latest
     # test
