@@ -1,3 +1,5 @@
+cat ~/.aws/credentials | cut -c 22-25
+
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 
