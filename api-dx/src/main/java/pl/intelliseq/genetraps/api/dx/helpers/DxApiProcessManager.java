@@ -3,7 +3,6 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 import com.dnanexus.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import pl.intelliseq.genetraps.api.dx.IProcessManager;
 
 import java.util.HashMap;
 
@@ -30,22 +29,42 @@ public class DxApiProcessManager {
     }
 
     public void runMkDir(String sampleNumber){
-        DXContainer.getInstance(env.getProperty("dx-project")).newFolder("/samples/"+sampleNumber);
+        DXContainer.getInstance(env.getProperty("dx-project")).newFolder("/samples/"+sampleNumber, true);
     }
 
-//    public DXJob runTouch(String fileId){
-//
-//        return DXApplet.getInstance("applet-FG6V7Y0045kFGFvy5xf68X42")
-//    }
+    public DXJob runTouch(String fileId){
+
+        return getAppletFromName("touch")
+                .newRun()
+                .setProject(DXProject.getInstance(env.getProperty("dx-project")))
+                .setInput(fileId)
+                .run();
+    }
 
     public DXJob runFastqc(String fileId){
         var input = new HashMap<>();
-        input.put("fastq_file", DXFile.getInstance(fileId));
+        DXFile file = DXFile.getInstance(fileId);
+        input.put("fastq_file", file);
 
-        return DXApplet.getInstance("applet-FG6V7qj045k7XVk43BZ34Fy8")
+
+
+        return getAppletFromName("iseq_fastqc")
                 .newRun()
                 .setProject(DXProject.getInstance(env.getProperty("dx-project")))
                 .setInput(input)
+                .setFolder(file.describe().getFolder().replace("rawdata", "fastqc/"+file.describe().getName()))
                 .run();
+    }
+
+    public DXApplet getAppletFromName(String appletName){
+        return (DXApplet) DXSearch.findDataObjects().nameMatchesExactly(appletName).execute().asList().get(0);
+    }
+
+    public DXJob.Describe JSONDescribe(String jobId){
+        return JSONDescribe(DXJob.getInstance(jobId));
+    }
+
+    public DXJob.Describe JSONDescribe(DXJob dxJob){
+        return dxJob.describe();
     }
 }
