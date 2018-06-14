@@ -1,5 +1,6 @@
 FROM ubuntu:18.04
 MAINTAINER Katarzyna Kolanek, https://github.com/lltw
+MAINTAINER Marcin piechota, https://github.com/marpiech
 
 ADD https://github.com/GregoryFaust/samblaster/releases/download/v.0.1.24/samblaster-v.0.1.24.tar.gz .
 ADD https://github.com/samtools/samtools/releases/download/1.8/samtools-1.8.tar.bz2 .

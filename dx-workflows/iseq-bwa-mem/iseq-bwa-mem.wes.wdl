@@ -25,23 +25,23 @@
 
 workflow IseqBwaMem {
 
-  String sample_id
-  String ref_name
+  String sample_id = "001"
+  String ref_name = "grch38"
 
   String RG_PL = "Illumina"
 
   Array[File] input_fastqs_1
   Array[File] input_fastqs_2
 
-  File ref_fasta
-  File ref_fasta_index
-  File ref_dict
-  File? ref_alt
-  File ref_sa
-  File ref_amb
-  File ref_bwt
-  File ref_ann
-  File ref_pac
+  File? ref_fasta = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa"
+  File? ref_fasta_index = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.fai"
+  File? ref_dict = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.dict"
+  File? ref_alt = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.alt"
+  File? ref_sa = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.sa"
+  File? ref_amb = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.amb"
+  File? ref_bwt = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.bwt"
+  File? ref_ann = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.ann"
+  File? ref_pac = "Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.pac"
 
   String bwa_commandline = "-K 100000000 -v 3 -Y $bash_ref_fasta"
   Int compression_level = 5
