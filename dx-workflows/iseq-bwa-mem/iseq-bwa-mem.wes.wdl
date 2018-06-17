@@ -233,3 +233,43 @@ task MergeBams {
   }
 
 }
+
+task MergeBams {
+
+  Array[File] aln_bams
+
+  String base_file_name
+
+  Int compression_level
+  String disk_size
+  String mem_size
+  String num_cpu
+
+  String docker_image
+
+  Int number_of_bam_pieces = length(aln_bams)
+  File first_aln_bam = aln_bams[0]
+
+  command <<<
+
+    if [ "${number_of_bam_pieces}" -eq "1" ]
+    then
+      mv  ${sep=' ' aln_bams} ${base_file_name}.aln.bam
+      sambamba index -t ${num_cpu} ${base_file_name}.aln.bam 2>  ${base_file_name}.sambamba.stderr.log
+    else
+      sambamba merge -t ${num_cpu} -l ${compression_level} ${base_file_name}.aln.bam ${sep=' ' aln_bams} 2>  ${base_file_name}.sambamba.stderr.log
+    fi
+
+  >>>
+
+  runtime {
+    dx_instance_type: "mem1_ssd1_x8"
+  }
+
+  output {
+    File output_bam = "${base_file_name}.aln.bam"
+    File output_bam_bai = "${base_file_name}.aln.bam.bai"
+    File sambamba_stderr_log = "${base_file_name}.sambamba.stderr.log"
+  }
+
+}
