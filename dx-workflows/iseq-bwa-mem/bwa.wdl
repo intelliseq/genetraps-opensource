@@ -78,18 +78,18 @@ workflow IseqBwaMem {
       docker_image = sambamba_docker
    }
 
-   #String version = BwaMem.version[0][0]
+   String version = BwaMem.version[0][0]
 
    output {
 
      File output_bam = MergeBams.output_bam
-     #File output_bam_bai = MergeBams.output_bam_bai
+     File output_bam_bai = MergeBams.output_bam_bai
 
-     #Array[File] bwa_stderr_log = BwaMem.bwa_stderr_log
-     #Array[File] deduplication_stderr_log = BwaMem.deduplication_stderr_log
-     #Array[File] samtools_stderr_log = BwaMem.samtools_stderr_log
-     #File sambamba_stderr_log = MergeBams.sambamba_stderr_log
-     #String bwa_version = version
+     Array[File] bwa_stderr_log = BwaMem.bwa_stderr_log
+     Array[File] deduplication_stderr_log = BwaMem.deduplication_stderr_log
+     Array[File] samtools_stderr_log = BwaMem.samtools_stderr_log
+     File sambamba_stderr_log = MergeBams.sambamba_stderr_log
+     String bwa_version = version
 
    }
 
@@ -181,14 +181,20 @@ task MergeBams {
 
   command <<<
 
+    mkdir /tmp/results
+    echo "--- base file name: " $base_file_name
     if [ "${number_of_bam_pieces}" -eq "1" ]
     then
-      mv  ${sep=' ' aln_bams} ${base_file_name}.aln.bam
-      sambamba index -t ${num_cpu} ${base_file_name}.aln.bam 2>  ${base_file_name}.sambamba.stderr.log
+      mv  ${sep=' ' aln_bams} /home/dnanexus/execution/inputs/${base_file_name}.aln.bam
+      echo "--- indexing..."
+      dx-docker run hello-world
+      dx-docker run -v /tmp/results:/tmp/results -v /home/dnanexus/execution/inputs:/home/dnanexus/execution/inputs --entrypoint "/bin/sh" intelliseq/sambamba:latest -c "sambamba index -t ${num_cpu} /home/dnanexus/execution/inputs/${base_file_name}.aln.bam 2> /tmp/results/${base_file_name}.sambamba.stderr.log"
+      echo '{"error": {"type": "AppInternalError", "message": "Error while running sambamba index"}}' > job_error.json
     else
-      sambamba merge -t ${num_cpu} -l ${compression_level} ${base_file_name}.aln.bam ${sep=' ' aln_bams} 2>  ${base_file_name}.sambamba.stderr.log
+      dx-docker run -v /tmp/results:/tmp/results -v /home/dnanexus/execution/inputs:/home/dnanexus/execution/inputs --entrypoint "/bin/sh" intelliseq/sambamba:latest -c "sambamba merge -t ${num_cpu} -l ${compression_level} /home/dnanexus/execution/inputs/${base_file_name}.aln.bam ${sep=' ' aln_bams} 2>  /tmp/results/${base_file_name}.sambamba.stderr.log"
+      echo '{"error": {"type": "AppInternalError", "message": "Error while running sambamba merge"}}' > job_error.json
     fi
-
+    ls /home/dnanexus/execution/inputs/
   >>>
 
   runtime {
@@ -196,9 +202,9 @@ task MergeBams {
   }
 
   output {
-    File output_bam = "${base_file_name}.aln.bam"
-    File output_bam_bai = "${base_file_name}.aln.bam.bai"
-    File sambamba_stderr_log = "${base_file_name}.sambamba.stderr.log"
+    File output_bam = "/home/dnanexus/execution/inputs/${base_file_name}.aln.bam"
+    File output_bam_bai = "/home/dnanexus/execution/inputs/${base_file_name}.aln.bam.bai"
+    File sambamba_stderr_log = "/tmp/results/${base_file_name}.sambamba.stderr.log"
   }
 
 }
