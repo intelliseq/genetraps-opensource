@@ -24,54 +24,54 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class UploadTests {
+public class ControllersTests {
 
-	Logger log = Logger.getLogger(UploadTests.class);
+    Logger log = Logger.getLogger(ControllersTests.class);
 
-	@Autowired
-	private TestRestTemplate restTemplate;
+    @Autowired
+    private TestRestTemplate restTemplate;
 
-	@Autowired
+    @Autowired
     private DxApiProcessManager processManager;
 
     private String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
     private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
 
-    private DXJob.Describe waitUntilJobIsDone(String jobId){
-        try{
+    private DXJob.Describe waitUntilJobIsDone(String jobId) {
+        try {
             JobState jobState;
             DXJob.Describe describe;
             do {
-                describe = processManager.JSONDescribe(jobId);
+                describe = DXJob.getInstance(jobId).describe();
                 jobState = describe.getState();
                 Thread.sleep(5000);
-            }while (jobState != JobState.DONE);
+            } while (jobState != JobState.DONE);
             return describe;
-        }catch (InterruptedException e){
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private DXJob.Describe upload(String sampleUrl, Integer sampleNumber, String... tags){
+    private DXJob.Describe upload(String sampleUrl, Integer sampleNumber, String... tags) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("url", sampleUrl);
         uploadValueMap.add("sampleNumber", sampleNumber.toString());
-        for(String tag:tags){
-            uploadValueMap.add("tags", tag);
+        for (String tag : tags) {
+            uploadValueMap.add("tag", tag);
         }
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
 
-        String response = this.restTemplate.postForObject("/upload", uploadEntity, String.class);
-        assertThat(response, Matchers.matchesPattern("job-\\w*"));
+        JsonNode response = this.restTemplate.postForObject("/upload", uploadEntity, JsonNode.class);
+        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
 
-        return waitUntilJobIsDone(response);
+        return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-    private DXJob.Describe fastqc(String fileId){
+    private DXJob.Describe fastqc(String fileId) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -80,24 +80,21 @@ public class UploadTests {
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
 
-        String response = this.restTemplate.postForObject("/fastqc", uploadEntity, String.class);
-        assertThat(response, Matchers.matchesPattern("job-\\w*"));
+        JsonNode response = this.restTemplate.postForObject("/fastqc", uploadEntity, JsonNode.class);
+        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
 
-        return waitUntilJobIsDone(response);
+        return waitUntilJobIsDone(response.get("id").textValue());
     }
 
 
     @Test
-    public void upload(){
+    public void upload() {
         DXJob.Describe upload1 = upload(sampleLeft, 1, "left");
         String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
-        String file2Id = upload(sampleRight, 1, "right").getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
-
+        log.info(restTemplate.getForObject("/describe/"+file1Id, JsonNode.class));
         log.info(fastqc(file1Id));
-        log.info(fastqc(file2Id));
     }
 
 
-	
 }

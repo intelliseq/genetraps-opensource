@@ -21,18 +21,18 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CoreTests {
 
-	Logger log = Logger.getLogger(CoreTests.class);
+    Logger log = Logger.getLogger(CoreTests.class);
 
-	@Autowired
-	private TestRestTemplate restTemplate;
-	
-	@Test
-	public void empty() {
-		assert true;
-	}
+    @Autowired
+    private TestRestTemplate restTemplate;
 
-	@Test
-    public void helloTest(){
+    @Test
+    public void empty() {
+        assert true;
+    }
+
+    @Test
+    public void helloTest() {
         HttpHeaders helloHeaders = new HttpHeaders();
         helloHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -43,9 +43,7 @@ public class CoreTests {
 
         String response = this.restTemplate.postForObject("/hello", helloEntity, String.class);
 
-//        System.out.println(response );
-
         assertEquals(response, "Hello Kamil");
     }
-	
+
 }

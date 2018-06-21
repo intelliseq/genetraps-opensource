@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 @Import(BeansConfiguration.class)
 public class ApiDxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ApiDxApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ApiDxApplication.class, args);
+    }
 }
