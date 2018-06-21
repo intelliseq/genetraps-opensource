@@ -22,6 +22,15 @@ else
 fi
 }
 
+### LOGGING TO AWS DOCKER HUB
+`aws ecr get-login --profile genetraps`
+
+### BUILDING CLIENT_INDEX ###
+CLIENT_INDEX_TAG=$AWS_CLIENT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps/client-index"
+CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum`
+docker build . -t $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
+docker push $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
+
 ### BUILDING API_DX ###
 LOG_APP="api-dx: "
 echo $LOG_PREFIX $LOG_APP "building..."

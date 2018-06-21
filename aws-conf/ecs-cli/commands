@@ -16,3 +16,6 @@ aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tc
 aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8088 --cidr 0.0.0.0/0 --profile genetraps
 aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8089 --cidr 0.0.0.0/0 --profile genetraps
 aws elbv2 create-load-balancer --name "$ECS_CLI_CLUSTER_NAME-load-balancer" --subnets $ECS_CLI_SUBNET1_ID $ECS_CLI_SUBNET2_ID --security-groups $ECS_CLI_SG_ID --profile genetraps
+
+
+aws ecr create-repository --repository-name genetraps/client-index --profile genetraps

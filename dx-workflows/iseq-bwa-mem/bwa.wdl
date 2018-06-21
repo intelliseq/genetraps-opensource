@@ -8,7 +8,7 @@ workflow IseqBwaMem {
   Array[File] fastq_1
   Array[File] fastq_2
 
-  File? ref_fasta = "dx://Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa"
+  File ref_fasta = "dx://project-FBb60yQ0FYJ8p0bY32XX4Zz6:file-FBb62X00FYJ6GY7ZJZv05GJy"
   File? ref_fasta_index = "dx://Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.fa.fai"
   File? ref_dict = "dx://Intelliseq - Resources:Reference genomes/GRCh38-no-alt-analysis-set/GRCh38.no_alt_analysis_set.dict"
   File? ref_alt
