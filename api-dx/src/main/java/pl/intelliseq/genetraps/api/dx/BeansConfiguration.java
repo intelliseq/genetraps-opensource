@@ -11,11 +11,12 @@ import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 @Configuration
 public class BeansConfiguration {
     @Bean
-    FilesManager filesManager(){
+    FilesManager filesManager() {
         return new FilesManager();
     }
+
     @Bean
-    DxApiProcessManager dxApiProcessManager(){
+    DxApiProcessManager dxApiProcessManager() {
         return new DxApiProcessManager();
     }
 }
