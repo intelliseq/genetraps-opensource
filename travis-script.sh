@@ -30,7 +30,7 @@ echo $LOG_PREFIX "logging to ecr..."
 LOG_APP="client-index: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
 CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index"
-CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum`
+CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
 echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
 docker build client-index/ -t $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
 docker push $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
