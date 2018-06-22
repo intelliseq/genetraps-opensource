@@ -10,4 +10,4 @@ ADD src/ /src
 WORKDIR /src
 
 # Run http server on port 8080
-CMD ["python3", "-m", "http.server"]
+CMD ["python3", "-m", "http.server", "8087"]
