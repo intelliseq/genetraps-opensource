@@ -27,9 +27,9 @@ echo $LOG_PREFIX "logging to ecr..."
 `aws ecr get-login --profile genetraps`
 
 ### BUILDING CLIENT_INDEX ###
-LOG_APP="clinet-index: "
+LOG_APP="client-index: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
-CLIENT_INDEX_TAG=$AWS_CLIENT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps/client-index"
+CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index"
 CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum`
 echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
 docker build . -t $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
