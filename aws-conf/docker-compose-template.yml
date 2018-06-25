@@ -1,5 +1,15 @@
 version: '2'
 services:
+  client-index:
+    image: clientIndexImageTag
+    ports:
+      - "8087:8080"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: GENETRAPS_DEV_LOG_GROUP
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: clientexplorare
   client-explorare:
     image: clientExplorareImageTag
     ports:
