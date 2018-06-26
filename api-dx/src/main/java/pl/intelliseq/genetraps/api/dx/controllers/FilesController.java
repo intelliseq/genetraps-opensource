@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.exceptions.DxRunnerException;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
+import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -20,6 +21,9 @@ public class FilesController {
 
     @Autowired
     private DxApiProcessManager processManager;
+
+    @Autowired
+    private FilesManager filesManager;
 
 
     private String matchFileAndGetName(String filename, String regex) {
@@ -76,4 +80,9 @@ public class FilesController {
         return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
 
+    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
+    @ResponseBody
+    public String mkDir() {
+        return String.format("{\"response\":%s}", filesManager.mkdir());
+    }
 }

@@ -46,7 +46,7 @@ public class ApiDxTest {
         dxApiProcessManager.runMkDir(folder);
     }
 
-    @Test
+//    @Test
     public void descriptiontesting() {
         var objectId = "job-FGP2j6Q0pqjbJZ7kKjJVJz8k";
         var out = DXJSON.safeTreeToValue(
