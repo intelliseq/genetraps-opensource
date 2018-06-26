@@ -81,6 +81,23 @@ sdk install gradle 4.6
   * **Code:** 200
     **Content:** `{"status": "up"}`
 
+**mkdir**
+----
+  Creates directory for a new sample
+
+* **URL**
+
+  /mkdir
+
+* **Method:**
+
+  `GET`
+
+* **Success Response:**
+
+  * **Code:** 200
+    **Content:** `{"response": 5}`
+
 **upload**
 ----
   Upload a file to dnanexus server
