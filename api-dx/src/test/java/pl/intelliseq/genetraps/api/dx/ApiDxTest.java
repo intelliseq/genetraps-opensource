@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx;
 
+import com.dnanexus.DXContainer;
 import com.dnanexus.DXEnvironment;
 import com.dnanexus.DXHTTPRequest;
 import com.dnanexus.DXJSON;
@@ -93,6 +94,12 @@ public class ApiDxTest {
         threadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS);
 
         assertEquals(filesManager.getNumericDirectories().size() - size, 10);
+
+        Integer folderToDelete = filesManager.getNumericDirectories().size() / 2;
+
+        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/"+folderToDelete);
+
+        assertEquals(filesManager.mkdir(), folderToDelete);
 
     }
 

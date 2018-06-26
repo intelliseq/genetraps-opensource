@@ -27,19 +27,12 @@ public class FilesManager {
     private AtomicInteger counter = new AtomicInteger(1);
 
     public synchronized Integer mkdir() {
-        if (getNumericDirectories().contains(counter.get())) {
+        var list = getNumericDirectories();
+        if (list.contains(counter.get()) || list.size() != counter.get() - 1) {
             counter.set(getLowestFreeIndex());
         }
         processManager.runMkDir(counter.get());
         return counter.getAndIncrement();
-    }
-
-    public Integer getAndIncrement() {
-        return counter.getAndIncrement();
-    }
-
-    public void resetCounter() {
-        counter.set(1);
     }
 
     public List<Integer> getNumericDirectories() {
@@ -60,15 +53,17 @@ public class FilesManager {
         log.info("Getting lowest free index");
         List<Integer> intList = getNumericDirectories();
         System.out.println(intList);
+        //Jeśli nic nie ma to zwracamy 1
         if (intList == null || intList.size() == 0) {
             log.info("Lowest index: " + 1);
             return 1;
         } else if (intList.size() == intList.get(intList.size() - 1)) {
+            //Jeśli ostatni element listy równa się jej wielkości, to oznacza, że nie ma dziur.
             log.info("Lowest index: " + (intList.size() + 1));
             return intList.size() + 1;
         }
         /**
-         * Bierzemy najniższy
+         * W przeciwnym wypadku szukamy dziury
          */
         Integer index = IntStream
                 .rangeClosed(1, intList.size())

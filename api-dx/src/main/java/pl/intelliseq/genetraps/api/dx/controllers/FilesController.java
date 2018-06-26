@@ -25,39 +25,39 @@ public class FilesController {
     @Autowired
     private FilesManager filesManager;
 
-
-    private String matchFileAndGetName(String filename, String regex) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(filename);
-        if (m.matches()) {
-            return m.group(1);
-        }
-        return null;
-    }
-
-
-    @RequestMapping(value = "/upload-both", method = RequestMethod.POST)
-    public String uploadBoth(
-            @RequestParam String left,
-            @RequestParam String right,
-            @RequestParam String sampleNumber,
-            @RequestParam(required = false) String... tag) {
-
-        String leftRegex = "(.*?)_1\\.(f(ast)?q(\\.gz)?)";
-        String leftName = matchFileAndGetName(left, leftRegex);
-
-        String rightRegex = "(.*?)_2\\.(f(ast)?q(\\.gz)?)";
-        String rightName = matchFileAndGetName(right, rightRegex);
-
-        if (leftName != null && leftName.equals(rightName)) {
-            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
-            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
-
-            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
-        } else {
-            throw new DxRunnerException("Incompatible files");
-        }
-    }
+//TODO: For future features
+//    private String matchFileAndGetName(String filename, String regex) {
+//        Pattern p = Pattern.compile(regex);
+//        Matcher m = p.matcher(filename);
+//        if (m.matches()) {
+//            return m.group(1);
+//        }
+//        return null;
+//    }
+//
+//
+//    @RequestMapping(value = "/upload-both", method = RequestMethod.POST)
+//    public String uploadBoth(
+//            @RequestParam String left,
+//            @RequestParam String right,
+//            @RequestParam String sampleNumber,
+//            @RequestParam(required = false) String... tag) {
+//
+//        String leftRegex = "(.*?)_1\\.(f(ast)?q(\\.gz)?)";
+//        String leftName = matchFileAndGetName(left, leftRegex);
+//
+//        String rightRegex = "(.*?)_2\\.(f(ast)?q(\\.gz)?)";
+//        String rightName = matchFileAndGetName(right, rightRegex);
+//
+//        if (leftName != null && leftName.equals(rightName)) {
+//            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
+//            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
+//
+//            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
+//        } else {
+//            throw new DxRunnerException("Incompatible files");
+//        }
+//    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(
