@@ -33,17 +33,9 @@ public class CoreTests {
 
     @Test
     public void helloTest() {
-        HttpHeaders helloHeaders = new HttpHeaders();
-        helloHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        String response = this.restTemplate.getForObject("/hello", String.class);
 
-        MultiValueMap<String, String> helloValueMap = new LinkedMultiValueMap<String, String>();
-        helloValueMap.add("name", "Kamil");
-
-        HttpEntity<MultiValueMap<String, String>> helloEntity = new HttpEntity<MultiValueMap<String, String>>(helloValueMap, helloHeaders);
-
-        String response = this.restTemplate.postForObject("/hello", helloEntity, String.class);
-
-        assertEquals(response, "Hello Kamil");
+        assertEquals(response, "{\"status\": \"up\"}");
     }
 
 }

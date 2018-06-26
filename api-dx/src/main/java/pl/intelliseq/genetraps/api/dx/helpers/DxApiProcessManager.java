@@ -18,7 +18,7 @@ public class DxApiProcessManager {
         input.put("url", inputUrl);
         input.put("tags", tags);
 
-        return DXApp.getInstance("app-FF6b2Bj9pQGXV19347j6fJPX")
+        return DXApp.getInstance(env.getProperty("dx-url-fetch-ap-id"))
                 .newRun()
                 .setProject(DXProject.getInstance(env.getProperty("dx-project")))
                 .setFolder(String.format("/samples/%s/rawdata", sampleNumber))
