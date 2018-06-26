@@ -2,7 +2,7 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 
 import com.dnanexus.DXContainer;
 import com.dnanexus.exceptions.ResourceNotFoundException;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
@@ -15,14 +15,13 @@ import java.util.stream.IntStream;
 /**
  * Created by intelliseq on 07/12/2017.
  */
+@Log4j2
 public class FilesManager {
     @Autowired
     private DxApiProcessManager processManager;
 
     @Autowired
     private Environment env;
-
-    private Logger log = Logger.getLogger(FilesManager.class);
 
     private AtomicInteger counter = new AtomicInteger(1);
 

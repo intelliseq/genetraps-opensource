@@ -6,7 +6,7 @@ import com.dnanexus.DXHTTPRequest;
 import com.dnanexus.DXJSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Log4j2
 public class ApiDxTest {
 
     @Autowired
@@ -39,15 +40,13 @@ public class ApiDxTest {
     @Autowired
     DxApiProcessManager dxApiProcessManager;
 
-    Logger log = Logger.getLogger(ApiDxTest.class);
-
     @Test
     public void singleMkdirTest() {
         Integer folder = filesManager.getLowestFreeIndex();
         dxApiProcessManager.runMkDir(folder);
     }
 
-//    @Test
+    //    @Test
     public void descriptiontesting() {
         var objectId = "job-FGP2j6Q0pqjbJZ7kKjJVJz8k";
         var out = DXJSON.safeTreeToValue(
@@ -97,7 +96,7 @@ public class ApiDxTest {
 
         Integer folderToDelete = filesManager.getNumericDirectories().size() / 2;
 
-        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/"+folderToDelete);
+        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/" + folderToDelete);
 
         assertEquals(filesManager.mkdir(), folderToDelete);
 

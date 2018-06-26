@@ -1,23 +1,17 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
-import com.dnanexus.DXJob;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.intelliseq.genetraps.api.dx.exceptions.DxRunnerException;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
+@Log4j2
 public class FilesController {
-
-    private Logger log = Logger.getLogger(FilesController.class);
-
 
     @Autowired
     private DxApiProcessManager processManager;
