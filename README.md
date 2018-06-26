@@ -16,6 +16,7 @@ As docker image port should be set to 8086.
 8084 - api dnatoken
 8085 - client dx
 8086 - api dx
+8087 - client index
 
 ## URL Tutorial
 

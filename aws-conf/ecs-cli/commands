@@ -19,3 +19,8 @@ aws elbv2 create-load-balancer --name "$ECS_CLI_CLUSTER_NAME-load-balancer" --su
 
 
 aws ecr create-repository --repository-name genetraps/client-index --profile genetraps
+aws logs create-log-group --log-group-name genetraps-logs --profile genetraps
+ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:958510462668:targetgroup/client-index-target-group/dceb1027326e4555 --container-name client-index --container-port 8087 --aws-profile genetraps
+
+ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:958510462668:targetgroup/client-index-target-group/dceb1027326e4555" --container-name client-index --container-port 8087 --aws-profile genetraps
+ 1648  cat aws-conf/ecs-cli/commands

@@ -29,24 +29,29 @@ echo $LOG_PREFIX "logging to ecr..."
 ### BUILDING CLIENT_INDEX ###
 LOG_APP="client-index: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
-CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index"
 CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
-echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
-docker build client-index/ -t $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
-docker push $CLIENT_INDEX_TAG":"$CLIENT_INDEX_CHECKSUM
+CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index:"$CLIENT_INDEX_CHECKSUM
+echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG
+docker build client-index/ -t $CLIENT_INDEX_TAG
+docker push $CLIENT_INDEX_TAG
+cat aws-conf/docker-compose-template.yml | sed 's@clientIndexImageTag@'"$CLIENT_INDEX_TAG"'@' > docker-compose.yml
+
+### ECS ###
+ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
+ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNTID":targetgroup/client-index-target-group/"$ECS_CLI_TG_CLIENT_INDEX --container-name client-index --container-port $ECS_CLI_PORT_CLIENT_INDEX --aws-profile genetraps
 
 ### BUILDING API_DX ###
-LOG_APP="api-dx: "
-echo $LOG_PREFIX $LOG_APP "building..."
-gradle build docker -p api-dx/
-echo $LOG_PREFIX $LOG_APP "running docker..."
-docker run -d -p 8086:8086 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/api-dx:latest
-echo $LOG_PREFIX $LOG_APP "waiting for service..."
-./scripts/wait-for-service.sh localhost:8086/hello 60
-echo $LOG_PREFIX $LOG_APP "checking for error..."
-check
-echo $LOG_PREFIX $LOG_APP "testing..."
-echo $(curl localhost:8086/touch)
+#LOG_APP="api-dx: "
+#echo $LOG_PREFIX $LOG_APP "building..."
+#gradle build docker -p api-dx/
+#echo $LOG_PREFIX $LOG_APP "running docker..."
+#docker run -d -p 8086:8086 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/api-dx:latest
+#echo $LOG_PREFIX $LOG_APP "waiting for service..."
+#./scripts/wait-for-service.sh localhost:8086/hello 60
+#echo $LOG_PREFIX $LOG_APP "checking for error..."
+#check
+#echo $LOG_PREFIX $LOG_APP "testing..."
+#echo $(curl localhost:8086/touch)
 
 #exit 0
 
