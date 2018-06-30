@@ -32,9 +32,12 @@ echo $LOG_PREFIX $LOG_APP "setting tag"
 CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
 CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index:"$CLIENT_INDEX_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG
-docker build client-index/ -t $CLIENT_INDEX_TAG
+docker build client-index/ -t $CLIENT_INDEX_TAG -q
+echo $LOG_PREFIX $LOG_APP "client tag" $CLIENT_INDEX_TAG
 docker push $CLIENT_INDEX_TAG
 cat aws-conf/docker-compose-template.yml | sed 's@clientIndexImageTag@'"$CLIENT_INDEX_TAG"'@' > docker-compose.yml
+echo $LOG_PREFIX $LOG_APP "printing docker-compose.yml"
+cat docker-compose.yml
 
 ### ECS ###
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
