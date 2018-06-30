@@ -3,30 +3,10 @@ services:
   client-index:
     image: clientIndexImageTag
     ports:
-      - "8087:8087"
+      - "portTag:portTag"
     logging:
       driver: awslogs
       options:
         awslogs-group: genetraps-logs
         awslogs-region: us-east-1
-        awslogs-stream-prefix: clientexplorare
-  client-explorare:
-    image: clientExplorareImageTag
-    ports:
-      - "8081:8081"
-    logging:
-      driver: awslogs
-      options: 
-        awslogs-group: GENETRAPS_DEV_LOG_GROUP
-        awslogs-region: us-east-1
-        awslogs-stream-prefix: clientexplorare
-  client-dnatoken:
-    image: clientDnatokenImageTag
-    ports:
-      - "8083:8083"
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: GENETRAPS_DEV_LOG_GROUP
-        awslogs-region: us-east-1
-        awslogs-stream-prefix: clientdnatoken
+        awslogs-stream-prefix: prefixTag

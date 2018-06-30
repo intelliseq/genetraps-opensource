@@ -34,13 +34,15 @@ CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-
 echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG
 docker build client-index/ -t $CLIENT_INDEX_TAG -q
 echo $LOG_PREFIX $LOG_APP "client tag" $CLIENT_INDEX_TAG
-docker push $CLIENT_INDEX_TAG -q
-cat aws-conf/docker-compose-template.yml | sed 's@clientIndexImageTag@'"$CLIENT_INDEX_TAG"'@' > docker-compose.yml
+docker push $CLIENT_INDEX_TAG
+cat aws-conf/docker-compose-template.yml | sed 's@clientIndexImageTag@'"$CLIENT_INDEX_TAG"'@' | sed 's@portTag@'"$ECS_CLI_PORT_CLIENT_INDEX"'@g' | sed 's@prefixTag@client-index-log@' > docker-compose.yml
 #echo $LOG_PREFIX $LOG_APP "printing docker-compose.yml"
 #cat docker-compose.yml
 
 ### ECS ###
+echo $LOG_PREFIX $LOG_APP "ecs-cli configuring"
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
+echo $LOG_PREFIX $LOG_APP "ecs-cli composing client-index"
 ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNTID":targetgroup/client-index-target-group/"$ECS_CLI_TG_CLIENT_INDEX --container-name client-index --container-port $ECS_CLI_PORT_CLIENT_INDEX --aws-profile genetraps
 
 ### BUILDING API_DX ###
