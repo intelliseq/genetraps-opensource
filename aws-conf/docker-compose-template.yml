@@ -7,7 +7,7 @@ services:
     logging:
       driver: awslogs
       options:
-        awslogs-group: GENETRAPS_DEV_LOG_GROUP
+        awslogs-group: genetraps-logs
         awslogs-region: us-east-1
         awslogs-stream-prefix: clientexplorare
   client-explorare:
