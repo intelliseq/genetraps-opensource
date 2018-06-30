@@ -4,12 +4,12 @@
 [![Build Status](https://travis-ci.org/marpiech/genetraps-opensource.svg?branch=master)](https://travis-ci.org/marpiech/genetraps-opensource)
 
 ## Services status
-# client-index service
+### client-index service
 ![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)
-# api-dx service
-![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)
-# api-security
-![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)
+### api-dx service
+![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/-client--index-online-brightgreen.svg)
+### api-security
+![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl/-client--index-online-brightgreen.svg)
 
 ## development philosophy
 # API dx
