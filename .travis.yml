@@ -17,6 +17,11 @@ before_install:
   - sudo -H pip install --upgrade --force-reinstall pip==9.0.3
   - sudo -H pip install awscli --upgrade
   - sudo -H pip install dxpy --upgrade
+  - curl -s api.sdkman.io | bash
+  - source /home/travis/.sdkman/bin/sdkman-init.sh
+  - sdk list gradle
+  - sdk install gradle 4.8.1
+  - sdk default gradle 4.8.1
   - mkdir ~/.aws
   - printf "[genetraps]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY > ~/.aws/credentials
   - printf "[profile genetraps]\nregion="$AWS_REGION"\noutput=json" > ~/.aws/config
