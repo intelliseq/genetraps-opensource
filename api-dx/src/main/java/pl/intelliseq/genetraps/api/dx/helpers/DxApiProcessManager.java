@@ -34,15 +34,6 @@ public class DxApiProcessManager {
         DXContainer.getInstance(env.getProperty("dx-project")).newFolder("/samples/" + sampleNumber, true);
     }
 
-    public DXJob runTouch(String fileId) {
-
-        return getAppletFromName("touch")
-                .newRun()
-                .setProject(DXProject.getInstance(env.getProperty("dx-project")))
-                .setInput(fileId)
-                .run();
-    }
-
     public DXJob runFastqc(String fileId) {
         var input = new HashMap<>();
         DXFile file = DXFile.getInstance(fileId);

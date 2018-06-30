@@ -1,23 +1,17 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
-import com.dnanexus.DXJob;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.intelliseq.genetraps.api.dx.exceptions.DxRunnerException;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
+@Log4j2
 public class FilesController {
-
-    private Logger log = Logger.getLogger(FilesController.class);
-
 
     @Autowired
     private DxApiProcessManager processManager;
@@ -25,39 +19,39 @@ public class FilesController {
     @Autowired
     private FilesManager filesManager;
 
-
-    private String matchFileAndGetName(String filename, String regex) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(filename);
-        if (m.matches()) {
-            return m.group(1);
-        }
-        return null;
-    }
-
-
-    @RequestMapping(value = "/upload-both", method = RequestMethod.POST)
-    public String uploadBoth(
-            @RequestParam String left,
-            @RequestParam String right,
-            @RequestParam String sampleNumber,
-            @RequestParam(required = false) String... tag) {
-
-        String leftRegex = "(.*?)_1\\.(f(ast)?q(\\.gz)?)";
-        String leftName = matchFileAndGetName(left, leftRegex);
-
-        String rightRegex = "(.*?)_2\\.(f(ast)?q(\\.gz)?)";
-        String rightName = matchFileAndGetName(right, rightRegex);
-
-        if (leftName != null && leftName.equals(rightName)) {
-            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
-            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
-
-            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
-        } else {
-            throw new DxRunnerException("Incompatible files");
-        }
-    }
+//TODO: For future features
+//    private String matchFileAndGetName(String filename, String regex) {
+//        Pattern p = Pattern.compile(regex);
+//        Matcher m = p.matcher(filename);
+//        if (m.matches()) {
+//            return m.group(1);
+//        }
+//        return null;
+//    }
+//
+//
+//    @RequestMapping(value = "/upload-both", method = RequestMethod.POST)
+//    public String uploadBoth(
+//            @RequestParam String left,
+//            @RequestParam String right,
+//            @RequestParam String sampleNumber,
+//            @RequestParam(required = false) String... tag) {
+//
+//        String leftRegex = "(.*?)_1\\.(f(ast)?q(\\.gz)?)";
+//        String leftName = matchFileAndGetName(left, leftRegex);
+//
+//        String rightRegex = "(.*?)_2\\.(f(ast)?q(\\.gz)?)";
+//        String rightName = matchFileAndGetName(right, rightRegex);
+//
+//        if (leftName != null && leftName.equals(rightName)) {
+//            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
+//            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
+//
+//            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
+//        } else {
+//            throw new DxRunnerException("Incompatible files");
+//        }
+//    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(

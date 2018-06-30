@@ -1,5 +1,5 @@
 #   ----------
-#   IseqBwaMem
+#   iseq-bwa-mem
 #   ----------
 #
 #   Katarzyna Kolanek
@@ -23,7 +23,7 @@
 #  WORKFLOW DEFINITION
 #  *******************
 
-workflow IseqBwaMem {
+workflow iseq-bwa-mem {
 
   String sample_id = "001"
   String ref_name = "grch38"

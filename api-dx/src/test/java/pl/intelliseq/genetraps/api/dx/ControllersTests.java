@@ -3,7 +3,7 @@ package pl.intelliseq.genetraps.api.dx;
 import com.dnanexus.DXJob;
 import com.dnanexus.JobState;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +24,8 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Log4j2
 public class ControllersTests {
-
-    Logger log = Logger.getLogger(ControllersTests.class);
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -36,6 +35,10 @@ public class ControllersTests {
 
     private String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
     private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
+
+    private Integer mkDir() {
+        return restTemplate.getForObject("/mkdir", JsonNode.class).get("response").asInt();
+    }
 
     private DXJob.Describe waitUntilJobIsDone(String jobId) {
         try {
@@ -89,10 +92,11 @@ public class ControllersTests {
 
     @Test
     public void upload() {
-        DXJob.Describe upload1 = upload(sampleLeft, 1, "left");
+        Integer sampleNumber = mkDir();
+        DXJob.Describe upload1 = upload(sampleLeft, sampleNumber, "left");
         String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
-        log.info(restTemplate.getForObject("/describe/"+file1Id, JsonNode.class));
+        log.info(restTemplate.getForObject("/describe/" + file1Id, JsonNode.class));
         log.info(fastqc(file1Id));
     }
 
