@@ -1,7 +1,6 @@
 package pl.intelliseq.explorare.model.hpo;
 
 public class GeneResult implements Comparable {
-
 	private String name;
 	private Double score;
 	
@@ -25,19 +24,9 @@ public class GeneResult implements Comparable {
 
 	@Override
 	public int compareTo(Object o) {
-
-		if (this.name.equals(((GeneResult) o).getName())) {
-			//System.out.println("Compare " + this.name);
-			return 0;
-		}
-
-		int compareResult = - this.score.compareTo(((GeneResult) o).getScore());
-
-		if (compareResult != 0) {
-			return compareResult;
-		}
-		else {
-			return this.name.compareTo(((GeneResult) o).getName());
-		}
+		if (this.name.equals(((GeneResult) o).getName())) {System.out.println("Compare " + this.name);return 0;}
+		int compareResult = -this.score.compareTo(((GeneResult) o).getScore());
+		if (compareResult != 0) return compareResult;
+		else return this.name.compareTo(((GeneResult) o).getName());
 	}
 }

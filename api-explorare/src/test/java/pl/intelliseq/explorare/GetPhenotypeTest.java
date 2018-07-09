@@ -28,7 +28,7 @@ public class GetPhenotypeTest {
 
 	@Test
 	public void diseaseAutocomplete() {
-		String url = "/get-phenotype-by-id?phenotypeid=HP:0001638";
+		String url = "/get-phenotype-by-id?phenotypeid=HP:0000836";
 		String body = this.restTemplate.getForObject(url, String.class);
 		System.out.println(body);
 	}

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.DeflaterInputStream;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -16,9 +15,6 @@ import pl.intelliseq.explorare.utils.json.Views;
  * @author marpiech
  *
  */
-
-
-
 public class HpoTerm {
 
 	@JsonView(Views.Rest.class)
@@ -26,16 +22,12 @@ public class HpoTerm {
 	@JsonView(Views.Rest.class)
 	String name;
 	List<String> synonyms;
-    List<HpoTerm> parents;
+	HpoTerm parent;
 	List <HpoTerm> children;
 	Set <String> genes;
 	Set <String> diseases;
-	List <ObsoleteHpoTerm> replacementOf;
-
-
 	/*** what is weight? Baby don't hurt me. No more.
 	 		dear future developer sorry I don't remember ***/
-
 	Double weight;
 	
 	public HpoTerm() {
@@ -43,11 +35,8 @@ public class HpoTerm {
 		this.name = "";
 		this.synonyms = new ArrayList <String> ();
 		this.children = new ArrayList <HpoTerm> ();
-        this.parents = new ArrayList <HpoTerm> ();
 		this.genes = new HashSet<String> ();
 		this.diseases = new HashSet<String> ();
-		this.replacementOf = new ArrayList<>();
-
 	}
 	
 	public HpoTerm(String id) {
@@ -58,10 +47,8 @@ public class HpoTerm {
 		this.id = id;
 		this.synonyms = new ArrayList <String> ();
 		this.children = new ArrayList <HpoTerm> ();
-        this.parents = new ArrayList <HpoTerm> ();
 		this.genes = new HashSet<String> ();
 		this.diseases = new HashSet<String> ();
-        this.replacementOf = new ArrayList<>();
 
 	}
 
@@ -73,35 +60,29 @@ public class HpoTerm {
 		this.name = name;
 	}
 
-	public void addParent(HpoTerm parent) {
-        parent.addChild(this);
-        this.parents.add(parent);
+	public void setParent(HpoTerm parent) {
+		this.parent = parent;
+		this.parent.addChild(this);
 	}
 	
 	public void addSynonym(String synonym) {
 		this.synonyms.add(synonym);
 	}
-
+	
 	public void addChild(HpoTerm child) {
 		this.children.add(child);
 	}
 	
 	public void addGene(String gene) {
 		this.genes.add(gene);
-        if (! this.parents.isEmpty()) {
-            for (HpoTerm parent : this.parents) {
-                parent.addGene(gene);
-            }
-        }
+		if (parent != null)
+			parent.addGene(gene);
 	}
 
 	public void addDisease(String disease) {
 		this.diseases.add(disease);
-        if (! this.parents.isEmpty()) {
-            for (HpoTerm parent : this.parents){
-                parent.addDisease(disease);
-            }
-        }
+		if (parent != null)
+			parent.addDisease(disease);
 	}
 	
 	public void setWeight(double weight) {
@@ -119,7 +100,7 @@ public class HpoTerm {
 		return name;
 	}
 
-    public Set <String> getGenes() {
+	public Set <String> getGenes() {
 		return genes;
 	}
 	
@@ -174,39 +155,24 @@ public class HpoTerm {
 		return 1d / (double) this.genes.size();
 	}
 
-	public List <HpoTerm> getParents() {
-		return this.parents;
+	public HpoTerm getParent() {
+		return this.parent;
 	}
-
-    public List<ObsoleteHpoTerm> getReplacementOf() {
-        return replacementOf;
-    }
-
-    public void addReplacementOf(String id, String name, List <String> synonyms) {
-        ObsoleteHpoTerm obsoleteHpoTerm = new ObsoleteHpoTerm(id, name, synonyms);
-        this.replacementOf.add(obsoleteHpoTerm);
-    }
-
-
-    public void increaseGeneScoresByWeight(Map<String, Double> geneScores, double weight) {
-
-
-        if (this.weight != null) {
-
-            double increaseBy = this.weight * weight;
-
-            for (String symbol : this.genes)
-                if (geneScores.containsKey(symbol))
-                    geneScores.put(symbol, geneScores.get(symbol) + increaseBy);
-                else
-                    geneScores.put(symbol, increaseBy);
-
-            if (geneScores.containsKey("maximum"))
-                geneScores.put("maximum", geneScores.get("maximum") + increaseBy);
-            else
-                geneScores.put("maximum", increaseBy);
-        }
-
+	public void increaseGeneScoresByWeight(Map<String, Double> geneScores, double weight) {
+		
+		double increaseBy = this.weight * weight;
+		
+		for (String symbol : this.genes)
+			if (geneScores.containsKey(symbol))
+				geneScores.put(symbol, geneScores.get(symbol) + increaseBy);
+			else
+				geneScores.put(symbol, increaseBy);
+		
+		if (geneScores.containsKey("maximum"))
+			geneScores.put("maximum", geneScores.get("maximum") + increaseBy);
+		else
+			geneScores.put("maximum", increaseBy);
+		
 	}
 
 	public void increaseDiseaseScoresByWeight(Map<String, Double> diseaseScores, double weight) {
@@ -234,38 +200,18 @@ public class HpoTerm {
 	}
 
 	public boolean isChildOf(HpoTerm term) {
-		return checkIfTermIsAmong(term, this.parents);
+		if (parent == null) return false;
+		if (parent.equals(term)) return true;
+		return parent.isChildOf(term);
+		
 	}
-
-	private boolean checkIfTermIsAmong(HpoTerm termToCheck, List <HpoTerm> terms) {
-	    if (terms.isEmpty()) return false;
-	    for (HpoTerm term : terms) {
-	        if (term.equals(termToCheck))
-	            return true;
-	    }
-        List <HpoTerm> parentsOfTerms = new ArrayList<>();
-        for (HpoTerm term : terms) {
-            parentsOfTerms.addAll(term.getParents());
-        }
-        return checkIfTermIsAmong(termToCheck, parentsOfTerms);
-    }
-
 
 	public boolean hasParent(String parentId) {
-		return checkByIdIfTermIsAmong(parentId, this.parents);
+		if (this.parent == null) return false;
+		if (this.parent.id.equals(parentId)) return true;
+		return this.parent.hasParent(parentId);
 	}
 
-    private boolean checkByIdIfTermIsAmong(String idToCheck, List <HpoTerm> terms) {
-        if (terms.isEmpty()) return false;
-        for (HpoTerm term : terms) {
-            if (term.getId().equals(idToCheck))
-                return true;
-        }
-        List <HpoTerm> parentsOfTerms = new ArrayList<>();
-        for (HpoTerm term : terms) {
-            parentsOfTerms.addAll(term.getParents());
-        }
-        return checkByIdIfTermIsAmong(idToCheck, parentsOfTerms);
-    }
+
 
 }

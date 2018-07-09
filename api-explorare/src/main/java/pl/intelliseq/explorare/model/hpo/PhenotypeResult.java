@@ -12,14 +12,14 @@ public class PhenotypeResult {
 	private HpoTerm phenotype;
 	
 	@JsonView(Views.Rest.class)
-	private List<HpoTerm> parents;
+	private HpoTerm parent;
 	
 	@JsonView(Views.Rest.class)
 	private List<HpoTerm> children;
 	
 	public PhenotypeResult(HpoTerm phenotype) {
 		this.phenotype = phenotype;
-		this.parents = phenotype.getParents();
+		this.parent = phenotype.getParent();
 		this.children = phenotype.getChildren();
 	}
 
@@ -31,12 +31,12 @@ public class PhenotypeResult {
 		this.phenotype = phenotype;
 	}
 
-	public List<HpoTerm> getParents() {
-		return parents;
+	public HpoTerm getParent() {
+		return parent;
 	}
 
-	public void setParents(List<HpoTerm> parents) {
-		this.parents = parents;
+	public void setParent(HpoTerm parent) {
+		this.parent = parent;
 	}
 
 	public List<HpoTerm> getChildren() {

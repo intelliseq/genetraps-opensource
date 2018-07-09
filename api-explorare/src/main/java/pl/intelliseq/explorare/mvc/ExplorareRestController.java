@@ -126,14 +126,12 @@ public class ExplorareRestController {
     	
 	
     	Set<GeneResult> finalResult = new TreeSet<GeneResult>();
-
     	for(Entry<String, Double> entry : result.entrySet()) {
     		if (this.diseaseGeneDictionary.getDiseaseById(entry.getKey()) != null)
     			for (String gene : this.diseaseGeneDictionary.getDiseaseById(entry.getKey()).getGenes())
     				finalResult.add(new GeneResult(gene, 100 * entry.getValue()));
     				
     	}
-
     	//System.out.println("Final Result " + finalResult.size());
     	
     	return finalResult;

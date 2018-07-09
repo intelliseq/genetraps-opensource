@@ -63,9 +63,6 @@ public class HpoOboParser {
 }
 
 class HpoCollector {
-
-	// it just reads hp.obo file line by line collecting Terms as lineBuffers and returning them as a list of Strings
-	// single lineBuffer starts at line "[Term]" and ends at empty line
 	
 	private boolean isReading = false;
 	private HpoTree hpoTree;
