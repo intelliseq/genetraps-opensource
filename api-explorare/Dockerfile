@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -9,11 +9,11 @@ RUN apt-get update && \
     apt-get install -y oracle-java10-installer && \
     apt-get clean
 
-#FROM openjdk:8-jdk-alpine
 
 RUN echo "echo starting app" > start.sh
 RUN echo "java -jar app.jar" >> start.sh
-ARG JAR_FILE
-ADD ${JAR_FILE} app.jar
+
+ADD build/libs/app-latest.jar app.jar
+ADD src/main/resources/ src/main/resources/
+
 ENTRYPOINT ["sh", "./start.sh"]
-#ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]

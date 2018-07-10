@@ -45,6 +45,31 @@ ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-
 echo $LOG_PREFIX $LOG_APP "ecs-cli composing client-index"
 ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNTID":targetgroup/client-index-target-group/"$ECS_CLI_TG_CLIENT_INDEX --container-name client-index --container-port $ECS_CLI_PORT_CLIENT_INDEX --aws-profile genetraps
 
+### BUILDING API_EXPLORARE
+### BUILDING API_EXPLORARE ###
+APP="api-explorare"
+PORT=$ECS_CLI_PORT_API_EXPLORARE
+TG=$ECS_CLI_TG_API_EXPLORARE
+LOG_APP=$APP": "
+echo $LOG_PREFIX $LOG_APP "building..."
+gradle build -p $APP/
+echo $LOG_PREFIX $LOG_APP "setting tag"
+CHECKSUM=`find $APP -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+TAG=""
+TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-"$APP":"$CHECKSUM
+echo $LOG_PREFIX $LOG_APP $TAG
+docker build $APP"/" -t $TAG -q
+echo $LOG_PREFIX $LOG_APP " tag=" $TAG
+docker run -d -p $PORT:$PORT -t $TAG
+echo $LOG_PREFIX $LOG_APP "waiting for service..."
+./scripts/wait-for-service.sh localhost:$PORT/hello 60
+echo $LOG_PREFIX $LOG_APP "checking for error..."
+check
+docker push $TAG
+cat aws-conf/docker-compose-template.yml | sed 's@imageTag@'"$TAG"'@' | sed 's@portTag@'"$PORT"'@g' | sed 's@prefixTag@"$APP"-log@' > docker-compose.yml
+echo $LOG_PREFIX $LOG_APP "ecs-cli composing "$APP
+ecs-cli compose --project-name genetraps-$APP -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNTID":targetgroup/$APP-target-group/"$TG --container-name $APP --container-port $PORT --aws-profile genetraps
+
 ### BUILDING API_DX ###
 LOG_APP="api-dx: "
 echo $LOG_PREFIX $LOG_APP "building..."

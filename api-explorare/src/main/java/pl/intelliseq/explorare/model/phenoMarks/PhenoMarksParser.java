@@ -21,8 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
-
 public class PhenoMarksParser {
 
 	POSTaggerME tagger;

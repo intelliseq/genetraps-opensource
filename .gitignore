@@ -6,11 +6,11 @@ RemoteSystemsTempFiles/
 docker-compose.yml
 
 # api-explorare
-api-explorare/bin/
-api-explorare/.settings/
-api-explorare/danlos
-api-explorare/.project
-api-explorare/.classpath
+*/bin/
+*/build/
+**/.settings/
+**/.project
+**/.classpath
 
 # Compiled class file
 *.class

@@ -18,13 +18,14 @@ As docker image port should be set to 8086.
 
 ## genetraps system
 # docker ports
-8081 - client explorare
-8082 - api explorae
-8083 - client dnatoken
-8084 - api dnatoken
-8085 - client dx
-8086 - api dx
-8087 - client index
+#### 8081 - client explorare
+#### 8082 - api explorare
+#### 8083 - client dnatoken
+#### 8084 - api dnatoken
+#### 8085 - client dx
+#### 8086 - api dx
+#### 8087 - client index
+#### 8088 - api security
 
 ## URL Tutorial
 
