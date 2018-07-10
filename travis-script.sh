@@ -1,6 +1,6 @@
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
-
+#
 echo $LOG_PREFIX"Starting travis script"
 source scripts/get-secrets.sh
 echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
