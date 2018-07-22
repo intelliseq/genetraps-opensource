@@ -1,6 +1,6 @@
 version: '2'
 services:
-  client-index:
+  appTag:
     image: imageTag
     ports:
       - "portTag:portTag"

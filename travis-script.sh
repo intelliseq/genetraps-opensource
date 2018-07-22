@@ -66,7 +66,7 @@ echo $LOG_PREFIX $LOG_APP "waiting for service..."
 echo $LOG_PREFIX $LOG_APP "checking for error..."
 check
 docker push $TAG
-cat aws-conf/docker-compose-template.yml | sed 's@imageTag@'"$TAG"'@' | sed 's@portTag@'"$PORT"'@g' | sed 's@prefixTag@"$APP"-log@' > docker-compose.yml
+cat aws-conf/docker-compose-template.yml | sed 's@appTag@'"$APP"'@' | sed 's@imageTag@'"$TAG"'@' | sed 's@portTag@'"$PORT"'@g' | sed 's@prefixTag@"$APP"-log@' > docker-compose.yml
 echo $LOG_PREFIX $LOG_APP "ecs-cli composing "$APP
 ecs-cli compose --project-name genetraps-$APP -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNTID":targetgroup/$APP-target-group/"$TG --container-name $APP --container-port $PORT --aws-profile genetraps
 
