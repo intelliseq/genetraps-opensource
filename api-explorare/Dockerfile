@@ -3,6 +3,7 @@ FROM ubuntu:18.04
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y  software-properties-common && \
+    apt-get install -y  gradle && \
     add-apt-repository ppa:linuxuprising/java -y && \
     apt-get update && \
     echo oracle-java10-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
