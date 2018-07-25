@@ -1,0 +1,4 @@
+aws elbv2 create-target-group --name db-security-target-group --protocol HTTP --port 27017 --target-type ip --vpc-id $ECS_CLI_VPC_ID --profile genetraps > logs
+export ECS_CLI_TG_DB_SECURITY=`cat logs | grep Arn | grep -oE "/[0-9a-zA-Z]*\"" | grep -oE "[0-9a-zA-Z]*"`
+scripts/save-secret.sh ECS_CLI_TG_DB_SECURITY
+
