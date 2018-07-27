@@ -3,7 +3,7 @@ sudo: required
 language: java
 
 jdk:
-  - oraclejdk9
+  - oraclejdk10
 
 python:
   - 3.4
@@ -14,12 +14,17 @@ services:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install python-pip python-dev build-essential
-  - sudo pip install pip --upgrade
-  - sudo pip install awscli --upgrade
-  - sudo pip install dxpy --upgrade
+  - sudo -H pip install --upgrade --force-reinstall pip==9.0.3
+  - sudo -H pip install awscli --upgrade
+  - sudo -H pip install dxpy --upgrade
+  - curl -s api.sdkman.io | bash
+  - source /home/travis/.sdkman/bin/sdkman-init.sh
+  - sdk list gradle
+  - sdk install gradle 4.8.1
+  - sdk default gradle 4.8.1
   - mkdir ~/.aws
-  - printf "[kms]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY > ~/.aws/credentials
-  - printf "[profile kms]\nregion="$AWS_REGION"\noutput=json" > ~/.aws/config
+  - printf "[genetraps]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY > ~/.aws/credentials
+  - printf "[profile genetraps]\nregion="$AWS_REGION"\noutput=json" > ~/.aws/config
   - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
   - sudo chmod a+x /usr/local/bin/ecs-cli
 

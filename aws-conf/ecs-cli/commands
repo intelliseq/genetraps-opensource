@@ -1,0 +1,29 @@
+aws iam --region us-east-1 create-role --role-name ecsTaskExecutionRole --assume-role-policy-document file://ecs-role.json --profile genetraps
+aws iam --region us-east-1 attach-role-policy --role-name ecsTaskExecutionRole --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy --profile genetraps
+ecs-cli configure --cluster genetraps --region us-east-1 --default-launch-type FARGATE --config-name genetraps
+ecs-cli configure profile --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --profile-name genetraps
+ecs-cli up --aws-profile genetraps
+### note VPC ID that was created in up task
+aws ec2 create-security-group --group-name "ecs-cli-sg" --description "ECS CLI group" --vpc-id $ECS_CLI_VPC_ID --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 80 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8081 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8082 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8083 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8084 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8085 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8086 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8087 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8088 --cidr 0.0.0.0/0 --profile genetraps
+aws ec2 authorize-security-group-ingress --group-id $ECS_CLI_SG_ID --protocol tcp --port 8089 --cidr 0.0.0.0/0 --profile genetraps
+
+### general ###
+aws elbv2 create-load-balancer --name "$ECS_CLI_CLUSTER_NAME-load-balancer" --subnets $ECS_CLI_SUBNET1_ID $ECS_CLI_SUBNET2_ID --security-groups $ECS_CLI_SG_ID --profile genetraps
+aws logs create-log-group --log-group-name genetraps-logs --profile genetraps
+
+### specific ###
+aws ecr create-repository --repository-name genetraps/client-index --profile genetraps
+export ECS_CLI_TG_API_DX=`aws elbv2 create-target-group --name api-dx-target-group --protocol HTTP --port $ECS_CLI_PORT_API_DX --vpc-id $ECS_CLI_VPC_ID --target-type ip --profile genetraps | grep Arn | grep -oP "[a-zA-Z0-9]{16}" | tail -1`
+ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:958510462668:targetgroup/client-index-target-group/dceb1027326e4555 --container-name client-index --container-port 8087 --aws-profile genetraps
+
+ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:us-east-1:958510462668:targetgroup/client-index-target-group/dceb1027326e4555" --container-name client-index --container-port 8087 --aws-profile genetraps
+ 1648  cat aws-conf/ecs-cli/commands

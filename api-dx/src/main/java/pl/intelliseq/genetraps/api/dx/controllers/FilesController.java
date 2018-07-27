@@ -1,86 +1,82 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
-import org.apache.log4j.Logger;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.intelliseq.genetraps.api.dx.exceptions.DxRunnerException;
-import pl.intelliseq.genetraps.api.dx.helpers.ProcessManager;
-import pl.intelliseq.genetraps.api.dx.models.IseqJSON;
+import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
+import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
+@Log4j2
 public class FilesController {
 
-	private Logger log = Logger.getLogger(FilesController.class);
+    @Autowired
+    private DxApiProcessManager processManager;
 
-	private String leftRegex = "(.*?)_1\\.(f(ast)?q(\\.gz)?)";
-	private String rightRegex = "(.*?)_2\\.(f(ast)?q(\\.gz)?)";
+    @Autowired
+    private FilesManager filesManager;
 
-
-	@Autowired
-    private ProcessManager processManager;
-
-
-	private String matchFileAndGetName(String filename, String regex) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(filename);
-        if(m.matches()){
-            return m.group(1);
-        }
-        return null;
-    }
-
-
-	@RequestMapping(value = "/upload-both", method = RequestMethod.POST)
-    public String uploadBoth(
-        @RequestParam String left,
-        @RequestParam String right,
-        @RequestParam String sampleNumber,
-        @RequestParam(required = false) String... tags){
-        String leftName = matchFileAndGetName(left, leftRegex);
-        String rightName = matchFileAndGetName(right, rightRegex);
-        if(leftName != null && leftName.equals(rightName)){
-            String leftId = processManager.runUrlFetch(left, sampleNumber, tags);
-            String rightId = processManager.runUrlFetch(right, sampleNumber, tags);
-
-            return new IseqJSON("id", String.format("[\"%s\",\"%s\"]", leftId, rightId)).toString();
-        } else {
-            throw new DxRunnerException("Incompatible files");
-        }
-    }
+//TODO: For future features
+//    private String matchFileAndGetName(String filename, String regex) {
+//        Pattern p = Pattern.compile(regex);
+//        Matcher m = p.matcher(filename);
+//        if (m.matches()) {
+//            return m.group(1);
+//        }
+//        return null;
+//    }
+//
+//
+//    @RequestMapping(value = "/upload-both", method = RequestMethod.POST)
+//    public String uploadBoth(
+//            @RequestParam String left,
+//            @RequestParam String right,
+//            @RequestParam String sampleNumber,
+//            @RequestParam(required = false) String... tag) {
+//
+//        String leftRegex = "(.*?)_1\\.(f(ast)?q(\\.gz)?)";
+//        String leftName = matchFileAndGetName(left, leftRegex);
+//
+//        String rightRegex = "(.*?)_2\\.(f(ast)?q(\\.gz)?)";
+//        String rightName = matchFileAndGetName(right, rightRegex);
+//
+//        if (leftName != null && leftName.equals(rightName)) {
+//            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
+//            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
+//
+//            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
+//        } else {
+//            throw new DxRunnerException("Incompatible files");
+//        }
+//    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(
             @RequestParam String url,
             @RequestParam String sampleNumber,
-            @RequestParam(required = false) Boolean force,
-            @RequestParam(required = false) String... tags){
-        log.info(Arrays.toString(tags));
+            @RequestParam(required = false) String... tag) {
+        log.info(Arrays.toString(tag));
 
-        return new IseqJSON("id", processManager.runUrlFetch(url, sampleNumber, tags)).toString();
+        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleNumber, tag).getId()).toString();
     }
 
     @RequestMapping(value = "/describe/{id}", method = RequestMethod.GET)
-    public String describe(@PathVariable String id){
-        return processManager.runJSONDescribe(id).toString();
-
+    public String describe(
+            @PathVariable String id) {
+        return processManager.JSONDescribe(id).toString();
     }
 
     @RequestMapping(value = "/fastqc", method = RequestMethod.POST)
-    public String fastqc(@RequestParam String fileId){
-        return new IseqJSON("id", processManager.runFastqc(fileId)).toString();
+    public String fastqc(@RequestParam String fileId) {
+        return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
 
-    @RequestMapping(value = "/bwa", method = RequestMethod.POST)
-    public String bwa(
-            @RequestParam String left,
-            @RequestParam String right,
-            @RequestParam String outputFolder
-    ){
-        return new IseqJSON("id", processManager.runBwa(left, right, outputFolder)).toString();
+    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
+    @ResponseBody
+    public String mkDir() {
+        return String.format("{\"response\":%s}", filesManager.mkdir());
     }
-    
 }

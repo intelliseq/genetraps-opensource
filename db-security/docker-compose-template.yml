@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  db-security:
+    image: mongo
+    container_name: "db-security"
+    ports:
+      - "27017:27017"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: genetraps-logs
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoUserTag
+      MONGO_INITDB_ROOT_PASSWORD: mongoPasswordTag

@@ -1,22 +1,12 @@
 version: '2'
 services:
-  client-explorare:
-    image: clientExplorareImageTag
+  appTag:
+    image: imageTag
     ports:
-      - "8081:8081"
-    logging:
-      driver: awslogs
-      options: 
-        awslogs-group: GENETRAPS_DEV_LOG_GROUP
-        awslogs-region: us-east-1
-        awslogs-stream-prefix: clientexplorare
-  client-dnatoken:
-    image: clientDnatokenImageTag
-    ports:
-      - "8083:8083"
+      - "portTag:portTag"
     logging:
       driver: awslogs
       options:
-        awslogs-group: GENETRAPS_DEV_LOG_GROUP
+        awslogs-group: genetraps-logs
         awslogs-region: us-east-1
-        awslogs-stream-prefix: clientdnatoken
+        awslogs-stream-prefix: prefixTag

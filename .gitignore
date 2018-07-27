@@ -5,6 +5,13 @@ RemoteSystemsTempFiles/
 
 docker-compose.yml
 
+# api-explorare
+*/bin/
+*/build/
+**/.settings/
+**/.project
+**/.classpath
+
 # Compiled class file
 *.class
 

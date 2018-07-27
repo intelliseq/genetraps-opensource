@@ -1,8 +1,11 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import com.dnanexus.DXContainer;
+import com.dnanexus.exceptions.ResourceNotFoundException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,44 +15,63 @@ import java.util.stream.IntStream;
 /**
  * Created by intelliseq on 07/12/2017.
  */
+@Log4j2
 public class FilesManager {
     @Autowired
-    private ProcessManager processManager;
+    private DxApiProcessManager processManager;
+
+    @Autowired
+    private Environment env;
 
     private AtomicInteger counter = new AtomicInteger(1);
 
-    public synchronized Integer mkdir(){
-        String response = processManager.runMkdir(String.valueOf(counter.get()));
-        if(!response.equals("")) {
+    public synchronized Integer mkdir() {
+        var list = getNumericDirectories();
+        if (list.contains(counter.get()) || list.size() != counter.get() - 1) {
             counter.set(getLowestFreeIndex());
-            processManager.runMkdir(String.valueOf(counter.get()));
         }
+        processManager.runMkDir(counter.get());
         return counter.getAndIncrement();
     }
 
-    public void resetCounter(){
-        counter.set(1);
-    }
-
-    public List<Integer> getNumericDirectories(){
-        String command = "dx ls --folders samples | grep -Eo \"^([0-9]+)\"";
-        String response = processManager.runCommand(command);
-        if(response.equals("")){
+    public List<Integer> getNumericDirectories() {
+        try {
+            return DXContainer.getInstance(env.getProperty("dx-project"))
+                    .listFolder("/samples")
+                    .getSubfolders()
+                    .stream()
+                    .map(s -> Integer.parseInt(s.substring(9)))
+                    .sorted()
+                    .collect(Collectors.toList());
+        } catch (ResourceNotFoundException e) {
             return new LinkedList<>();
         }
-        return Arrays.stream(response.split("\n")).map(Integer::valueOf).sorted().collect(Collectors.toList());
     }
 
-    public Integer getLowestFreeIndex(){
+    public Integer getLowestFreeIndex() {
+        log.info("Getting lowest free index");
         List<Integer> intList = getNumericDirectories();
-        if(intList == null || intList.size() == 0){
-            return 0;
-        } else if(intList.size() == intList.get(intList.size()-1)){
-            return intList.size() +1;
+        System.out.println(intList);
+        //Jeśli nic nie ma to zwracamy 1
+        if (intList == null || intList.size() == 0) {
+            log.info("Lowest index: " + 1);
+            return 1;
+        } else if (intList.size() == intList.get(intList.size() - 1)) {
+            //Jeśli ostatni element listy równa się jej wielkości, to oznacza, że nie ma dziur.
+            log.info("Lowest index: " + (intList.size() + 1));
+            return intList.size() + 1;
         }
         /**
-         * Bierzemy najniższy
+         * W przeciwnym wypadku szukamy dziury
          */
-        return IntStream.rangeClosed(1, intList.size()).filter(i -> !intList.contains(i)).sorted().boxed().collect(Collectors.toList()).get(0);
+        Integer index = IntStream
+                .rangeClosed(1, intList.size())
+                .filter(i -> !intList.contains(i))
+                .sorted()
+                .boxed()
+                .collect(Collectors.toList())
+                .get(0);
+        log.info("Lowest index: " + index);
+        return index;
     }
 }
