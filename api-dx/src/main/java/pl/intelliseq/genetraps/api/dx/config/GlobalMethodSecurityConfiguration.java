@@ -1,3 +1,4 @@
+/*
 package pl.intelliseq.genetraps.api.dx.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -7,5 +8,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class GlobalMethodSecurityConfiguration {
 
-    // enables PreAuthorize
+
+    // enables PreAuthorize, etc. (as a part of AOP aproach)
+
+
 }
+*/
