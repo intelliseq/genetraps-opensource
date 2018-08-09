@@ -35,25 +35,28 @@ As docker image port should be set to 8086.
 
 
 **To check if server is up**  
-`curl localhost:8080/hello`  
+`curl localhost:8086/hello` 
+
+**!!!To run any request you need an oauth2 token to authorize!!!**
+`TOKEN=$(curl -XPOST -H "Authorization: Bearer $TOKEN" "web_app:secret@localhost:8088/oauth/token" -d grant_type=password -d client_id=web_app -d username=admin -d password=welcome1 | jq -r ".access_token")`
 
 **To create lowest sample folder and get number**  
-`SAMPLE_NUMBER=$(curl localhost:8080/mkdir | jq -r ".response")`  
+`SAMPLE_NUMBER=$(curl -H "Authorization: Bearer $TOKEN" localhost:8086/mkdir | jq -r ".response")`  
 
 **To upload file to sample**  
-`U1ID=$(curl -X POST "localhost:8080/upload?url=http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz&tag=left&sampleNumber=$SAMPLE_NUMBER" | jq -r ".id")`  
+`U1ID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/upload?url=http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz&tag=left&sampleNumber=$SAMPLE_NUMBER" | jq -r ".id")`  
 
 **To check job id, and get file id**  
-`curl "localhost:8080/describe/$U1ID"`
-`curl "localhost:8080/describe/$U1ID" | jq -r ".state"`
+`curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID"`
+`curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID" | jq -r ".state"`
 
 **To get file id if job is done**
-`F1ID=$(curl "localhost:8080/describe/$U1ID" | jq -r '.output.file | .["$dnanexus_link"]')`
+`F1ID=$(curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID" | jq -r '.output.file | .["$dnanexus_link"]')`
 
 **To make fastqc analysis**
-`FQC1=$(curl -X POST localhost:8080/fastqc?fileId=$F1ID | jq -r ".id")`
-`curl "localhost:8080/describe/$FQC1"`
-`curl "localhost:8080/describe/$FQC1" | jq -r ".state"`
+`FQC1=$(curl -X POST -H "Authorization: Bearer $TOKEN" localhost:8086/fastqc?fileId=$F1ID | jq -r ".id")`
+`curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1"`
+`curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1" | jq -r ".state"`
 
 # Project Setup
 ## Set environment variables
