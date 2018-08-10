@@ -2,6 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="api-security_main" target="1.10" />
+      <module name="api-security_test" target="1.10" />
       <module name="security_main" target="1.10" />
       <module name="security_test" target="1.10" />
     </bytecodeTargetLevel>

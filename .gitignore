@@ -73,11 +73,8 @@ local.properties
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-**/.idea/**/*.iml
-
 # User-specific stuff
 **/.idea/**/workspace.xml
-**/.idea/**/compiler.xml
 **/.idea/**/tasks.xml
 **/.idea/**/usage.statistics.xml
 **/.idea/**/dictionaries
@@ -172,7 +169,7 @@ hs_err_pid*
 
 ### Gradle ###
 .gradle
-*/build/
+**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
