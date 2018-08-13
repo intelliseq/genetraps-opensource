@@ -38,7 +38,7 @@ As docker image port should be set to 8086.
 `curl localhost:8086/hello` 
 
 **!!!To run any request you need an authorisation token to authorize!!!**
-`TOKEN=$(curl -XPOST "web_app:secret@localhost:8088/oauth/token" -d grant_type=password -d client_id=web_app -d username=admin -d password=welcome1 | jq -r ".access_token")`
+`TOKEN=$(curl -XPOST "web_app:secret@localhost:8088/oauth/token" -d grant_type=password -d client_id=web_app -d username=$UNAME -d password=$PASSWD | jq -r ".access_token")`
 
 **To create lowest sample folder and get number**  
 `SAMPLE_NUMBER=$(curl -H "Authorization: Bearer $TOKEN" localhost:8086/mkdir | jq -r ".response")`  
