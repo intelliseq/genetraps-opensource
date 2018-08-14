@@ -38,13 +38,13 @@ As docker image port should be set to 8086.
 `curl localhost:8086/hello` 
 
 **!!!To run any request you need an authorisation token to authorize!!!**
-`TOKEN=$(curl -XPOST "web_app:secret@localhost:8088/oauth/token" -d grant_type=password -d client_id=web_app -d username=$UNAME -d password=$PASSWD | jq -r ".access_token")`
+`TOKEN=$(curl -XPOST "web_app:secret@localhost:8088/oauth/token" -d grant_type=password -d client_id=web_app -d username=$STAGING_USERNAME -d password=$STAGING_PASSWORD | jq -r ".access_token")`
 
 **To create lowest sample folder and get number**  
 `SAMPLE_NUMBER=$(curl -H "Authorization: Bearer $TOKEN" localhost:8086/mkdir | jq -r ".response")`  
 
 **To upload file to sample**  
-`U1ID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/upload?url=https://github.com/intelliseq/genetraps-opensource/blob/master/test-data/fastq/capn3.1.fq.gz&tag=left&sampleNumber=$SAMPLE_NUMBER" | jq -r ".id")`  
+`U1ID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/upload?url=http://rawgit.com/intelliseq/genetraps-opensource/master/test-data/fastq/capn3.1.fq.gz&tag=left&sampleNumber=$SAMPLE_NUMBER" | jq -r ".id")`  
 
 **To check job id, and get file id**  
 `curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID"`
