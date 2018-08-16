@@ -74,6 +74,16 @@ public class FilesController {
         return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
 
+    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2", "reference"})
+    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2, @RequestParam(defaultValue = "genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar") String reference) {
+        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2, reference).getId()).toString();
+    }
+
+    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"samples_number", "reference"})
+    public String bwa(@RequestParam int samples_number, @RequestParam(defaultValue = "genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar") String reference) {
+        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(samples_number, reference).getId()).toString();
+    }
+
     @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
     @ResponseBody
     public String mkDir() {
