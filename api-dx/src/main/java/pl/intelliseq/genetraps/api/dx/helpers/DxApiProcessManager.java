@@ -54,43 +54,45 @@ public class DxApiProcessManager {
         var input = new HashMap<>();
         DXFile fastqFile1 = DXFile.getInstance(fastq_fileId_1);
         DXFile fastqFile2 = DXFile.getInstance(fastq_fileId_2);
-        input.put("fastq_file1", fastqFile1);
-        input.put("fastq_file2", fastqFile2);
-        input.put("reference", reference);
+        DXFile ref = DXFile.getInstance(reference);
+        input.put("fastq_file_1", fastqFile1);
+        input.put("fastq_file_2", fastqFile2);
+        input.put("reference", ref);
 
 
         return getAppletFromName("iseq_bwa")
                 .newRun()
                 .setProject(DXProject.getInstance(env.getProperty("dx-project")))
                 .setInput(input)
-                .setFolder(fastqFile1.describe().getFolder().replace("rawdata", "bwa/" + fastqFile1.describe().getName()))
-                .setFolder(fastqFile2.describe().getFolder().replace("rawdata", "bwa/" + fastqFile2.describe().getName()))
+                .setFolder(fastqFile1.describe().getFolder().replace("rawdata", "bwa"))
                 .run();
     }
 
     public DXJob runBwa(Integer samples_number, String reference) {
         var input = new HashMap<>();
-        List fileList = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + samples_number.toString()).withTag("left").execute().asList();
-        if(fileList.size() != 1) {
-            throw new WrongNumberOfFilesException("expected: 1 with 'left' tag ; found: " + fileList.size());
+        List fileListLeft = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + samples_number.toString() + "/rawdata").withTag("left").execute().asList();
+        if(fileListLeft.size() != 1) {
+            throw new WrongNumberOfFilesException("expected: 1 with 'left' tag ; found: " + fileListLeft.size());
         }
-        DXFile fastqFile1 = (DXFile) fileList.get(0);
-        fileList = DXSearch.findDataObjects().withTag("right").execute().asList();
-        if(fileList.size() != 1) {
-            throw new WrongNumberOfFilesException("expected: 1 with 'right' tag ; found: " + fileList.size());
+        DXFile fastqFile1 = (DXFile) fileListLeft.get(0);
+
+        List fileListRight = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + samples_number.toString() + "/rawdata").withTag("right").execute().asList();
+        if(fileListRight.size() != 1) {
+            throw new WrongNumberOfFilesException("expected: 1 with 'right' tag ; found: " + fileListRight.size());
         }
-        DXFile fastqFile2 = (DXFile) fileList.get(0);
-        input.put("fastq_file1", fastqFile1);
-        input.put("fastq_file2", fastqFile2);
-        input.put("reference", reference);
+        DXFile fastqFile2 = (DXFile) fileListRight.get(0);
+
+        DXFile ref = DXFile.getInstance(reference);
+        input.put("fastq_file_1", fastqFile1);
+        input.put("fastq_file_2", fastqFile2);
+        input.put("reference", ref);
 
 
         return getAppletFromName("iseq_bwa")
                 .newRun()
                 .setProject(DXProject.getInstance(env.getProperty("dx-project")))
                 .setInput(input)
-                .setFolder(fastqFile1.describe().getFolder().replace("rawdata", "bwa/" + fastqFile1.describe().getName()))
-                .setFolder(fastqFile2.describe().getFolder().replace("rawdata", "bwa/" + fastqFile2.describe().getName()))
+                .setFolder(fastqFile1.describe().getFolder().replace("rawdata", "bwa"))
                 .run();
     }
 
