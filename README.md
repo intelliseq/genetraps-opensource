@@ -58,6 +58,14 @@ As docker image port should be set to 8086.
 `curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1"`
 `curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1" | jq -r ".state"`
 
+**To run bwa**
+*reference: genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar*
+Z Id plików:
+`referenceId=file-FJkBGjQ0Qj5YZ50K53B372Qy`
+`curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?fastq_file_1=$F1ID&fastq_file_2=$F2ID&reference=referenceId"`
+Z tagami: "left" i "right"
+`curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?samples_number=$SAMPLE_NUMBER&reference=referenceId"`
+
 # Project Setup
 ## Set environment variables
 ```
