@@ -1,7 +1,7 @@
 # genetraps-opensource
 
 ## Build status
-[![Build Status](https://travis-ci.org/marpiech/genetraps-opensource.svg?branch=master)](https://travis-ci.org/marpiech/genetraps-opensource)
+[![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.svg?branch=master)](https://travis-ci.org/intelliseq/genetraps-opensource)
 
 ## Services status
 ### client-index service
