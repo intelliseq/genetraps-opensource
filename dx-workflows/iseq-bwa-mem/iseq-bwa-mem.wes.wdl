@@ -199,8 +199,7 @@ task MergeBams {
   String base_file_name
 
   Int compression_level
-  String disk_size
-  String mem_size
+
   String num_cpu
 
   String docker_image
