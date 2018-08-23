@@ -57,7 +57,7 @@ public class FilesController {
     public String upload(
             @RequestParam String url,
             @RequestParam String sampleNumber,
-            @RequestParam(required = false) String... tag) {
+            @RequestParam String... tag) {
         log.info(Arrays.toString(tag));
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleNumber, tag).getId()).toString();
@@ -88,5 +88,15 @@ public class FilesController {
     @ResponseBody
     public String mkDir() {
         return String.format("{\"response\":%s}", filesManager.mkdir());
+    }
+
+    @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
+    public String samplels(@PathVariable("no") int samples_number) {
+        return processManager.sampleLs(samples_number);
+    }
+
+    @RequestMapping(value = "/sample/{no}/revls", method = RequestMethod.GET)
+    public String samplerevls(@PathVariable("no") int samples_number) {
+        return processManager.sampleRevLs(samples_number);
     }
 }
