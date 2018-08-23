@@ -6,13 +6,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.util.FileCopyUtils;
+import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 
 /**
@@ -30,6 +33,11 @@ public class BeansConfiguration {
         return new DxApiProcessManager();
     }
 
+    @Bean
+    AuroraDBManager auroraDBManager(){
+        return new AuroraDBManager();
+    }
+
     // JWT Configuration
     @Autowired
     private JwtAccessTokenConverter jwtAccessTokenConverter;
@@ -38,6 +46,16 @@ public class BeansConfiguration {
     @Qualifier("tokenStore")
     public TokenStore tokenStore() {
         return new JwtTokenStore(jwtAccessTokenConverter);
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource ds = new DriverManagerDataSource();
+        ds.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
+        ds.setUrl("jdbc:mysql://genetraps-provisioned.cluster-cvdvrgz3bmic.us-east-1.rds.amazonaws.com:3306/genetraps_security");
+        ds.setUsername("genetraps-client");
+        ds.setPassword("");
+        return ds;
     }
 
     @Bean
