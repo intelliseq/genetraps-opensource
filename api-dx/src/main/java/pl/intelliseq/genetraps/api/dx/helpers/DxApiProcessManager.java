@@ -3,15 +3,12 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 import com.dnanexus.*;
 import com.dnanexus.exceptions.TagsException;
 import com.dnanexus.exceptions.WrongNumberOfFilesException;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -126,9 +123,6 @@ public class DxApiProcessManager {
     public String sampleLs(Integer samples_number) {
         List filesList = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + samples_number.toString() + "/rawdata").execute().asList();
         Map<String, Object> responseMap = new HashMap<>();
-
-        Writer writer = new StringWriter();
-        JsonGenerator jsonGenerator;
         String samplelsOutputResponse = null;
 
         if(filesList.size() > 0) {
@@ -142,36 +136,24 @@ public class DxApiProcessManager {
                 filesMap.clear();
             }
             try {
-                jsonGenerator = new JsonFactory().createGenerator(writer);
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writeValue(jsonGenerator, responseMap);
-                jsonGenerator.close();
-                samplelsOutputResponse = writer.toString();
-            } catch (Exception e) {
+                samplelsOutputResponse = new ObjectMapper().writeValueAsString(responseMap);
+            } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            return samplelsOutputResponse;
         } else {
             try {
-                jsonGenerator = new JsonFactory().createGenerator(writer);
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writeValue(jsonGenerator, responseMap);
-                jsonGenerator.close();
-                samplelsOutputResponse = writer.toString();
-            } catch (Exception e) {
+                samplelsOutputResponse = new ObjectMapper().writeValueAsString(responseMap);
+            } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            return samplelsOutputResponse;
         }
+        return samplelsOutputResponse;
     }
 
     public String sampleRevLs(Integer samples_number) {
         List filesList = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + samples_number.toString() + "/rawdata").execute().asList();
         Map<String, Object> responseMap = new HashMap<>();
-
-        Writer writer = new StringWriter();
-        JsonGenerator jsonGenerator;
-        String samplelsOutputResponse = null;
+        String samplerevlsOutputResponse = null;
 
         if(filesList.size() > 0) {
             Map<String, Object> filesMap = new HashMap<>();
@@ -184,26 +166,17 @@ public class DxApiProcessManager {
                 filesMap.clear();
             }
             try {
-                jsonGenerator = new JsonFactory().createGenerator(writer);
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writeValue(jsonGenerator, responseMap);
-                jsonGenerator.close();
-                samplelsOutputResponse = writer.toString();
-            } catch (Exception e) {
+                samplerevlsOutputResponse = new ObjectMapper().writeValueAsString(responseMap);
+            } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            return samplelsOutputResponse;
         } else {
             try {
-                jsonGenerator = new JsonFactory().createGenerator(writer);
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.writeValue(jsonGenerator, responseMap);
-                jsonGenerator.close();
-                samplelsOutputResponse = writer.toString();
-            } catch (Exception e) {
+                samplerevlsOutputResponse = new ObjectMapper().writeValueAsString(responseMap);
+            } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            return samplelsOutputResponse;
         }
+        return samplerevlsOutputResponse;
     }
 }
