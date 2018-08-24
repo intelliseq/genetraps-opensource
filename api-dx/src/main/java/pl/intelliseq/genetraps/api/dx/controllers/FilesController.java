@@ -57,7 +57,7 @@ public class FilesController {
     public String upload(
             @RequestParam String url,
             @RequestParam String sampleNumber,
-            @RequestParam(required = false) String... tag) {
+            @RequestParam String... tag) {
         log.info(Arrays.toString(tag));
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleNumber, tag).getId()).toString();
@@ -74,9 +74,29 @@ public class FilesController {
         return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
 
+    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2", "reference"})
+    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2, @RequestParam(defaultValue = "genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar") String reference) {
+        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2, reference).getId()).toString();
+    }
+
+    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"samples_number", "reference"})
+    public String bwa(@RequestParam int samples_number, @RequestParam(defaultValue = "genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar") String reference) {
+        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(samples_number, reference).getId()).toString();
+    }
+
     @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
     @ResponseBody
     public String mkDir() {
         return String.format("{\"response\":%s}", filesManager.mkdir());
+    }
+
+    @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
+    public String samplels(@PathVariable("no") int samples_number) {
+        return processManager.sampleLs(samples_number);
+    }
+
+    @RequestMapping(value = "/sample/{no}/revls", method = RequestMethod.GET)
+    public String samplerevls(@PathVariable("no") int samples_number) {
+        return processManager.sampleRevLs(samples_number);
     }
 }
