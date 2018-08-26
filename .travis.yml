@@ -4,6 +4,7 @@ branches:
   - master
   - develop
   - travis
+  - feature-travis-api-dx-build
 sudo: required
 language: java
 jdk:
