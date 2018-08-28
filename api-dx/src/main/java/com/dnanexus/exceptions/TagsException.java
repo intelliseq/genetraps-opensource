@@ -1,7 +1,7 @@
 package com.dnanexus.exceptions;
 
 /**
- * The number of files found is incorrect/unexpected
+ * A problem with tags (specified in message) has occured
  */
 public class TagsException extends RuntimeException {
 
