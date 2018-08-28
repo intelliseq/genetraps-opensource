@@ -1,11 +1,12 @@
+
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 #
 echo $LOG_PREFIX"Starting travis script"
-source scripts/get-secrets.sh
+if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
 echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
-printf "0\n" | dx login --token $DNANEXUS_TOKEN_TEST
-
+dx login --token $DNANEXUS_TOKEN_TEST --noprojects
+dx select genetraps-test
 
 echo $LOG_PREFIX"Cleaning DNANEXUS test space"
  dx rm -r -a /samples/
@@ -26,24 +27,121 @@ fi
 echo $LOG_PREFIX "logging to ecr..."
 `aws ecr get-login --profile genetraps --no-include-email`
 
-### BUILDING CLIENT_INDEX ###
-#LOG_APP="client-index: "
-#echo $LOG_PREFIX $LOG_APP "setting tag"
-#CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
-#CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index:"$CLIENT_INDEX_CHECKSUM
-#echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG
-#docker build client-index/ -t $CLIENT_INDEX_TAG -q
-#echo $LOG_PREFIX $LOG_APP "client tag" $CLIENT_INDEX_TAG
-#docker push $CLIENT_INDEX_TAG
-#cat aws-conf/docker-compose-template.yml | sed 's@clientIndexImageTag@'"$CLIENT_INDEX_TAG"'@' | sed 's@portTag@'"$ECS_CLI_PORT_CLIENT_INDEX"'@g' | sed 's@prefixTag@client-index-log@' > docker-compose.yml
-#echo $LOG_PREFIX $LOG_APP "printing docker-compose.yml"
-#cat docker-compose.yml
-
-### ECS ###
+### CONFIGURING ECS ###
 echo $LOG_PREFIX $LOG_APP "ecs-cli configuring"
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
-#echo $LOG_PREFIX $LOG_APP "ecs-cli composing client-index"
-#ecs-cli compose --project-name genetraps-client-index -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNTID":targetgroup/client-index-target-group/"$ECS_CLI_TG_CLIENT_INDEX --container-name client-index --container-port $ECS_CLI_PORT_CLIENT_INDEX --aws-profile genetraps
+
+#############################
+### BUILDING CLIENT_INDEX ###
+#############################
+
+LOG_APP="client-index: "
+echo $LOG_PREFIX $LOG_APP "setting tag"
+CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index:"$CLIENT_INDEX_CHECKSUM
+echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG
+docker pull $CLIENT_INDEX_TAG
+if [ $? -eq 0 ]; then
+    echo $LOG_PREFIX"docker image already exists"
+else
+    echo $LOG_PREFIX"building new image"
+    docker build client-index/ -t $CLIENT_INDEX_TAG -q
+    echo $LOG_PREFIX $LOG_APP "client tag: " $CLIENT_INDEX_TAG
+    docker push $CLIENT_INDEX_TAG
+    cat aws-conf/docker-compose-template.yml | \
+        sed 's@appTag@'"client-index"'@' | \
+        sed 's@imageTag@'"$CLIENT_INDEX_TAG"'@' | \
+        sed 's@portTag@'"$ECS_CLI_PORT_CLIENT_INDEX"'@g' | \
+        sed 's@prefixTag@client-index-log@' > docker-compose.yml
+    echo $LOG_PREFIX $LOG_APP "ecs-cli composing client-index"
+    ecs-cli compose \
+        --project-name genetraps-client-index \
+        -f docker-compose.yml \
+        --ecs-params ./aws-conf/ecs-params.yml \
+        service up \
+            --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNT_ID":targetgroup/client-index-target-group/"$ECS_CLI_TG_CLIENT_INDEX \
+            --container-name client-index \
+            --container-port $ECS_CLI_PORT_CLIENT_INDEX \
+            --aws-profile genetraps \
+            --timeout 1
+fi
+
+#############################
+### BUILDING API_SECURITY ###
+#############################
+
+LOG_APP="api-security: "
+echo $LOG_PREFIX $LOG_APP "setting tag"
+API_SECURITY_CHECKSUM=`find api-security -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+API_SECURITY_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-security:"$API_SECURITY_CHECKSUM
+echo $LOG_PREFIX $LOG_APP $API_SECURITY_TAG
+docker pull $API_SECURITY_TAG
+if [ $? -eq 0 ]; then
+    echo $LOG_PREFIX"docker image already exists"
+else
+    echo $LOG_PREFIX"building new image"
+    gradle build -p api-security
+    cp `ls api-security/build/libs/api-security*` api-security/build/libs/app.jar
+    docker build api-security/ -t $API_SECURITY_TAG -q
+    echo $LOG_PREFIX $LOG_APP "security tag: " $API_SECURITY_TAG
+    docker push $API_SECURITY_TAG
+    cat aws-conf/docker-compose-template.yml | \
+        sed 's@appTag@'"api-security"'@' | \
+        sed 's@imageTag@'"$API_SECURITY_TAG"'@' | \
+        sed 's@portTag@'"$ECS_CLI_PORT_API_SECURITY"'@g' | \
+        sed 's@prefixTag@api-security-log@' > docker-compose.yml
+    echo $LOG_PREFIX $LOG_APP "ecs-cli composing api-security"
+    ecs-cli compose \
+        --project-name genetraps-api-security \
+        -f docker-compose.yml \
+        --ecs-params ./aws-conf/ecs-params.yml \
+        service up \
+            --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNT_ID":targetgroup/api-security-target-group/"$ECS_CLI_TG_API_SECURITY \
+            --container-name api-security \
+            --container-port $ECS_CLI_PORT_API_SECURITY \
+            --aws-profile genetraps \
+            --timeout 1
+fi
+
+#############################
+### BUILDING API_DX #########
+#############################
+
+LOG_APP="api-dx: "
+echo $LOG_PREFIX $LOG_APP "setting tag"
+API_DX_CHECKSUM=`find api-dx -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+API_DX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-security:"$API_DX_CHECKSUM
+echo $LOG_PREFIX $LOG_APP $API_DX_TAG
+docker pull $API_DX_TAG
+if [ $? -eq 0 ]; then
+    echo $LOG_PREFIX"docker image already exists"
+else
+    echo $LOG_PREFIX"building new image"
+    gradle build -p api-dx
+    cp `ls api-dx/build/libs/api-dx*` api-dx/build/libs/app.jar
+    docker build api-dx/ -t $API_DX_TAG -q
+    echo $LOG_PREFIX $LOG_APP "dx tag: " $API_DX_TAG
+    docker push $API_DX_TAG
+    cat aws-conf/docker-compose-template.yml | \
+        sed 's@appTag@'"api-dx"'@' | \
+        sed 's@imageTag@'"$API_DX_TAG"'@' | \
+        sed 's@portTag@'"$ECS_CLI_PORT_API_DX"'@g' | \
+        sed 's@prefixTag@api-security-log@' > docker-compose.yml
+    echo $LOG_PREFIX $LOG_APP "ecs-cli composing api-dx"
+    ecs-cli compose \
+        --project-name genetraps-api-dx \
+        -f docker-compose.yml \
+        --ecs-params ./aws-conf/ecs-params.yml \
+        service up \
+            --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNT_ID":targetgroup/api-dx-target-group/"$ECS_CLI_TG_API_DX \
+            --container-name api-dx \
+            --container-port $ECS_CLI_PORT_API_DX \
+            --aws-profile genetraps \
+            --timeout 1
+fi
+
+
+
 
 ### BUILDING API_EXPLORARE
 ### BUILDING API_EXPLORARE ###
