@@ -37,40 +37,37 @@ As docker image port should be set to 8086.
 **To check if server is up**  
 `curl localhost:8086/hello` 
 
-**!!!To run any request you need an authorisation token to authorize!!!**
+**!!!To run any request below you need an authorisation token to authorize!!!**  
 `TOKEN=$(curl -XPOST "web_app:secret@localhost:8088/oauth/token" -d grant_type=password -d client_id=web_app -d username=$STAGING_USERNAME -d password=$STAGING_PASSWORD | jq -r ".access_token")`
 
 **To create lowest sample folder and get number**  
-`SAMPLE_NUMBER=$(curl -H "Authorization: Bearer $TOKEN" localhost:8086/mkdir | jq -r ".response")`  
+`SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" localhost:8086/mkdir | jq -r ".response")`  
 
 **To upload file to sample**  
-`U1ID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/upload?url=http://rawgit.com/intelliseq/genetraps-opensource/master/test-data/fastq/capn3.1.fq.gz&tag=left&sampleNumber=$SAMPLE_NUMBER" | jq -r ".id")`  
+`U1ID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/upload?url=http://rawgit.com/intelliseq/genetraps-opensource/master/test-data/fastq/capn3.1.fq.gz&tag=left&sampleid=$SAMPLEID" | jq -r ".id")`  
 
 **To check job id, and get file id**  
 `curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID"`
 `curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID" | jq -r ".state"`
 
-**To get file id if job is done**
+**To get file id if job is done**  
 `F1ID=$(curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$U1ID" | jq -r '.output.file | .["$dnanexus_link"]')`
 
-**To make fastqc analysis**
-`FQC1=$(curl -X POST -H "Authorization: Bearer $TOKEN" localhost:8086/fastqc?fileId=$F1ID | jq -r ".id")`
-`curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1"`
+**To make fastqc analysis**  
+`FQC1=$(curl -X POST -H "Authorization: Bearer $TOKEN" localhost:8086/fastqc?fileId=$F1ID | jq -r ".id")`  
+`curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1"`  
 `curl -H "Authorization: Bearer $TOKEN" "localhost:8086/describe/$FQC1" | jq -r ".state"`
 
-**To run bwa**
+**To run bwa**  
+*reference (in properties): genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar*  
+With tags: "left" i "right"  
+`BWAID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?sampleid=$SAMPLEID" | jq -r ".id")`  
+With files' ids:  
+`BWAID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?fastq_file_1=$F1ID&fastq_file_2=$F2ID" | jq -r ".id")`
 
-*reference: genetraps-resources:reference/grch38-no-alt/grch38-no-alt.tar*
-
-`referenceId=file-FJkBGjQ0Qj5YZ50K53B372Qy`
-
-Z Id plików:
-
-`curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?fastq_file_1=$F1ID&fastq_file_2=$F2ID&reference=$referenceId"`
-
-Z tagami: "left" i "right"
-
-`curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?samples_number=$SAMPLE_NUMBER&reference=$referenceId"`
+**To run gatk hc**  
+*reference and vcfs (their ids) in properties; interval not required*  
+`GATKID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/gatkhc?sampleid=$SAMPLEID&interval=chr15:42377802-42397802" | jq -r ".id")`
 
 # Project Setup
 ## Set environment variables
@@ -141,7 +138,7 @@ sdk install gradle 4.6
    **Required:**
 
    `url=[string]`
-   `sampleNumber=[string]`
+   `sampleid=[string]`
 
    **Optional**
 
@@ -193,6 +190,61 @@ sdk install gradle 4.6
    **Required:**
 
    `fileId=[string]`
+
+* **Success Response:**
+
+  * **Code:** 200
+    **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
+
+**bwa**
+----
+  Make bwa job analysis
+
+* **URL**
+
+  /bwa
+
+* **Method:**
+
+  `POST`
+
+*  **URL Params**
+
+   **Required:**
+
+   `sampleid=[int]`
+   
+   ***Or:***
+   
+   `fastq_file_1(id)=[string]`
+   `fastq_file_2(id)=[string]`
+
+* **Success Response:**
+
+  * **Code:** 200
+    **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
+
+**gatk (haplotype caller)**
+----
+  Make gatk hc job analysis
+
+* **URL**
+
+  /gatkhc
+
+* **Method:**
+
+  `POST`
+
+*  **URL Params**
+
+   **Required:**
+
+   `sampleid=[string]`
+
+   **Not required:**
+
+   `interval=[string]`
 
 * **Success Response:**
 
