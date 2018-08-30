@@ -24,7 +24,7 @@ public class ResourceServerConfigurationForTest extends ResourceServerConfigurer
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/**")
-                // for tests, without oauth2 token authorization
+                // for tests, without oauth2 token authorisation
                 .permitAll();
     }
 
