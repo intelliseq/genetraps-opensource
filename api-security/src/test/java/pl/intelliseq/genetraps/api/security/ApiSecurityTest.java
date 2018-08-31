@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SecurityApplicationTests {
+public class ApiSecurityTest {
 
     @Autowired
     Environment env;
@@ -34,8 +34,7 @@ public class SecurityApplicationTests {
 				.body("grant_type=password&username=admin&password=welcome1")
 				.asString();
 
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode actualObj = mapper.readTree(response.getBody());
+		JsonNode actualObj = new ObjectMapper().readTree(response.getBody());
 
 		assert actualObj.get("access_token").asText().length() > 0;
 	}
