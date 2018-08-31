@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
-import pl.intelliseq.genetraps.api.security.services.MongoUserDetailsService;
+import pl.intelliseq.genetraps.api.security.services.AuroraUserDetailsService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -65,7 +65,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private
-    MongoUserDetailsService userDetailsService;
+    AuroraUserDetailsService userDetailsService;
 
     @Override
     @Bean

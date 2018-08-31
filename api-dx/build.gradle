@@ -28,7 +28,7 @@ version = 'latest'
 sourceCompatibility = 10
 
 lombok {
-    version = "1.18.0"
+    version = "1.18.2"
     sha256 = ""
 }
 

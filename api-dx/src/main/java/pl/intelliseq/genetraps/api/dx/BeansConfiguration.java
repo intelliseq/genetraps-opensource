@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -42,6 +43,9 @@ public class BeansConfiguration {
     @Autowired
     private JwtAccessTokenConverter jwtAccessTokenConverter;
 
+    @Autowired
+    private Environment env;
+
     @Bean
     @Qualifier("tokenStore")
     public TokenStore tokenStore() {
@@ -54,7 +58,7 @@ public class BeansConfiguration {
         ds.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
         ds.setUrl("jdbc:mysql://genetraps-provisioned.cluster-cvdvrgz3bmic.us-east-1.rds.amazonaws.com:3306/genetraps_security");
         ds.setUsername("genetraps-client");
-        ds.setPassword("");
+        ds.setPassword(env.getProperty("AURORA_GENETRAPS_CLIENT_PASSWD"));
         return ds;
     }
 

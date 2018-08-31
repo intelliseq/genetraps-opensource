@@ -11,6 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
+import java.sql.SQLException;
+
 import static org.junit.Assert.assertEquals;
 
 
@@ -24,8 +26,9 @@ public class AuroraTests {
     private AuroraDBManager auroraDBManager;
 
     @Test
-    public void auroraTest(){
+    public void auroraTest() throws SQLException {
         auroraDBManager.getUsers();
+        System.out.println(auroraDBManager.getUserPriviligeToSample(1, 1));
     }
 
 }
