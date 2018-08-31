@@ -91,39 +91,28 @@ GATKID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/gatkhc?s
 See `.travis.yml` and `travis-script.sh` for instructions
 
 ## Endpoints
+### api-dx endpoints
 
-**hello**
+**genetraps.intelliseq.pl:8086/hello**
 ----
   Simple check if server is up
-
 * **URL**
-
   /hello
-
 * **Method:**
-
   `GET`
-
 * **Success Response:**
-
-  * **Code:** 200
+  * **Code:** 200\
     **Content:** `{"status": "up"}`
 
-**mkdir**
+**genetraps.intelliseq.pl:8086/mkdir**
 ----
   Creates directory for a new sample
-
 * **URL**
-
   /mkdir
-
 * **Method:**
-
   `GET`
-
 * **Success Response:**
-
-  * **Code:** 200
+  * **Code:** 200\
     **Content:** `{"response": 5}`
 
 **upload**
@@ -134,14 +123,15 @@ See `.travis.yml` and `travis-script.sh` for instructions
 * **Method:**
   `POST`
 *  **URL Params**
-   **Required:**
-   `url=[string]`
-   `sampleid=[string]`
-   **Optional**
+   **Required:**\
+   `url=[string]`\
+   `sampleid=[string]`\
+   **Optional**\
    `tag=[string]` - can be used multiple times
 * **Success Response:**
-  * **Code:** 200
+  * **Code:** 200\
     **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
+\
 **describe**
 
 ----
