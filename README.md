@@ -1,4 +1,6 @@
 # genetraps-opensource
+System  for automated WGS and WES analysis
+copyright by intelliseq
 
 ## Build status
 Master [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.svg?branch=master)](https://travis-ci.org/intelliseq/genetraps-opensource)\
@@ -9,23 +11,7 @@ client-index service ![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/c
 api-dx service ![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/api--dx-not%20online-brightgreen.svg)\
 api-security ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl/api--security-not%20online-brightgreen.svg)\
 
-## development philosophy
-# API dx
-Project id should be determined by token.
-As docker image port should be set to 8086.
-
-## genetraps system
-# docker ports
-#### 8081 - client explorare
-#### 8082 - api explorare
-#### 8083 - client dnatoken
-#### 8084 - api dnatoken
-#### 8085 - client dx
-#### 8086 - api dx
-#### 8087 - client index
-#### 8088 - api security
-
-## URL Tutorial
+## Usage
 
 `gradle build docker -p api-dx -x test`
 `docker run -d -p 8080:8080 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN -t pl.intelliseq.genetraps.api.dx/api-dx:latest`  
@@ -67,23 +53,20 @@ With files' ids:
 *reference and vcfs (their ids) in properties; interval not required*  
 `GATKID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/gatkhc?sampleid=$SAMPLEID&interval=chr15:42377802-42397802" | jq -r ".id")`
 
-# Project Setup
-## Set environment variables
-```
-AWS_ACCESS_KEY_ID  
-AWS_PROFILE  
-AWS_REGION  
-AWS_SECRET_ACCESS_KEY
-```
+## Ports
+```8081 - client explorare
+8082 - api explorare
+8083 - client dnatoken
+8084 - api dnatoken
+8085 - client dx
+8086 - api dx
+8087 - client index
+8088 - api security```
 
-## Set up tools
-```
-curl -s "https://get.sdkman.io" | bash
-source "/home/marpiech/.sdkman/bin/sdkman-init.sh"
-sdk install gradle 4.6
-```
+## Project Setup
+See `.travis.yml` and `travis-script.sh` for instructions
 
-# Endpoints
+## Endpoints
 
 **hello**
 ----
