@@ -5,12 +5,9 @@ Master [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.sv
 Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.svg?branch=develop)](https://travis-ci.org/intelliseq/genetraps-opensource)
 
 ## Services status
-client-index service\
-![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)
-api-dx service\
-![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/api--dx-not%20online-brightgreen.svg)
-api-security\
-![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl/api--security-not%20online-brightgreen.svg)
+client-index service ![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)\
+api-dx service ![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/api--dx-not%20online-brightgreen.svg)\
+api-security ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl/api--security-not%20online-brightgreen.svg)\
 
 ## development philosophy
 # API dx
