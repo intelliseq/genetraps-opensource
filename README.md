@@ -129,33 +129,23 @@ See `.travis.yml` and `travis-script.sh` for instructions
 **upload**
 ----
   Upload a file to dnanexus server
-
 * **URL**
-
   /upload
-
 * **Method:**
-
   `POST`
-
 *  **URL Params**
-
    **Required:**
-
    `url=[string]`
    `sampleid=[string]`
-
    **Optional**
-
    `tag=[string]` - can be used multiple times
-
 * **Success Response:**
-
   * **Code:** 200
     **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
-
 **describe**
+
 ----
+
   Get a full description of file/job/... in JSON
 
 * **URL**
