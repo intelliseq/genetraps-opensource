@@ -90,6 +90,9 @@ else
         sed 's@imageTag@'"$API_SECURITY_TAG"'@' | \
         sed 's@portTag@'"$ECS_CLI_PORT_API_SECURITY"'@g' | \
         sed 's@prefixTag@api-security-log@' > docker-compose.yml
+    echo "    environment:" >> docker-compose.yml
+    echo "      - AURORA_GENETRAPS_CLIENT_PASSWD"
+    echo "      - AURORA_GENETRAPS_CLIENT_LOGIN"
     echo $LOG_PREFIX $LOG_APP "ecs-cli composing api-security"
     ecs-cli compose \
         --project-name genetraps-api-security \
