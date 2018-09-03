@@ -9,5 +9,7 @@ Files *300_chrUn_KI270515v1.g.vcf* and *301_chrUn_KI270515v1.g.vcf* were taken f
 **vcf**
 
 File *300_301_chrUn_KI270515v1_merged_genotyped.vcf.gz* was created by *iseq_gatk_joint_genotyping* using gvcf files mentioned above.
+
 File *CBD_random-chr22.vcf.gz* is a merged vcf containing reads of chr22_*_random from all five _Centrum Badań DNA_ samples (194, 300, 301, 461, 483).
 
+File *test_FBN1.vcf* is a filtered vcf - only FBN1 gene.
