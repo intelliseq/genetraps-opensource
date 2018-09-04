@@ -1,0 +1,12 @@
+version: '2'
+services:
+  api-dx:
+    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-security:926c0510bddebd07a4f86b7c187c97ee
+    ports:
+      - "8087:8087"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: genetraps-logs
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: api-security-log

@@ -37,6 +37,7 @@ public class ControllersTests {
 
     private String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
     private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
+    private String interval = "chr15:42377802-42397802";
 
     private Integer mkDir() {
         return restTemplate.getForObject("/mkdir", JsonNode.class).get("response").asInt();
@@ -57,13 +58,13 @@ public class ControllersTests {
         }
     }
 
-    private DXJob.Describe upload(String sampleUrl, Integer sampleNumber, String... tags) {
+    private DXJob.Describe upload(String sampleUrl, Integer sampleid, String... tags) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("url", sampleUrl);
-        uploadValueMap.add("sampleNumber", sampleNumber.toString());
+        uploadValueMap.add("sampleid", sampleid.toString());
         for (String tag : tags) {
             uploadValueMap.add("tag", tag);
         }
@@ -91,16 +92,52 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
+    private DXJob.Describe bwa(Integer sampleid) {
+        HttpHeaders uploadHeaders = new HttpHeaders();
+        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-    @Test
+        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
+        uploadValueMap.add("sampleid", sampleid.toString());
+
+        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
+
+        JsonNode response = this.restTemplate.postForObject("/bwa", uploadEntity, JsonNode.class);
+        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
+
+        return waitUntilJobIsDone(response.get("id").textValue());
+    }
+
+    private DXJob.Describe gatkhc(Integer sampleid, String interval) {
+        HttpHeaders uploadHeaders = new HttpHeaders();
+        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
+        uploadValueMap.add("sampleid", sampleid.toString());
+        uploadValueMap.add("interval", interval);
+
+        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
+
+        JsonNode response = this.restTemplate.postForObject("/gatkhc", uploadEntity, JsonNode.class);
+        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
+
+        return waitUntilJobIsDone(response.get("id").textValue());
+    }
+
+//    @Test
     public void upload() {
-        Integer sampleNumber = mkDir();
-        DXJob.Describe upload1 = upload(sampleLeft, sampleNumber, "left");
+        Integer sampleid = mkDir();
+        DXJob.Describe upload1 = upload(sampleLeft, sampleid, "left");
+        DXJob.Describe upload2 = upload(sampleRight, sampleid, "right");
         String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
         log.info(restTemplate.getForObject("/describe/" + file1Id, JsonNode.class));
         log.info(fastqc(file1Id));
+        log.info(bwa(sampleid));
+        log.info(gatkhc(sampleid, interval));
+
     }
+
+
 
 
 }
