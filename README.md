@@ -7,7 +7,7 @@
 ### client-index service
 ![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)
 ### api-dx service
-![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/-client--index-online-brightgreen.svg)
+![API-DX NOT ONLINE](http://genetraps.intelliseq.pl/api-dx-online-svg-badge)
 ### api-security
 ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl/-client--index-online-brightgreen.svg)
 
