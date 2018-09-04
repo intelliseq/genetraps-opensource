@@ -1,0 +1,17 @@
+{
+  "default_task_dx_attributes" : {
+    "runSpec": {
+        "timeoutPolicy": {
+          "*": {
+            "hours": 2
+          }
+        },
+        "access" : {
+          "network": [
+            "*"
+          ],
+          "developer": true
+        }
+      }
+  }
+}
