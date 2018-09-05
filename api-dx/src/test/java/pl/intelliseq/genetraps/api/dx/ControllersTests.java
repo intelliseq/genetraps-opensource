@@ -123,7 +123,7 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-//    @Test
+    @Test
     public void upload() {
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(sampleLeft, sampleid, "left");
