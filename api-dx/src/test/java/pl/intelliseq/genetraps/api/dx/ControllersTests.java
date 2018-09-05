@@ -132,8 +132,8 @@ public class ControllersTests {
 
         log.info(restTemplate.getForObject("/describe/" + file1Id, JsonNode.class));
         log.info(fastqc(file1Id));
-        log.info(bwa(sampleid));
-        log.info(gatkhc(sampleid, interval));
+//        log.info(bwa(sampleid));
+//        log.info(gatkhc(sampleid, interval));
 
     }
 
