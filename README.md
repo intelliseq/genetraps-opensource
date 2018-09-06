@@ -7,9 +7,9 @@ Master [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.sv
 Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.svg?branch=develop)](https://travis-ci.org/intelliseq/genetraps-opensource)
 
 ## Services status
-client-index service ![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)\
-api-dx service ![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/api-dx-online-svg-badge)\
-api-security ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/api-security-online-svg-badge)
+`client-index` ![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)\
+`api-dx      ` ![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/api-dx-online-svg-badge)\
+`api-security` ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/api-security-online-svg-badge)
 
 ## Usage
 
