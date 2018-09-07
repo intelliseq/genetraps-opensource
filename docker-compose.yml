@@ -1,9 +1,9 @@
 version: '2'
 services:
   api-dx:
-    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-security:e1afb72676b4ff023843ccebd51684de
+    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:22ac969b9a1bb3e7f89211468e3890f8
     ports:
-      - "8087:8087"
+      - "8086:8086"
     logging:
       driver: awslogs
       options:

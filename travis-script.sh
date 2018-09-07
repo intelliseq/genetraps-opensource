@@ -40,8 +40,11 @@ echo $LOG_PREFIX $LOG_APP "setting tag"
 CLIENT_INDEX_CHECKSUM=`find client-index -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
 CLIENT_INDEX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-index:"$CLIENT_INDEX_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $CLIENT_INDEX_TAG
-docker pull $CLIENT_INDEX_TAG
-if [ $? -eq 0 ]; then
+echo $LOG_PREFIX $LOG_APP "checking if image exists"
+CLIENT_INDEX_EXISTS=`aws ecr list-images --repository-name genetraps-client-index --profile genetraps | grep $CLIENT_INDEX_CHECKSUM | wc -l`
+echo $LOG_PREFIX $LOG_APP "exists:" $EXISTS
+#docker pull $CLIENT_INDEX_TAG
+if [ $CLIENT_INDEX_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
@@ -75,8 +78,9 @@ echo $LOG_PREFIX $LOG_APP "setting tag"
 API_SECURITY_CHECKSUM=`find api-security -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
 API_SECURITY_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-security:"$API_SECURITY_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $API_SECURITY_TAG
-docker pull $API_SECURITY_TAG
-if [ $? -eq 0 ]; then
+#docker pull $API_SECURITY_TAG
+API_SECURITY_EXISTS=`aws ecr list-images --repository-name genetraps-api-security --profile genetraps | grep $API_SECURITY_CHECKSUM | wc -l`
+if [ $API_SECURITY_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
@@ -113,10 +117,11 @@ fi
 LOG_APP="api-dx: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
 API_DX_CHECKSUM=`find api-dx -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
-API_DX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-security:"$API_DX_CHECKSUM
+API_DX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-dx:"$API_DX_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $API_DX_TAG
-docker pull $API_DX_TAG
-if [ $? -eq 0 ]; then
+#docker pull $API_DX_TAG
+API_DX_EXISTS=`aws ecr list-images --repository-name genetraps-api-dx --profile genetraps | grep $API_DX_CHECKSUM | wc -l`
+if [ $API_DX_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"

@@ -123,17 +123,17 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-//    @Test
+    @Test
     public void upload() {
-        Integer sampleid = mkDir();
-        DXJob.Describe upload1 = upload(sampleLeft, sampleid, "left");
-        DXJob.Describe upload2 = upload(sampleRight, sampleid, "right");
-        String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
+        //Integer sampleid = mkDir();
+        //DXJob.Describe upload1 = upload(sampleLeft, sampleid, "left");
+        //DXJob.Describe upload2 = upload(sampleRight, sampleid, "right");
+        //String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
-        log.info(restTemplate.getForObject("/describe/" + file1Id, JsonNode.class));
-        log.info(fastqc(file1Id));
-        log.info(bwa(sampleid));
-        log.info(gatkhc(sampleid, interval));
+        //log.info(restTemplate.getForObject("/describe/" + file1Id, JsonNode.class));
+        //log.info(fastqc(file1Id));
+        //log.info(bwa(sampleid));
+        //log.info(gatkhc(sampleid, interval));
 
     }
 

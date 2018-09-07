@@ -86,6 +86,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/hello").permitAll()
+                .antMatchers("/api-security-online-svg-badge").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
                 .httpBasic();

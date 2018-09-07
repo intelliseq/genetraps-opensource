@@ -22,6 +22,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/hello").permitAll()
+                .antMatchers("/api-dx-online-svg-badge").permitAll()
                 .antMatchers("/**").authenticated();
     }
 
