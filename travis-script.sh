@@ -1,4 +1,3 @@
-
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 #
@@ -148,6 +147,42 @@ else
             --timeout 1
 fi
 
+################################
+### BUILDING CLIENT_DX #########
+################################
+
+LOG_APP="client-dx: "
+echo $LOG_PREFIX $LOG_APP "setting tag"
+CLIENT_DX_CHECKSUM=`find client-dx -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+CLIENT_DX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-client-dx:"$CLIENT_DX_CHECKSUM
+echo $LOG_PREFIX $LOG_APP $CLIENT_DX_TAG
+#docker pull $CLIENT_DX_TAG
+CLIENT_DX_EXISTS=`aws ecr list-images --repository-name genetraps-client-dx --profile genetraps | grep $CLIENT_DX_CHECKSUM | wc -l`
+if [ $CLIENT_DX_EXISTS -eq 1 ]; then
+    echo $LOG_PREFIX"docker image already exists"
+else
+    echo $LOG_PREFIX"building new image"
+    docker build client-dx/ -t $CLIENT_DX_TAG -q
+    echo $LOG_PREFIX $LOG_APP "dx tag: " $CLIENT_DX_TAG
+    docker push $CLIENT_DX_TAG | cat
+    cat aws-conf/docker-compose-template.yml | \
+        sed 's@appTag@'"client-dx"'@' | \
+        sed 's@imageTag@'"$CLIENT_DX_TAG"'@' | \
+        sed 's@portTag@'"$ECS_CLI_PORT_CLIENT_DX"'@g' | \
+        sed 's@prefixTag@api-security-log@' > docker-compose.yml
+    echo $LOG_PREFIX $LOG_APP "ecs-cli composing client-dx"
+    ecs-cli compose \
+        --project-name genetraps-client-dx \
+        -f docker-compose.yml \
+        --ecs-params ./aws-conf/ecs-params.yml \
+        service up \
+            --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNT_ID":targetgroup/client-dx-target-group/"$ECS_CLI_TG_CLIENT_DX \
+            --container-name client-dx \
+            --container-port $ECS_CLI_PORT_CLIENT_DX \
+            --aws-profile genetraps \
+            --timeout 1
+fi
+
 
 
 
@@ -176,12 +211,12 @@ fi
 #echo $LOG_PREFIX $LOG_APP "ecs-cli composing "$APP
 #ecs-cli compose --project-name genetraps-$APP -f docker-compose.yml --ecs-params ./aws-conf/ecs-params.yml service up --target-group-arn "arn:aws:elasticloadbalancing:"$AWS_REGION":"$AWS_ACCOUNT_ID":targetgroup/$APP-target-group/"$TG --container-name $APP --container-port $PORT --aws-profile genetraps
 
-### BUILDING API_DX ###
-#LOG_APP="api-dx: "
+### BUILDING CLIENT_DX ###
+#LOG_APP="client-dx: "
 #echo $LOG_PREFIX $LOG_APP "building..."
-#gradle build docker -p api-dx/
+#gradle build docker -p client-dx/
 #echo $LOG_PREFIX $LOG_APP "running docker..."
-#docker run -d -p 8086:8086 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/api-dx:latest
+#docker run -d -p 8086:8086 -e "DNANEXUS_TOKEN="$DNANEXUS_TOKEN_TEST -t pl.intelliseq.genetraps.api.dx/client-dx:latest
 #echo $LOG_PREFIX $LOG_APP "waiting for service..."
 #./scripts/wait-for-service.sh localhost:8086/hello 60
 #echo $LOG_PREFIX $LOG_APP "checking for error..."
@@ -238,22 +273,22 @@ fi
 #echo `ecs-cli ps --ecs-profile genetraps`
 #echo `ecs-cli ps --aws-profile genetraps`
 
-#TAG_API_DX=`ls -alR --full-time api-dx/ -Ibin -Ibuild -I.* | sha1sum | cut -d " " -f1`
+#TAG_CLIENT_DX=`ls -alR --full-time client-dx/ -Ibin -Ibuild -I.* | sha1sum | cut -d " " -f1`
 #TAG_CLIENT_EXPLORARE=`ls -alR --full-time client-explorare/ -Inode_modules -Idist -Ietc -I.* | tr -s ' ' | cut -f1-5,9 | sha1sum | cut -d " " -f1`
 #TAG_CLIENT_DNATOKEN=`ls -alR --full-time client-dnatoken/ -Inode_modules -Idist -Ietc -I.* | tr -s ' ' | cut -f1-5,9 | sha1sum | cut -d " " -f1`
-#echo $TAG_API_DX
+#echo $TAG_CLIENT_DX
 #echo $TAG_CLIENT_EXPLORARE
-#IMAGE_API_DX=pl.intelliseq.genetraps.api.dx/api-dx:latest
+#IMAGE_CLIENT_DX=pl.intelliseq.genetraps.api.dx/client-dx:latest
 #IMAGE_CLIENT_EXPLORARE=pl.intelliseq.genetraps.client.explorare/client-explorare:latest
 #IMAGE_CLIENT_DNATOKEN=pl.intelliseq.genetraps.client.dnatoken/client-dnatoken:latest
 #echo $IMAGE_CLIENT_EXPLORARE
-#TAG_API_DX=$AWS_ACCOUNT_ID".dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:"$TAG_API_DX
+#TAG_CLIENT_DX=$AWS_ACCOUNT_ID".dkr.ecr.us-east-1.amazonaws.com/genetraps-client-dx:"$TAG_CLIENT_DX
 #TAG_CLIENT_EXPLORARE=$AWS_ACCOUNT_ID".dkr.ecr.us-east-1.amazonaws.com/genetraps-client-explorare:"$TAG_CLIENT_EXPLORARE
 #TAG_CLIENT_DNATOKEN=$AWS_ACCOUNT_ID".dkr.ecr.us-east-1.amazonaws.com/genetraps-client-dnatoken:"$TAG_CLIENT_DNATOKEN
-#docker tag $IMAGE_API_DX $TAG_API_DX
+#docker tag $IMAGE_CLIENT_DX $TAG_CLIENT_DX
 #docker tag $IMAGE_CLIENT_EXPLORARE $TAG_CLIENT_EXPLORARE
 #docker tag $IMAGE_CLIENT_DNATOKEN $TAG_CLIENT_DNATOKEN
-#ecs-cli push $TAG_API_DX --ecs-profile genetraps
+#ecs-cli push $TAG_CLIENT_DX --ecs-profile genetraps
 #ecs-cli push $TAG_CLIENT_EXPLORARE --ecs-profile genetraps
 #ecs-cli push $TAG_CLIENT_DNATOKEN --ecs-profile genetraps
 #echo $TAG_CLIENT_EXPLORARE

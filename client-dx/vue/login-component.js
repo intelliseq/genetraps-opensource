@@ -45,7 +45,7 @@ const Login = {
               }
               axios({
                 method: 'post', //you can set what request you want to be
-                url: 'http://localhost:8088/oauth/token',
+                url: 'http://genetraps.intelliseq.pl:8088/oauth/token',
                 withCredentials: true,
                 crossdomain: true,
                 data: Object.keys(reqData).map(function(key) {
