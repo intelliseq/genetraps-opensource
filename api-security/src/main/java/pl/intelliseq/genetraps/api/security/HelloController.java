@@ -5,6 +5,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 @RestController
 public class HelloController {
@@ -14,8 +16,12 @@ public class HelloController {
     }
 
     @RequestMapping(value = "/api-security-online-svg-badge", method = RequestMethod.GET)
-    public Resource getBadge() {
+    public Resource getBadge(HttpServletResponse response) {
+
         Resource resource = new FileSystemResource("src/main/resources/api--security-online-brightgreen.svg");
+	response.setHeader("Cache-Control", "no-cache");
+	Date date= new Date();
+	response.setHeader("ETag","" + date.getTime());
         return resource;
     }
 }
