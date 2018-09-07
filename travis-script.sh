@@ -50,7 +50,7 @@ else
     echo $LOG_PREFIX"building new image"
     docker build client-index/ -t $CLIENT_INDEX_TAG -q
     echo $LOG_PREFIX $LOG_APP "client tag: " $CLIENT_INDEX_TAG
-    docker push $CLIENT_INDEX_TAG
+    docker push $CLIENT_INDEX_TAG | cat
     cat aws-conf/docker-compose-template.yml | \
         sed 's@appTag@'"client-index"'@' | \
         sed 's@imageTag@'"$CLIENT_INDEX_TAG"'@' | \
@@ -84,11 +84,11 @@ if [ $API_SECURITY_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
-    gradle build -p api-security
+    gradle build -q -p api-security
     cp `ls api-security/build/libs/api-security*` api-security/build/libs/app.jar
     docker build api-security/ -t $API_SECURITY_TAG -q
     echo $LOG_PREFIX $LOG_APP "security tag: " $API_SECURITY_TAG
-    docker push $API_SECURITY_TAG
+    docker push $API_SECURITY_TAG | cat
     cat aws-conf/docker-compose-template.yml | \
         sed 's@appTag@'"api-security"'@' | \
         sed 's@imageTag@'"$API_SECURITY_TAG"'@' | \
@@ -125,11 +125,11 @@ if [ $API_DX_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
-    gradle build -p api-dx
+    gradle build -q -p api-dx
     cp `ls api-dx/build/libs/api-dx*` api-dx/build/libs/app.jar
     docker build api-dx/ -t $API_DX_TAG -q
     echo $LOG_PREFIX $LOG_APP "dx tag: " $API_DX_TAG
-    docker push $API_DX_TAG
+    docker push $API_DX_TAG | cat
     cat aws-conf/docker-compose-template.yml | \
         sed 's@appTag@'"api-dx"'@' | \
         sed 's@imageTag@'"$API_DX_TAG"'@' | \
