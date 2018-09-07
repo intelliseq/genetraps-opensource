@@ -134,7 +134,6 @@ public class ControllersTests {
         //log.info(fastqc(file1Id));
         //log.info(bwa(sampleid));
         //log.info(gatkhc(sampleid, interval));
-
     }
 
 
