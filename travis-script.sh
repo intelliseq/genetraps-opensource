@@ -75,7 +75,7 @@ fi
 
 LOG_APP="api-security: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
-API_SECURITY_CHECKSUM=`find api-security -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+API_SECURITY_CHECKSUM=`find api-security -type f -exec md5sum {} \; | sort -k 2 | grep -P "/src/|Readme" | md5sum | sed 's/  -//g'`
 API_SECURITY_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-security:"$API_SECURITY_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $API_SECURITY_TAG
 #docker pull $API_SECURITY_TAG
@@ -116,7 +116,7 @@ fi
 
 LOG_APP="api-dx: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
-API_DX_CHECKSUM=`find api-dx -type f -exec md5sum {} \; | sort -k 2 | md5sum | sed 's/  -//g'`
+API_DX_CHECKSUM=`find api-dx -type f -exec md5sum {} \; | sort -k 2 | grep -P "/src/|Readme" | md5sum | sed 's/  -//g'`
 API_DX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-dx:"$API_DX_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $API_DX_TAG
 #docker pull $API_DX_TAG
