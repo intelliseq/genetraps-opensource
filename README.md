@@ -12,7 +12,6 @@ Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.s
 `api-security` ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/api-security-online-svg-badge)
 
 ## Usage
-
 Build project
 ```
 gradle build docker -p api-dx -x test
