@@ -19,6 +19,9 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import pl.intelliseq.genetraps.api.security.services.AuroraUserDetailsService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,7 +41,7 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
                 .secret(new BCryptPasswordEncoder(4).encode("secret"))
                 .scopes("FOO")
                 .autoApprove(true)
-                .authorizedGrantTypes("implicit","refresh_token", "password", "authorization_code");
+                .authorizedGrantTypes("implicit", "refresh_token", "password", "authorization_code");
     }
 
     @Override
@@ -87,11 +90,11 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/hello").permitAll()
                 .antMatchers("/api-security-online-svg-badge").permitAll()
+                .antMatchers("/").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
                 .httpBasic();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder(){

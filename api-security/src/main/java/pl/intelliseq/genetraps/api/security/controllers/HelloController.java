@@ -1,4 +1,4 @@
-package pl.intelliseq.genetraps.api.security;
+package pl.intelliseq.genetraps.api.security.controllers;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
