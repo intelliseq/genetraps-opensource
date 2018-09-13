@@ -20,6 +20,7 @@ public class HelloController {
 
         Resource resource = new FileSystemResource("src/main/resources/api--security-online-brightgreen.svg");
 	response.setHeader("Cache-Control", "no-cache");
+	response.setContentType("image/svg+xml");
 	Date date= new Date();
 	response.setHeader("ETag","" + date.getTime());
         return resource;
