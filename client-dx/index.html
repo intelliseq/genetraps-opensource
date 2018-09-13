@@ -7,15 +7,57 @@
   <title>genetraps</title>
   <meta name="description" content="genetraps web page">
   <meta name="author" content="Intelliseq">
+
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+
+   var loadGoogleAnalytics = function(){
+     console.log("LOG: loadGoogleAnalytics()");
+
+     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+     ga('create', 'UA-125435882-1', 'auto');
+     ga('send', 'pageview');
+
+       ga('set', 'page', router.currentRoute.path);
+       ga('send', 'pageview');
+
+       router.afterEach(( to, from ) => {
+         ga('set', 'page', to.path);
+         ga('send', 'pageview');
+         console.console.log("Vue.App.router.afterEach() " + to.path);
+       });
+
+    }
+</script>
+  <!--<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-125435882-1', 'auto');
+  ga('send', 'pageview');
+</script>-->
+  <!-- End Google Analytics -->
+
   <!--<link href="https://code.jquery.com/qunit/qunit-2.6.2.css" rel="stylesheet">-->
-  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+  <!--<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
   <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <link href="styles/animate.css" rel="stylesheet">
+
+
 </head>
 
 <body>
   <div id="genetraps-app">
-    <login-component></login-component>
+    <!--<transition enter-active-class="animated flipInX" leave-active-class="animated flipInY">-->
     <router-view></router-view>
+  <!--</transition>-->
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
@@ -24,9 +66,10 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-cookies/vue-cookies.js"></script>
   <!--<script src="https://code.jquery.com/qunit/qunit-2.6.2.js"></script>-->
-  <script src="vue/login-component.js"></script>
-  <script src="vue/welcome-component.js"></script>
-  <script src="vue/genetraps-app-vue.js"></script>
+  <script src="vue/cookies-component.vue.js"></script>
+  <script src="vue/login-component.vue.js"></script>
+  <script src="vue/welcome-component.vue.js"></script>
+  <script src="vue/app-genetraps.vue.js"></script>
   <!--<script src="qunit/qunit-tests.js"></script>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>-->
