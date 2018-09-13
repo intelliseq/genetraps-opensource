@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# use . ./get-secrets.sh kms-store 
+# use . source get-secrets.sh
 
 BUCKET=param-store
 echo "Retrieving keys"
