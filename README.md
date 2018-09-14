@@ -74,6 +74,15 @@ To run gatk hc
 GATKID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/gatkhc?sampleid=$SAMPLEID&interval=chr15:42377802-42397802" | jq -r ".id")
 ```
 
+To list out contents of a given sample's rawdata folder
+```
+curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/ls
+```
+To list out contents of a given sample's rawdata folder (in reverse order)
+```
+curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/revls
+```
+
 ## Ports
 ```
 8081 - client explorare
@@ -234,3 +243,31 @@ See `.travis.yml` and `travis-script.sh` for instructions
 
   * **Code:** 200
     **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
+
+**sample ls / sample revls (reverse ls)**
+----
+  List out the contents of a sample's rawdata folder
+
+* **URL**
+
+  /sample/:sampleid/ls
+  /sample/:sampleid/revls
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   **Required:**
+
+   `sampleid=[string]`
+
+* **Success Response:**
+
+  * **Code:** 200
+    **Content:**  
+Sample ls  
+`{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`  
+Sample rev ls  
+`{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`
