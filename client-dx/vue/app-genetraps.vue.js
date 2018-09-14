@@ -26,6 +26,9 @@ new Vue({
     });
   },
   mounted() {
+    /* first we check for cookies */
+    /* then we check for google anlytics */
+    /* finally we check for refresh token */
     console.log("LOG: Vue.App.mounted()")
     if(this.$cookies.get("cookies_necessary") == null) {
       console.log("LOG: Vue.App.mounted() no agreement for cookies")
@@ -34,13 +37,14 @@ new Vue({
       if(this.$cookies.get("cookies_statistics") != null) {
         loadGoogleAnalytics()
       }
+      if(this.$cookies.get("refresh_token") == null) {
+        this.$router.push("/login")
+      } else {
+        this.loginWithRefreshToken()
+      }
     }
 
-    //if(this.$cookies.get("refresh_token") == null) {
-    //  this.$router.push("/login")
-    //} else {
-    //  this.loginWithRefreshToken()
-    //}
+
   },
   methods: {
     loginWithRefreshToken() {

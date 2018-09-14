@@ -1,11 +1,16 @@
 const CookiesComponent = {
   template:`
   <v-app>
+  <v-layout column align-center justify-center>
+    <v-flex text-xs-center transition="scale-transition">
+      <img src="images/logo.svg" class="float-center" style="width: 25%;"></img>
+    </v-flex>
+  </v-layout>
   <v-layout row justify-center>
     <v-dialog v-model="dialog_visibility" persistent max-width="500">
       <v-card>
         <v-card-title class="headline">genomicapt uses cookies</v-card-title>
-        <v-card-text>We use cookies for security purposes, to personalize content and to analyse our traffic. We use Google analytics to analyse our traffic. You consent to our cookies if you continue to use this website.</v-card-text>
+        <v-card-text>We use cookies for security purposes, to personalize content and to analyse our traffic. We use Google analytics to analyse traffic. You consent to our cookies if you continue to use this website.</v-card-text>
         <v-card-actions>
           <v-layout column>
             <v-spacer></v-spacer>
@@ -38,6 +43,9 @@ const CookiesComponent = {
     methods: {
             setCookies: function () {
               console.log("LOG: Vue.Cookies.setCookies()")
+              console.log("LOG: Vue.Cookies.setCookies() necessary " + this.necessary)
+              console.log("LOG: Vue.Cookies.setCookies() prefrences " + this.preferences)
+              console.log("LOG: Vue.Cookies.setCookies() statistics " + this.statistics)
               this.$cookies.set("cookies_necessary", true)
               if(this.preferences) {
                 console.log("LOG: Vue.Cookies.setCookies() preferences")
