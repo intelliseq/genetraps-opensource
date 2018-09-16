@@ -1,5 +1,25 @@
 /* event hub */
-Vue.prototype.$hub = new Vue();
+Vue.prototype.$hub = new Vue({
+  data: function() {
+    debug = true,
+    info = true,
+    warn = true,
+    error = true
+  },
+  created () {
+    this.$on('log', function (level, text) {
+      if ((level == "INFO" && info) || (level == "DEBUG" && debug) || (level == "WARN" && warn) || (level == "ERROR" && error)){
+        today = new Date();
+        dd = today.getDate();
+        mm = today.getMonth()+1; //January is 0!
+        yyyy = today.getFullYear();
+        if (dd < 10) {dd = '0' + dd;}
+        if (mm < 10) {mm = '0' + mm;}
+        var date_string = dd + '/' + mm + '/' + yyyy + " " + today.getHours() + ":" + today.getMinutes()
+        console.log("LOG: " + date_string + " " + level + " " + text.name)}
+    });
+  }
+});
 
 const router = new VueRouter({
   mode: 'history',
@@ -17,7 +37,7 @@ new Vue({
     access_token: ""
   },
   created() {
-    console.log("LOG: Vue.App.created()")
+    this.$hub.$emit('log', "DEBUG", this)
     this.$hub.$on('login', (response) => {
       this.$cookies.set("refresh_token", response.refresh_token, "7D")
       this.access_token = response.access_token
@@ -48,6 +68,7 @@ new Vue({
   },
   methods: {
     loginWithRefreshToken() {
+      this.$hub.$emit('start_waiting', "Signing in")
       var reqData = {
         "grant_type": "refresh_token",
         "client_id": "web_app",
