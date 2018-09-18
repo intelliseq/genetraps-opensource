@@ -3,6 +3,7 @@ package pl.intelliseq.genetraps.api.dx.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
@@ -55,10 +56,13 @@ public class FilesController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(
+            OAuth2Authentication auth,
             @RequestParam String url,
             @RequestParam String sampleid,
             @RequestParam String... tag) {
-        log.info(Arrays.toString(tag));
+        log.info("upload");
+        log.debug(Arrays.toString(tag));
+//        log.debug(auth.getUserAuthentication().getPrincipal().toString());
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
     }
@@ -103,6 +107,7 @@ public class FilesController {
 
     @RequestMapping(value = "/sample/{no}/revls", method = RequestMethod.GET)
     public String samplerevls(@PathVariable("no") int sampleid) {
+        //Reverse ls - keys swapped with values
         return processManager.sampleRevLs(sampleid);
     }
 }
