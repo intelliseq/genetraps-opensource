@@ -1,13 +1,14 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mysql.jdbc.DatabaseMetaData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -18,6 +19,7 @@ import java.util.Map;
 /**
  * Created by intelliseq on 26/04/2017.
  */
+@Log4j2
 public class AuroraDBManager {
 
 
@@ -28,8 +30,6 @@ public class AuroraDBManager {
     private DataSource dataSource;
 
     private JdbcTemplate jdbcTemplate;
-
-    private Logger logger = LoggerFactory.getLogger(AuroraDBManager.class);
 
     @PostConstruct
     private void postConstruct(){
@@ -45,13 +45,13 @@ public class AuroraDBManager {
         while (rs.next()) {
             String spName = rs.getString("PROCEDURE_NAME");
             int spType = rs.getInt("PROCEDURE_TYPE");
-            System.out.println("Stored Procedure Name: " + spName);
+            log.debug("Stored Procedure Name: " + spName);
             if (spType == DatabaseMetaData.procedureReturnsResult) {
-                System.out.println("procedure Returns Result");
+                log.debug("procedure Returns Result");
             } else if (spType == DatabaseMetaData.procedureNoResult) {
-                System.out.println("procedure No Result");
+                log.debug("procedure No Result");
             } else {
-                System.out.println("procedure Result unknown");
+                log.debug("procedure Result unknown");
             }
 
         }
@@ -67,6 +67,58 @@ public class AuroraDBManager {
 //                .addValue("UserID", userID)
 //                .addValue("SampleID", sampleID)));
 
+    }
+
+    public JsonNode getUserSimpleDetails(String username){
+
+        String query = String.format("SELECT U.*, S.Username FROM " +
+                "Security AS S " +
+                "JOIN Users AS U ON S.UserID=U.USerID " +
+                "WHERE S.Username = \"%s\";", username);
+
+//        log.debug(query);
+//
+//        jdbcTemplate.query(query, (rs, rowNum) -> System.out.printf("Email: %s\n", rs.getString("Email")));
+//
+//        SimpleModule module = new SimpleModule();
+//        module.addSerializer(new ResultSetSerializer());
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.registerModule(module);
+
+        ObjectNode node = jdbcTemplate.query(query, (resultSet, rowNum) -> new ObjectMapper().createObjectNode()
+                .put("UserID", resultSet.getInt("UserID"))
+                .put("LastName", resultSet.getString("LastName"))
+                .put("FirstName", resultSet.getString("FirstName"))
+                .put("Email", resultSet.getString("Email"))
+                .put("Username", resultSet.getString("Username"))).get(0);
+
+        log.debug(node);
+
+        return node;
+
+//        ResultSet resultSet = jdbcTemplate.query(query, (rs, rowNum) -> rs).get(0);
+//
+//        try {
+//            log.debug(resultSet.getString("Email"));
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        //TODO: Można napisać konwerter (https://stackoverflow.com/a/8120442)
+//        JsonNode user = null;
+//        try {
+//            user = new ObjectMapper().createObjectNode()
+//                    .put("UserID", resultSet.getInt("UserID"))
+//                    .put("LastName", resultSet.getString("LastName"))
+//                    .put("FirstName", resultSet.getString("FirstName"))
+//                    .put("Email", resultSet.getString("Email"))
+//                    .put("Username", username);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return user;
     }
 
     public void getUsers(){
