@@ -23,6 +23,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/hello").permitAll()
                 .antMatchers("/api-dx-online-svg-badge").permitAll()
+                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .antMatchers("/**").authenticated();
     }
 
