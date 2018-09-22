@@ -1,4 +1,4 @@
-const CookiesComponent = {
+const cookiesComponent = {
   template:`
   <v-app>
   <v-layout column align-center justify-center>
@@ -42,17 +42,17 @@ const CookiesComponent = {
 
     methods: {
             setCookies: function () {
-              console.log("LOG: Vue.Cookies.setCookies()")
-              console.log("LOG: Vue.Cookies.setCookies() necessary " + this.necessary)
-              console.log("LOG: Vue.Cookies.setCookies() prefrences " + this.preferences)
-              console.log("LOG: Vue.Cookies.setCookies() statistics " + this.statistics)
+              logger("DEBUG", "vue.cookies.setCookies")
+              logger("DEBUG", "vue.cookies.setCookies necessary " + this.necessary)
+              logger("DEBUG", "vue.cookies.setCookies prefrences " + this.preferences)
+              logger("DEBUG", "vue.cookies.setCookies statistics " + this.statistics)
               this.$cookies.set("cookies_necessary", true)
               if(this.preferences) {
-                console.log("LOG: Vue.Cookies.setCookies() preferences")
+                logger("DEBUG", "vue.cookies.setCookies preferences")
                 this.$cookies.set("cookies_preferences", true)
               }
               if(this.statistics) {
-                console.log("LOG: Vue.Cookies.setCookies() statistics")
+                logger("DEBUG", "vue.cookies.setCookies statistics")
                 this.$cookies.set("cookies_statistics", true)
                 loadGoogleAnalytics()
               }
