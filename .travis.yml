@@ -13,11 +13,9 @@ jdk:
 services:
 - docker
 before_install:
-- sudo apt-get remove python2.7
-- sudo apt-get clean
-- yes | sudo add-apt-repository ppa:jonathonf/python-2.7
 - sudo apt-get -qq update
-- sudo apt-get install python python2.7
+- sudo apt-get update
+- sudo apt-get install python3
 - sudo apt-get install python-six
 - sudo apt-get install python-urllib3
 - sudo apt-get install python-requests
