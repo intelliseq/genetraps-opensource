@@ -29,7 +29,7 @@ before_install:
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
 - sdk list gradle
-- sdk install java 10.0.2-oracle
+- yes | sdk install java 10.0.2-oracle
 - sdk default java 10.0.2-oracle
 - sdk install gradle 4.8.1
 - sdk default gradle 4.8.1
