@@ -16,10 +16,6 @@ services:
 - docker
 before_install:
 - sudo apt-get -qq update
-- yes | sudo add-apt-repository ppa:linuxuprising/java
-- sudo apt-get -qq update
-- sudo apt-get install oracle-java10-installer
-- sudo apt install oracle-java10-set-default
 - sudo apt-get install python-six
 - sudo apt-get install python-urllib3
 - sudo apt-get install python-requests
@@ -33,6 +29,8 @@ before_install:
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
 - sdk list gradle
+- sdk install java 10.0.2-oracle
+- sdk default java 10.0.2-oracle
 - sdk install gradle 4.8.1
 - sdk default gradle 4.8.1
 - mkdir ~/.aws
