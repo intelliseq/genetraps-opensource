@@ -21,7 +21,7 @@ before_install:
 - cd Python-2.7.9/
 - ./configure --prefix /usr/local/lib/python2.7.9
 - make
-- make install
+- sudo make install
 - sudo apt-get install python-six
 - sudo apt-get install python-urllib3
 - sudo apt-get install python-requests
