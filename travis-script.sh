@@ -2,7 +2,8 @@ LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 #
 /usr/bin/python --version
-echo `/usr/bin/python --version`
+java -version
+javac -version
 echo $LOG_PREFIX"Starting travis script"
 if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
 echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
