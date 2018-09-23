@@ -27,12 +27,11 @@ before_install:
 - sudo -H pip install --user dxpy --upgrade
 - sudo -H pip install --user 'requests[security]'
 - curl -s api.sdkman.io | bash
-- source /home/travis/.sdkman/bin/sdkman-init.sh
-- sdk list gradle
-- yes | sdk install java 10.0.2-oracle
-- sdk default java 10.0.2-oracle
-- sdk install gradle 4.8.1
-- sdk default gradle 4.8.1
+- sudo source /home/travis/.sdkman/bin/sdkman-init.sh
+- yes | sudo sdk install java 10.0.2-oracle
+- sudo sdk default java 10.0.2-oracle
+- sudo sdk install gradle 4.8.1
+- sudo sdk default gradle 4.8.1
 - mkdir ~/.aws
 - printf "[genetraps]\naws_access_key_id="$AWS_ACCESS_KEY_ID"\naws_secret_access_key="$AWS_SECRET_ACCESS_KEY
   > ~/.aws/credentials
