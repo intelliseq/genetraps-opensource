@@ -23,7 +23,6 @@ apply plugin: "io.franzbecker.gradle-lombok"
 
 group = 'pl.intelliseq.genetraps.api'
 version = '0.0.1-SNAPSHOT'
-targetComaptibility = 10
 sourceCompatibility = 10
 
 lombok {
