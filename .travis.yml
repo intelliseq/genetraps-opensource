@@ -15,7 +15,7 @@ services:
 before_install:
 - sudo apt-get remove python2.7
 - sudo apt-get clean
-- sudo add-apt-repository ppa:jonathonf/python-2.7
+- yes | sudo add-apt-repository ppa:jonathonf/python-2.7
 - sudo apt-get -qq update
 - sudo apt-get install python python2.7
 - sudo apt-get install python-six
