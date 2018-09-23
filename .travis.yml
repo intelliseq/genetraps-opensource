@@ -11,7 +11,7 @@ language: java
 jdk:
 - oraclejdk10
 python:
-- 3.4
+- 2.7.13
 services:
 - docker
 before_install:
