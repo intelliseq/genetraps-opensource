@@ -17,7 +17,8 @@ before_install:
 - sudo apt-get -qq update
 - sudo apt-get install python2.7
 - sudo apt-get -qq update
-- sudo apt-get install python-pip python-dev build-essential
+- sudo apt-get install python-requests
+- sudo apt-get install python-pip
 - sudo apt-get install python-dev libffi-dev libssl-dev
 - sudo apt-get install python-urllib3
 - sudo -H pip install --upgrade --force-reinstall pip==9.0.3
