@@ -28,8 +28,11 @@ before_install:
 - sudo -H pip install --user 'requests[security]'
 - curl -s api.sdkman.io | bash
 - sudo source /home/travis/.sdkman/bin/sdkman-init.sh
-- yes | sudo sdk install java 10.0.2-oracle
-- sudo sdk default java 10.0.2-oracle
+- yes | sudo add-apt-repository ppa:linuxuprising/java
+- sudo apt-get -qq update
+- sudo apt-get install oracle-java10-installer
+- sudo apt-get install oracle-java10-set-default
+- java -version
 - sudo sdk install gradle 4.8.1
 - sudo sdk default gradle 4.8.1
 - mkdir ~/.aws
