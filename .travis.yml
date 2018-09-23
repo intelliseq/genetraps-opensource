@@ -25,11 +25,11 @@ before_install:
 - sudo apt-get install python-requests
 - sudo apt-get install python-pip
 - sudo apt-get install python-dev libffi-dev libssl-dev
-- pip install --user urllib3[secure]
-- pip install --user --upgrade --force-reinstall pip==9.0.3
-- pip install --user awscli --upgrade
-- pip install --user dxpy --upgrade
-- pip install --user 'requests[security]'
+- sudo -H pip install urllib3[secure]
+- sudo -H pip install --user --upgrade --force-reinstall pip==9.0.3
+- sudo -H pip install --user awscli --upgrade
+- sudo -H pip install --user dxpy --upgrade
+- sudo -H pip install --user 'requests[security]'
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
 - sdk list gradle
