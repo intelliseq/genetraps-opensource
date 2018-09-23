@@ -16,7 +16,7 @@ services:
 - docker
 before_install:
 - sudo apt-get -qq update
-- sudo add-apt-repository ppa:linuxuprising/java
+- yes | udo add-apt-repository ppa:linuxuprising/java
 - sudo apt-get -qq update
 - sudo apt-get install oracle-java10-installer
 - sudo apt install oracle-java10-set-default
