@@ -7,21 +7,19 @@ branches:
   - feature-travis-api-dx-build
   - feature-tests
 sudo: required
-language: java
+language: python
+python:
+- "3.6"
 jdk:
 - oraclejdk10
 services:
 - docker
 before_install:
 - sudo apt-get -qq update
-- sudo apt-get update
-- cd /tmp
-- wget https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz
-- tar xfz Python-2.7.9.tgz
-- cd Python-2.7.9/
-- ./configure --prefix /usr/local/lib/python2.7.9
-- make
-- sudo make install
+- sudo add-apt-repository ppa:linuxuprising/java
+- sudo apt-get -qq update
+- sudo apt-get install oracle-java10-installer
+- sudo apt install oracle-java10-set-default
 - sudo apt-get install python-six
 - sudo apt-get install python-urllib3
 - sudo apt-get install python-requests
