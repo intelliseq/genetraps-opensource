@@ -9,7 +9,7 @@ branches:
 sudo: required
 language: python
 python:
-- "3.6"
+- "2.7.14"
 jdk:
 - oraclejdk10
 services:
