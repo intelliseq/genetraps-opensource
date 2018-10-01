@@ -55,14 +55,14 @@ public class ApiDxTest {
                 new DXHTTPRequest(DXEnvironment.create()).request("/" + objectId + "/" + "describe",
                         new ObjectMapper().createObjectNode(), DXHTTPRequest.RetryStrategy.SAFE_TO_RETRY), JsonNode.class);
 
-        System.out.println(out);
+        log.info(out);
 
         objectId = "file-FGbb8Q0021X1X4V2G1v3vv8G";
         out = DXJSON.safeTreeToValue(
                 new DXHTTPRequest(DXEnvironment.create()).request("/" + objectId + "/" + "describe",
                         new ObjectMapper().createObjectNode(), DXHTTPRequest.RetryStrategy.SAFE_TO_RETRY), JsonNode.class);
 
-        System.out.println(out);
+        log.info(out);
     }
 
     @Test

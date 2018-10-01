@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -57,6 +58,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * A file (an opaque sequence of bytes).
  */
+@Log4j2
 public class DXFile extends DXDataObject {
 
     /**
@@ -632,7 +634,7 @@ public class DXFile extends DXDataObject {
                 if (retryAttempts > maxRetryAttempts) {
                     throw e;
                 }
-                System.out.println("HTTP error (no response). Waiting " + timeoutSeconds + " second(s) before retrying...");
+                log.error("HTTP error (no response). Waiting " + timeoutSeconds + " second(s) before retrying...");
                 sleep(timeoutSeconds);
                 timeoutSeconds *= 2;
                 continue;
@@ -644,7 +646,7 @@ public class DXFile extends DXDataObject {
                 if (retryAttempts > maxRetryAttempts) {
                     throw new IOException("HTTP error (status code " + statusCode + ")");
                 }
-                System.out.println("HTTP error (status code " + statusCode + "). Waiting " + timeoutSeconds + " second(s) before retrying...");
+                log.error("HTTP error (status code " + statusCode + "). Waiting " + timeoutSeconds + " second(s) before retrying...");
                 sleep(timeoutSeconds);
                 timeoutSeconds *= 2;
                 continue;

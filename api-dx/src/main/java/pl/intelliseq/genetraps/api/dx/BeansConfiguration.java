@@ -56,7 +56,7 @@ public class BeansConfiguration {
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-        ds.setUrl("jdbc:mysql://genetraps-provisioned.cluster-cvdvrgz3bmic.us-east-1.rds.amazonaws.com:3306/genetraps_security");
+        ds.setUrl("jdbc:mysql://genetraps-provisioned.cluster-cvdvrgz3bmic.us-east-1.rds.amazonaws.com:3306/genetraps_security?noAccessToProcedureBodies=true");
         ds.setUsername("genetraps-client");
         ds.setPassword(env.getProperty("AURORA_GENETRAPS_CLIENT_PASSWD"));
         return ds;

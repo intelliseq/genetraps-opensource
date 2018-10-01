@@ -51,7 +51,6 @@ public class FilesManager {
     public Integer getLowestFreeIndex() {
         log.info("Getting lowest free index");
         List<Integer> intList = getNumericDirectories();
-        System.out.println(intList);
         //Jeśli nic nie ma to zwracamy 1
         if (intList == null || intList.size() == 0) {
             log.info("Lowest index: " + 1);
