@@ -1,6 +1,7 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
 import com.dnanexus.*;
+import com.dnanexus.exceptions.ResourceNotFoundException;
 import com.dnanexus.exceptions.TagsException;
 import com.dnanexus.exceptions.WrongNumberOfFilesException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,7 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +27,10 @@ public class DxApiProcessManager {
 
         boolean leftTag = Arrays.asList(tags).contains("left");
         boolean rightTag = Arrays.asList(tags).contains("right");
-        if(leftTag == true && rightTag == true) {
+        if(leftTag && rightTag) {
             throw new TagsException("both 'left' and 'right' tags cannot be used at same time");
         }
-        if(leftTag == false && rightTag == false) {
+        if(!leftTag && !rightTag) {
             throw new TagsException("neither 'left' nor 'right' tag was used");
         }
 
@@ -40,6 +43,33 @@ public class DxApiProcessManager {
                 .setFolder(String.format("/samples/%s/rawdata", sampleid))
                 .setInput(input)
                 .run();
+    }
+
+    public String runUploadFile(MultipartFile mfile, Integer sampleid, String ufilename, List<String> tags) throws IOException {
+
+
+        if(ufilename == null) {
+            ufilename = mfile.getOriginalFilename();
+        }
+
+        DXFile.Builder filebuilder;
+        filebuilder = DXFile.newFile()
+                .setName(ufilename).setFolder(String.format("/samples/%s/rawdata", sampleid.toString()))
+                .setProject(DXContainer.getInstance(env.getProperty("dx-project")));
+
+        if(tags != null)
+                filebuilder.addTags(tags);
+
+        DXFile file;
+        try {
+            file = filebuilder.upload(mfile.getBytes()).build();
+        }
+        catch (ResourceNotFoundException e) {
+            DXContainer.getInstance(env.getProperty("dx-project")).newFolder(String.format("/samples/%s/rawdata", sampleid.toString()), true);
+            file = filebuilder.upload(mfile.getBytes()).build();
+        }
+        file.close();
+        return file.getId();
     }
 
     public void runMkDir(Integer sampleid) {
