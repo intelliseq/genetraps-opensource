@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,6 +44,12 @@ public class CoreTests {
         String response = this.restTemplate.getForObject("/hello", String.class);
 
         assertEquals(response, "{\"status\": \"up\"}");
+    }
+
+    @Test
+    public void badge(){
+        Resource resource = restTemplate.getForObject("/api-dx-online-svg-badge", Resource.class);
+        assertTrue(resource.exists());
     }
 
     @Test

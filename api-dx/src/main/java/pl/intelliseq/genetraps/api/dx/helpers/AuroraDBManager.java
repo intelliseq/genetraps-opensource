@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import com.dnanexus.DXFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -9,11 +10,17 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,35 +44,21 @@ public class AuroraDBManager {
     }
 
     public Map<String, Object> getUserPriviligeToSample(Integer userID, Integer sampleID) throws SQLException {
+        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withProcedureName("GetUserPriviligeToSample")
+                .declareParameters(new SqlParameter("UserID", Types.SMALLINT))
+                .declareParameters(new SqlParameter("SampleID", Types.SMALLINT));
 
+        jdbcCall.compile();
 
+        Map<String, Object> inParamMap = new HashMap<>();
+        inParamMap.put("UserID", userID);
+        inParamMap.put("SampleID", sampleID);
+        SqlParameterSource in = new MapSqlParameterSource(inParamMap);
 
-        ResultSet rs = dataSource.getConnection().getMetaData().getProcedures("genetraps_security", "genetraps_security", "%");
+        log.debug(jdbcCall.getInParameterNames());
 
-        while (rs.next()) {
-            String spName = rs.getString("PROCEDURE_NAME");
-            int spType = rs.getInt("PROCEDURE_TYPE");
-            log.debug("Stored Procedure Name: " + spName);
-            if (spType == DatabaseMetaData.procedureReturnsResult) {
-                log.debug("procedure Returns Result");
-            } else if (spType == DatabaseMetaData.procedureNoResult) {
-                log.debug("procedure No Result");
-            } else {
-                log.debug("procedure Result unknown");
-            }
-
-        }
-
-        return null;
-//
-//        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(dataSource)
-//                .withCatalogName("genetraps_security")
-//                .withSchemaName("genetraps_security")
-//                .withProcedureName("GetUserPriviligeToSample");
-//
-//        return(jdbcCall.execute(new MapSqlParameterSource()
-//                .addValue("UserID", userID)
-//                .addValue("SampleID", sampleID)));
+        return(jdbcCall.execute(inParamMap));
 
     }
 
