@@ -1,10 +1,10 @@
-## Endpoints
-### api-dx endpoints
-[api-dx/hello](#api-dx-hello)
-[api-dx/mkdir](#api-dx-mkdir)
+### Endpoints
+#### api-dx endpoints
+[api-dx/hello](#api-dx-hello)  
+[api-dx/mkdir](#api-dx-mkdir)  
 
 ----
-##### api-dx/hello
+#### api-dx hello
 [genetraps.intelliseq.pl:8086/hello](genetraps.intelliseq.pl:8086/hello)  
 Checks if server is up
 * **URL:** `/hello`
@@ -14,7 +14,7 @@ Checks if server is up
   * **Content:** `{"status": "up"}`
 
 ----
-##### api-dx/mkdir
+#### api-dx mkdir
 [genetraps.intelliseq.pl:8086/mkdir](genetraps.intelliseq.pl:8086/mkdir)
 Creates directory for a new sample
 * **URL** `/mkdir`
