@@ -1,6 +1,8 @@
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 #
+echo $LOG_PREFIX "PYTHON VERSION: " `/usr/bin/python --version`
+echo $LOG_PREFIX "JAVA VERSION: " `javac -version`
 echo $LOG_PREFIX"Starting travis script"
 if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
 echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
@@ -83,7 +85,7 @@ if [ $API_SECURITY_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
-    gradle build -q -p api-security
+    gradle build -q -p api-security 2>&1 | grep -v "WARNING:"
     cp `ls api-security/build/libs/api-security*` api-security/build/libs/app.jar
     docker build api-security/ -t $API_SECURITY_TAG -q
     echo $LOG_PREFIX $LOG_APP "security tag: " $API_SECURITY_TAG
@@ -134,6 +136,10 @@ else
         sed 's@imageTag@'"$API_DX_TAG"'@' | \
         sed 's@portTag@'"$ECS_CLI_PORT_API_DX"'@g' | \
         sed 's@prefixTag@api-security-log@' > docker-compose.yml
+    echo "    environment:" >> docker-compose.yml
+    echo "      - AURORA_GENETRAPS_CLIENT_PASSWD" >> docker-compose.yml
+    echo "      - AURORA_GENETRAPS_CLIENT_LOGIN" >> docker-compose.yml
+    echo "      - DNANEXUS_TOKEN_TEST" >> docker-compose.yml
     echo $LOG_PREFIX $LOG_APP "ecs-cli composing api-dx"
     ecs-cli compose \
         --project-name genetraps-api-dx \

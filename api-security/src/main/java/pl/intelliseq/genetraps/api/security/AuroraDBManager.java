@@ -40,6 +40,11 @@ public class AuroraDBManager {
     }
 
     public User getUser(String username){
-        return jdbcTemplate.query(String.format("SELECT * FROM Security WHERE Username = \"%s\"", username), (rs, rowNum) -> new User(username, rs.getString("Password"), Collections.singletonList(new SimpleGrantedAuthority("user")))).get(0);
+        return jdbcTemplate.query(
+                String.format("SELECT S.* FROM " +
+                        "Security AS S " +
+                        "JOIN Users AS U ON S.UserID=U.USerID " +
+                        "WHERE S.Username = \"%s\" OR U.Email = \"%s\";", username, username),
+                (rs, rowNum) -> new User(username, rs.getString("Password"), Collections.singletonList(new SimpleGrantedAuthority("user")))).get(0);
     }
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # how to use
-# ./save-file.sh KEY(nameinbucket) VALUE(file)
+# ./save-file.sh KEY(name-in-bucket) VALUE(file)
 KEY=$1
 #VALUE=$2
 BUCKET=fil-store

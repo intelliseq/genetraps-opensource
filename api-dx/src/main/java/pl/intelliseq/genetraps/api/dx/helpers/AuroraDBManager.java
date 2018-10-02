@@ -1,23 +1,32 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import com.dnanexus.DXFile;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mysql.jdbc.DatabaseMetaData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by intelliseq on 26/04/2017.
  */
+@Log4j2
 public class AuroraDBManager {
 
 
@@ -29,44 +38,80 @@ public class AuroraDBManager {
 
     private JdbcTemplate jdbcTemplate;
 
-    private Logger logger = LoggerFactory.getLogger(AuroraDBManager.class);
-
     @PostConstruct
     private void postConstruct(){
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     public Map<String, Object> getUserPriviligeToSample(Integer userID, Integer sampleID) throws SQLException {
+        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withProcedureName("GetUserPriviligeToSample")
+                .declareParameters(new SqlParameter("UserID", Types.SMALLINT))
+                .declareParameters(new SqlParameter("SampleID", Types.SMALLINT));
 
+        jdbcCall.compile();
 
+        Map<String, Object> inParamMap = new HashMap<>();
+        inParamMap.put("UserID", userID);
+        inParamMap.put("SampleID", sampleID);
+        SqlParameterSource in = new MapSqlParameterSource(inParamMap);
 
-        ResultSet rs = dataSource.getConnection().getMetaData().getProcedures("genetraps_security", "genetraps_security", "%");
+        log.debug(jdbcCall.getInParameterNames());
 
-        while (rs.next()) {
-            String spName = rs.getString("PROCEDURE_NAME");
-            int spType = rs.getInt("PROCEDURE_TYPE");
-            System.out.println("Stored Procedure Name: " + spName);
-            if (spType == DatabaseMetaData.procedureReturnsResult) {
-                System.out.println("procedure Returns Result");
-            } else if (spType == DatabaseMetaData.procedureNoResult) {
-                System.out.println("procedure No Result");
-            } else {
-                System.out.println("procedure Result unknown");
-            }
+        return(jdbcCall.execute(inParamMap));
 
-        }
+    }
 
-        return null;
+    public JsonNode getUserSimpleDetails(String username){
+
+        String query = String.format("SELECT U.*, S.Username FROM " +
+                "Security AS S " +
+                "JOIN Users AS U ON S.UserID=U.USerID " +
+                "WHERE S.Username = \"%s\";", username);
+
+//        log.debug(query);
 //
-//        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(dataSource)
-//                .withCatalogName("genetraps_security")
-//                .withSchemaName("genetraps_security")
-//                .withProcedureName("GetUserPriviligeToSample");
+//        jdbcTemplate.query(query, (rs, rowNum) -> System.out.printf("Email: %s\n", rs.getString("Email")));
 //
-//        return(jdbcCall.execute(new MapSqlParameterSource()
-//                .addValue("UserID", userID)
-//                .addValue("SampleID", sampleID)));
+//        SimpleModule module = new SimpleModule();
+//        module.addSerializer(new ResultSetSerializer());
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.registerModule(module);
 
+        ObjectNode node = jdbcTemplate.query(query, (resultSet, rowNum) -> new ObjectMapper().createObjectNode()
+                .put("UserID", resultSet.getInt("UserID"))
+                .put("LastName", resultSet.getString("LastName"))
+                .put("FirstName", resultSet.getString("FirstName"))
+                .put("Email", resultSet.getString("Email"))
+                .put("Username", resultSet.getString("Username"))).get(0);
+
+        log.debug(node);
+
+        return node;
+
+//        ResultSet resultSet = jdbcTemplate.query(query, (rs, rowNum) -> rs).get(0);
+//
+//        try {
+//            log.debug(resultSet.getString("Email"));
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        //TODO: Można napisać konwerter (https://stackoverflow.com/a/8120442)
+//        JsonNode user = null;
+//        try {
+//            user = new ObjectMapper().createObjectNode()
+//                    .put("UserID", resultSet.getInt("UserID"))
+//                    .put("LastName", resultSet.getString("LastName"))
+//                    .put("FirstName", resultSet.getString("FirstName"))
+//                    .put("Email", resultSet.getString("Email"))
+//                    .put("Username", username);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return user;
     }
 
     public void getUsers(){

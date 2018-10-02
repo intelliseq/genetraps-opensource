@@ -3,6 +3,7 @@ package pl.intelliseq.genetraps.api.dx.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
@@ -55,10 +56,13 @@ public class FilesController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(
+            OAuth2Authentication auth,
             @RequestParam String url,
             @RequestParam String sampleid,
             @RequestParam String... tag) {
-        log.info(Arrays.toString(tag));
+        log.info("upload");
+        log.debug(Arrays.toString(tag));
+//        log.debug(auth.getUserAuthentication().getPrincipal().toString());
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
     }
@@ -74,10 +78,11 @@ public class FilesController {
         return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
 
-    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2"})
-    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2).getId()).toString();
-    }
+//    test me not in use
+//    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2"})
+//    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2) {
+//        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2).getId()).toString();
+//    }
 
     @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"sampleid"})
     public String bwa(@RequestParam int sampleid) {
@@ -97,12 +102,9 @@ public class FilesController {
     }
 
     @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
-    public String samplels(@PathVariable("no") int sampleid) {
-        return processManager.sampleLs(sampleid);
+    public String samplels(@PathVariable("no") int sampleid,
+                            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
+        return processManager.sampleLs(sampleid, byNames);
     }
 
-    @RequestMapping(value = "/sample/{no}/revls", method = RequestMethod.GET)
-    public String samplerevls(@PathVariable("no") int sampleid) {
-        return processManager.sampleRevLs(sampleid);
-    }
 }

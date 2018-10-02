@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 public class AuroraTests {
 
     @Autowired
@@ -28,7 +28,7 @@ public class AuroraTests {
     @Test
     public void auroraTest() throws SQLException {
         auroraDBManager.getUsers();
-        System.out.println(auroraDBManager.getUserPriviligeToSample(1, 1));
+        log.info(auroraDBManager.getUserPriviligeToSample(1, 1));
     }
 
 }
