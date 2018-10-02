@@ -1,30 +1,29 @@
 ## Endpoints
 ### api-dx endpoints
 [api-dx/hello](#api-dx-hello)
+[api-dx/mkdir](#api-dx-mkdir)
 
 ----
-### api-dx-hello
-`genetraps.intelliseq.pl:8086/hello`
+##### api-dx/hello
+[genetraps.intelliseq.pl:8086/hello](genetraps.intelliseq.pl:8086/hello)  
 Checks if server is up
-* **URL**
-  `/hello`
-* **Method:**
-  `GET`
+* **URL:** `/hello`
+* **Method:** `GET`
 * **Success Response:**
   * **Code:** `200\`
-    **Content:** `{"status": "up"}`
+  * **Content:** `{"status": "up"}`
 
 ----
-**genetraps.intelliseq.pl:8086/mkdir**
-  Creates directory for a new sample
-* **URL**
-  /mkdir
-* **Method:**
-  `GET`
+##### api-dx/mkdir
+[genetraps.intelliseq.pl:8086/mkdir](genetraps.intelliseq.pl:8086/mkdir)
+Creates directory for a new sample
+* **URL** `/mkdir`
+* **Method:** `GET`
 * **Success Response:**
-  * **Code:** 200\
-    **Content:** `{"response": 5}`
+  * **Code:** `200\`
+  * **Content:** `{"response": 5}`
 
+----
 **upload**
 ----
   Upload a file to dnanexus server
