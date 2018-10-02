@@ -8,7 +8,7 @@
 ```
 genetraps.intelliseq.pl:8086/hello
 ```
-Checks if server is up
+> Checks if server is up
 * **URL:** `/hello`
 * **Method:** `GET`
 * **Success Response:**
@@ -20,7 +20,7 @@ Checks if server is up
 ```
 genetraps.intelliseq.pl:8086/mkdir
 ```
-Creates directory for a new sample
+> Creates directory for a new sample
 * **URL** `/mkdir`
 * **Method:** `GET`
 * **Success Response:**
