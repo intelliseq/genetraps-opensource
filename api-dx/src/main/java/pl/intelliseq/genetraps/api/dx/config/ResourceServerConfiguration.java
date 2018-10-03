@@ -1,14 +1,24 @@
 package pl.intelliseq.genetraps.api.dx.config;
 
 import lombok.extern.log4j.Log4j2;
+
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.http.HttpMethod;
 
 @Configuration
@@ -16,6 +26,20 @@ import org.springframework.http.HttpMethod;
 @Log4j2
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
+	@Bean
+    public FilterRegistrationBean corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+	
     @Override
     public void configure(HttpSecurity http) throws Exception {
         log.info("Profile: Main");
@@ -24,7 +48,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/hello").permitAll()
                 .antMatchers("/api-dx-online-svg-badge").permitAll()
-                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                //.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .antMatchers("/**").authenticated();
     }
 

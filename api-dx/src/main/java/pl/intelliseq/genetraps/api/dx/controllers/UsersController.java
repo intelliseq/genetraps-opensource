@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
 @RestController
@@ -23,6 +24,7 @@ public class UsersController {
     @Autowired
     private AuroraDBManager auroraDBManager;
 
+    //@CrossOrigin
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String user(OAuth2Authentication auth) {
         //TODO: Choose better option
