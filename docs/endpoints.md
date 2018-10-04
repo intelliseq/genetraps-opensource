@@ -2,6 +2,12 @@
 #### api-dx endpoints
 [api-dx/hello](#api-dx-hello)  
 [api-dx/mkdir](#api-dx-mkdir)  
+[api-dx/upload](#api-dx-upload)  
+[api-dx/describe](#api-dx-describe)  
+[api-dx/fastqc](#api-dx-fastqc)  
+[api-dx/bwa](#api-dx-bwa)  
+[api-dx/gatkhc](#api-dx-gatkhc)  
+[api-dx/ls](#api-dx-ls)  
 
 ----
 #### api-dx hello
