@@ -42,13 +42,13 @@ genetraps.intelliseq.pl:8086/mkdir
 * **URL** `/upload`
 * **Method:** `POST`
 *  **URL Params**
-   **Required:**\
-   * `url=[string]`\
-   * `sampleid=[string]`\
-   **Optional**\
+   **Required:**  
+   * `url=[string]`  
+   * `sampleid=[string]`  
+   **Optional**  
    * `tag=[string]` - can be used multiple times
 * **Success Response:**
-  * **Code:** `200`\
+  * **Code:** `200`  
   * **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
 
 ----
@@ -91,7 +91,7 @@ genetraps.intelliseq.pl:8086/fastqc
 * **Method:** `POST`
 *  **URL Params**
    **Required:**
-   * `sampleid=[int]`
+   * `sampleid=[int]`  
    ***Or:***
    * `fastq_file_1(id)=[string]`
    * `fastq_file_2(id)=[string]`
@@ -109,7 +109,7 @@ genetraps.intelliseq.pl:8086/gatkhc
 * **Method:** `POST`
 *  **URL Params**
    **Required:**
-   * `sampleid=[string]`
+   * `sampleid=[string]`  
    **Not required:**
    * `interval=[string]`
 * **Success Response:**
@@ -117,22 +117,23 @@ genetraps.intelliseq.pl:8086/gatkhc
   * **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
 
 ----
-### sample ls / sample rev ls
+### sample ls
 ```
 genetraps.intelliseq.pl:8086/gatkhc
 ```
-> List out the contents of a sample's rawdata folder
-* **URL**
-  * `/sample/:sampleid/ls`
-  * `/sample/:sampleid/revls`
-* **Method:** `GET`
-*  **URL Params**
-   **Required:**
-   * `sampleid=[string]`
-* **Success Response:**
-  * **Code:** 200
-  * **Content:**  
+> List out the contents of a sample's rawdata folder by file ids ('byNames' is false by default). If optional parameter 'byNames' is set to true, listing proceeds by file names.  
+* **URL**  
+  * `/sample/:sampleid/ls`  
+* **Method:** `GET`  
+*  **URL Params**  
+   **Required:**  
+   * `sampleid=[string]`  
+   **Not required:**  
+   * `byNames=[boolean]`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
 Sample ls  
 `{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`  
-Sample rev ls  
+Sample ls (with byNames as true)  
 `{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
