@@ -117,7 +117,7 @@ genetraps.intelliseq.pl:8086/gatkhc
   * **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
 
 ----
-### sample ls
+### sample ls / sample rev ls
 ```
 genetraps.intelliseq.pl:8086/gatkhc
 ```
@@ -135,4 +135,4 @@ genetraps.intelliseq.pl:8086/gatkhc
 Sample ls  
 `{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`  
 Sample rev ls  
-`{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`
+`{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
