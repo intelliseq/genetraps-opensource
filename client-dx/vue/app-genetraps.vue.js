@@ -15,16 +15,16 @@ const app = new Vue({
     access_token: ""
   },
   created() {
-    logger("DEBUG", "vue.app.created")
+    logger.debug("vue.app.created")
   },
   mounted() {
 
     /* first we check for cookies */
     /* then we check for google anlytics */
     /* finally we check for refresh token */
-    logger("DEBUG", "vue.app.mounted")
+    logger.debug("vue.app.mounted")
     if(this.$cookies.get("cookies_necessary") == null) {
-      logger("DEBUG", "vue.app no agreement for cookies")
+      logger.debug("vue.app no agreement for cookies")
       this.$router.push("/cookies")
     } else {
       if(this.$cookies.get("cookies_statistics") != null) {

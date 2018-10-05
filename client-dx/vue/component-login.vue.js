@@ -35,7 +35,7 @@ const loginComponent = {
   `,
   methods: {
           getToken: function (event) {
-              logger("DEBUG", "vue.login.getToken")
+              logger.debug("vue.login.getToken")
               var credentials = {login: this.login, password: this.password}
               store.dispatch('security/loginWithCredentials', credentials)
 
@@ -62,7 +62,7 @@ const loginComponent = {
         }
       },
       mounted() {
-        logger("DEBUG", "vue.login.mounted")
+        logger.debug("vue.login.mounted")
         this.dialog_visibility = true
       }
 }

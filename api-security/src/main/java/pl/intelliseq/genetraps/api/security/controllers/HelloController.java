@@ -15,14 +15,12 @@ public class HelloController {
         return "{\"status\": \"up\"}";
     }
 
-    @RequestMapping(value = "/api-security-online-svg-badge", method = RequestMethod.GET)
+    @RequestMapping(value = "/status", method = RequestMethod.GET, produces="image/svg+xml")
     public Resource getBadge(HttpServletResponse response) {
 
         Resource resource = new FileSystemResource("src/main/resources/api--security-online-brightgreen.svg");
 	response.setHeader("Cache-Control", "no-cache");
-	response.setContentType("image/svg+xml");
-	Date date= new Date();
-	response.setHeader("ETag","" + date.getTime());
+	response.setHeader("ETag","" + (new Date()).getTime());
         return resource;
     }
 }

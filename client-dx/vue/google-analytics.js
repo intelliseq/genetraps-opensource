@@ -1,5 +1,5 @@
 var loadGoogleAnalytics = function(){
-  logger("DEBUG", "loadGoogleAnalytics");
+  logger.debug("loadGoogleAnalytics");
 
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -15,7 +15,7 @@ var loadGoogleAnalytics = function(){
     router.afterEach(( to, from ) => {
       ga('set', 'page', to.path);
       ga('send', 'pageview');
-      logger("DEBUG", "vue.app.router.afterEach " + to.path);
+      logger.debug("vue.app.router.afterEach " + to.path);
     });
 
  }

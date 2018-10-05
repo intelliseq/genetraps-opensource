@@ -1,23 +1,20 @@
 const welcomeComponent = {
   template:`
     <v-app>
-
+      <v-btn v-on:click.prevent="createSample">CREATE SAMPLE</v-btn>
     </v-app>`,
     data: function () {
       return {
-        waiting_visibility: false
+
+      }
+    },
+    methods: {
+      createSample: function (event) {
+        logger.debug("vue.welcome.createSample")
+        store.dispatch('sample/createSample')
       }
     },
     created: function () {
-      logger("DEBUG", "vue.welcome.created")
-      //this.$hub.$on('wait', (turnon) => {
-        //this.waiting_visibility = turnon
-        //console.log("LOG: Vue.Welcome.hub.wait")
-      //});
-    },
-    methods: {
-            go: function () {
-                this.$router.push("/login")
-            }
-        }
+      logger.debug("vue.welcome.created")
+    }
 }

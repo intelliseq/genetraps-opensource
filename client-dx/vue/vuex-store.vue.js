@@ -8,7 +8,7 @@ const store = new Vuex.Store({
     mutations: {
       setWaitingVisibility(state, waitingVisibility) {
         state.waitingVisibility = waitingVisibility
-        logger("DEBUG", "setWaitingVisibility")
+        logger.debug("setWaitingVisibility")
       },
       setWaitingText(state, waitingText) {
         state.waitingText = waitingText
@@ -16,6 +16,7 @@ const store = new Vuex.Store({
     },
     modules: {
     	user: userModule,
-      security: securityModule
+      security: securityModule,
+      sample: sampleModule
     },
 })

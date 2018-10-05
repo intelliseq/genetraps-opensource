@@ -10,7 +10,7 @@ const toolbarComponent = {
     <v-toolbar-side-icon></v-toolbar-side-icon>
     <v-toolbar-title>genetraps</v-toolbar-title>
     <v-spacer></v-spacer>
-    <span>{{toolbarVisibility}}</span><span>=====</span><span>{{userEmail}}</span>
+    <span>{{userEmail}}</span>
   </v-toolbar>
 </v-card>
 `,
@@ -22,6 +22,6 @@ const toolbarComponent = {
     //  Vuex.mapState('user', ['userEmail'])
     //}
     created: function () {
-      logger("DEBUG", "vue.wait.created")
+      logger.debug("vue.wait.created")
     }
 }
