@@ -119,7 +119,7 @@ genetraps.intelliseq.pl:8086/gatkhc
 ----
 ### sample ls
 ```
-genetraps.intelliseq.pl:8086/gatkhc
+genetraps.intelliseq.pl:8086/sample/:sampleid/ls
 ```
 > List out the contents of a sample's rawdata folder by file ids ('byNames' is false by default). If optional parameter 'byNames' is set to true, listing proceeds by file names.  
 * **URL**  
@@ -137,3 +137,25 @@ Sample ls
 `{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`  
 Sample ls (with byNames as true)  
 `{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
+
+----
+### upload file
+```
+genetraps.intelliseq.pl:8086/uploadfile
+```
+> Upload a given file, all params must be passed using '-F' (form) option.  
+* **URL**  
+  * `/uploadfile`  
+* **Method:** `POST`  
+*  **URL Params**  
+   **Required:**  
+   * `file=@[filename]`  
+   * `sampleid=[string]`  
+   **Not required:**  
+   * `newfilename=[string]` 
+   * `tag=[string]` (can be multiple)  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
+Sample ls  
+`{"id":"file-XXXXXXXXXXXXXXXXXXXXXXXX"}`  
