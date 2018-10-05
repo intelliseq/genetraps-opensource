@@ -45,16 +45,16 @@ public class DxApiProcessManager {
                 .run();
     }
 
-    public String runUploadFile(MultipartFile mfile, Integer sampleid, String ufilename, List<String> tags) throws IOException {
+    public String runUploadFile(MultipartFile mfile, Integer sampleid, String newfilename, List<String> tags) throws IOException {
 
 
-        if(ufilename == null) {
-            ufilename = mfile.getOriginalFilename();
+        if(newfilename == null) {
+            newfilename = mfile.getOriginalFilename();
         }
 
         DXFile.Builder filebuilder;
         filebuilder = DXFile.newFile()
-                .setName(ufilename).setFolder(String.format("/samples/%s/rawdata", sampleid.toString()))
+                .setName(newfilename).setFolder(String.format("/samples/%s/rawdata", sampleid.toString()))
                 .setProject(DXContainer.getInstance(env.getProperty("dx-project")));
 
         if(tags != null)

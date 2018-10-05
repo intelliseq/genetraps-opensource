@@ -74,13 +74,13 @@ public class FilesController {
     public String uploadfile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "sampleid") int sampleid,
-            @RequestParam(value = "ufilename", required = false) String ufilename,
+            @RequestParam(value = "newfilename", required = false) String newfilename,
             @RequestParam(value = "tag", required = false) List<String> tags) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, sampleid, ufilename, tags)).toString();
+            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, sampleid, newfilename, tags)).toString();
         } catch (IOException e) {
-            return new ObjectMapper().createObjectNode().put("id", "error").toString();
+            return new ObjectMapper().createObjectNode().put("id", "").toString();
         }
     }
 
