@@ -5,10 +5,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @Log4j2
@@ -65,6 +68,20 @@ public class FilesController {
 //        log.debug(auth.getUserAuthentication().getPrincipal().toString());
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
+    }
+
+    @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
+    public String uploadfile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "sampleid") int sampleid,
+            @RequestParam(value = "newfilename", required = false) String newfilename,
+            @RequestParam(value = "tag", required = false) List<String> tags) {
+
+        try {
+            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, sampleid, newfilename, tags)).toString();
+        } catch (IOException e) {
+            return new ObjectMapper().createObjectNode().put("id", "").toString();
+        }
     }
 
     @RequestMapping(value = "/describe/{id}", method = RequestMethod.GET)
