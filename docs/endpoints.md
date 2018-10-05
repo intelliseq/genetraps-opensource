@@ -7,7 +7,8 @@
 [api-dx/fastqc](#api-dx-fastqc)  
 [api-dx/bwa](#api-dx-bwa)  
 [api-dx/gatkhc](#api-dx-gatkhc)  
-[api-dx/ls](#api-dx-ls)  
+[api-dx/ls](#api-dx-sample-ls)  
+[api-dx/uploadfile](#api-dx-upload-file)  
 
 ----
 #### api-dx hello
@@ -117,7 +118,7 @@ genetraps.intelliseq.pl:8086/gatkhc
   * **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
 
 ----
-### sample ls
+### api-dx sample ls
 ```
 genetraps.intelliseq.pl:8086/sample/:sampleid/ls
 ```
@@ -139,7 +140,7 @@ Sample ls (with byNames as true)
 `{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
 
 ----
-### upload file
+### api-dx upload file
 ```
 genetraps.intelliseq.pl:8086/uploadfile
 ```
