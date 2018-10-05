@@ -10,6 +10,8 @@
 ![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/api-dx-online-svg-badge)
 ### api-security
 ![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/api-security-online-svg-badge)
+### genetraps folders and files structure  
+[IMAGE](https://github.com/intelliseq/genetraps-opensource/blob/develop/api-dx/src/main/resources/images/genetraps%20folders%20and%20files%20structure.jpg)
 
 ## development philosophy
 # API dx

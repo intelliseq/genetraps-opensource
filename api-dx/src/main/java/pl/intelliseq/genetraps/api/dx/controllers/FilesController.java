@@ -95,10 +95,11 @@ public class FilesController {
         return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
 
-    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2"})
-    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2).getId()).toString();
-    }
+//    test me not in use
+//    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2"})
+//    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2) {
+//        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2).getId()).toString();
+//    }
 
     @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"sampleid"})
     public String bwa(@RequestParam int sampleid) {
@@ -118,13 +119,9 @@ public class FilesController {
     }
 
     @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
-    public String samplels(@PathVariable("no") int sampleid) {
-        return processManager.sampleLs(sampleid);
+    public String samplels(@PathVariable("no") int sampleid,
+                            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
+        return processManager.sampleLs(sampleid, byNames);
     }
 
-    @RequestMapping(value = "/sample/{no}/revls", method = RequestMethod.GET)
-    public String samplerevls(@PathVariable("no") int sampleid) {
-        //Reverse ls - keys swapped with values
-        return processManager.sampleRevLs(sampleid);
-    }
 }

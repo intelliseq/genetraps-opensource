@@ -126,7 +126,7 @@ if [ $API_DX_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
-    gradle build -q -p api-dx
+    gradle build -q -p api-dx -x test
     cp `ls api-dx/build/libs/api-dx*` api-dx/build/libs/app.jar
     docker build api-dx/ -t $API_DX_TAG -q
     echo $LOG_PREFIX $LOG_APP "dx tag: " $API_DX_TAG

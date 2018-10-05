@@ -11,22 +11,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 public class ControllersTests {
 
     @Autowired
@@ -39,8 +42,20 @@ public class ControllersTests {
     private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
     private String interval = "chr15:42377802-42397802";
 
+    public ResponseEntity<JsonNode> getForResponseEnity(TestUser user, String url) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+user.getAccessToken());
+
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+
+        ResponseEntity<JsonNode> response = restTemplate.exchange(url, HttpMethod.GET, entity, JsonNode.class);
+
+        return response;
+    }
+
     private Integer mkDir() {
-        return restTemplate.getForObject("/mkdir", JsonNode.class).get("response").asInt();
+        return getForResponseEnity(PSYDUCK, "/mkdir").getBody().get("response").asInt();
     }
 
     private DXJob.Describe waitUntilJobIsDone(String jobId) {
@@ -58,9 +73,10 @@ public class ControllersTests {
         }
     }
 
-    private DXJob.Describe upload(String sampleUrl, Integer sampleid, String... tags) {
+    private DXJob.Describe upload(TestUser user, String sampleUrl, Integer sampleid, String... tags) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("url", sampleUrl);
@@ -77,9 +93,10 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-    private DXJob.Describe fastqc(String fileId) {
+    private DXJob.Describe fastqc(TestUser user, String fileId) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("fileId", fileId);
@@ -92,9 +109,10 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-    private DXJob.Describe bwa(Integer sampleid) {
+    private DXJob.Describe bwa(TestUser user, Integer sampleid) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
         uploadValueMap.add("sampleid", sampleid.toString());
@@ -107,9 +125,10 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-    private DXJob.Describe gatkhc(Integer sampleid, String interval) {
+    private DXJob.Describe gatkhc(TestUser user, Integer sampleid, String interval) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
         uploadValueMap.add("sampleid", sampleid.toString());
@@ -125,15 +144,27 @@ public class ControllersTests {
 
     @Test
     public void upload() {
-        //Integer sampleid = mkDir();
-        //DXJob.Describe upload1 = upload(sampleLeft, sampleid, "left");
-        //DXJob.Describe upload2 = upload(sampleRight, sampleid, "right");
-        //String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
+        Integer sampleid = mkDir();
+        DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
+        DXJob.Describe upload2 = upload(PSYDUCK, sampleRight, sampleid, "right");
 
-        //log.info(restTemplate.getForObject("/describe/" + file1Id, JsonNode.class));
-        //log.info(fastqc(file1Id));
-        //log.info(bwa(sampleid));
-        //log.info(gatkhc(sampleid, interval));
+        ResponseEntity<JsonNode> ls = getForResponseEnity(PSYDUCK, String.format("/sample/%s/ls", sampleid));
+        assertTrue(ls.getStatusCode().is2xxSuccessful());
+        ResponseEntity<JsonNode> lsByNames = getForResponseEnity(PSYDUCK, String.format("/sample/%s/ls?byNames=true", sampleid));
+        assertTrue(lsByNames.getStatusCode().is2xxSuccessful());
+        log.info(ls.getBody());
+        log.info(lsByNames.getBody());
+
+        String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
+
+        ResponseEntity<JsonNode> describe = getForResponseEnity(PSYDUCK, "/describe/" + file1Id);
+        assertTrue(describe.getStatusCode().is2xxSuccessful());
+        log.info(describe.getBody());
+
+        log.info(fastqc(PSYDUCK, file1Id));
+        log.info(bwa(PSYDUCK, sampleid));
+        log.info(gatkhc(PSYDUCK, sampleid, interval));
+
     }
 
 

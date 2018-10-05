@@ -16,13 +16,13 @@ public class HelloController {
     }
 
     /* preflight */
-    @RequestMapping(
-            value = "/**",
-            method = RequestMethod.OPTIONS
-    )
-    public ResponseEntity handle() {
-        return new ResponseEntity(HttpStatus.OK);
-    }
+//    @RequestMapping(
+//            value = "/**",
+//            method = RequestMethod.OPTIONS
+//    )
+//    public ResponseEntity handle() {
+//        return new ResponseEntity(HttpStatus.OK);
+//    }
 
     @RequestMapping(value = "/api-dx-online-svg-badge", method = RequestMethod.GET)
     public Resource getBadge() {

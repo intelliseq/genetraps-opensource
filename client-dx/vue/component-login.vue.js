@@ -1,4 +1,4 @@
-const Login = {
+const loginComponent = {
   template: `
   <v-app>
   <v-alert :value="error" type="error" dismissible transition="scale-transition" v-model="alert_visibility">
@@ -35,39 +35,11 @@ const Login = {
   `,
   methods: {
           getToken: function (event) {
-              console.log("LOG: Vue.Login.getToken() method started")
+              logger("DEBUG", "vue.login.getToken")
+              var credentials = {login: this.login, password: this.password}
+              store.dispatch('security/loginWithCredentials', credentials)
 
-              var reqData = {
-                "grant_type": "password",
-                "client_id": "web_app",
-                "username": this.login,
-                "password": this.password
-              }
-              axios({
-                method: 'post', //you can set what request you want to be
-                url: 'http://genetraps.intelliseq.pl:8088/oauth/token',
-                withCredentials: true,
-                crossdomain: true,
-                data: Object.keys(reqData).map(function(key) {
-                  return encodeURIComponent(key) + '=' + encodeURIComponent(reqData[key])
-                }).join('&'),
-                headers: {
-                  'Authorization': 'Basic d2ViX2FwcDpzZWNyZXQ=',
-                  'Content-Type': 'application/x-www-form-urlencoded' },
-              })
-              .then(response => {
-                console.log("LOG: Vue.Login.getToken() succesfull login")
-                this.$hub.$emit('login', response.data);
-                //console.log(response.data.access_token)
-              })
-              .catch(e => {
-                console.log(e)
-                this.error = true
-                this.dialog_visibility = false
-                this.error_message = "Error: " + e.response.data.error
-                this.error_description = "Error description: " + e.response.data.error_description
-                this.alert_visibility = true
-              })
+
           }
       },
       data: function () {
@@ -90,7 +62,7 @@ const Login = {
         }
       },
       mounted() {
-        console.log("LOG: Vue.Login.mounted()")
+        logger("DEBUG", "vue.login.mounted")
         this.dialog_visibility = true
       }
 }
