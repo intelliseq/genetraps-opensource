@@ -18,16 +18,35 @@ const securityModule = {
 			store.dispatch('user/getUser')
 		},
     loginWithCredentials({commit}, credentials) {
-			store.commit('setWaitingText', "Signing in")
-			store.commit('setWaitingVisibility', true)
       logger.debug("vue.vuex.security.loginWithCredentials")
-      var reqData = {
+			request({
+				waitingText: "Signing in",
+				service: "API_SECURITY",
+				endpoint: "oauth/token",
+				method: "post",
+				reqData: {
+	        "grant_type": "password",
+	        "client_id": store.state.security.client_id,
+	        "username": credentials.login,
+	        "password": credentials.password
+	      },
+				headers: {
+          'Authorization': 'Basic d2ViX2FwcDpzZWNyZXQ=',
+          'Content-Type': 'application/x-www-form-urlencoded'
+      	},
+				callback: function(data) {
+					logger.debug("vue.app.loginWithRefreshToken succesfull login")
+					store.dispatch('security/login', data)
+					router.push("/")
+				} // calback:
+			}) // request()
+      /*var reqData = {
         "grant_type": "password",
         "client_id": store.state.security.client_id,
         "username": credentials.login,
         "password": credentials.password
-      }
-      axios({
+      }*/
+      /*axios({
         method: 'post', //you can set what request you want to be
         url: 'http://genetraps.intelliseq.pl:8088/oauth/token',
         withCredentials: true,
@@ -49,7 +68,7 @@ const securityModule = {
       .catch(e => {
         console.log(e)
 				store.commit('setWaitingVisibility', false)
-      })
+      })*/
     },
     loginWithRefreshToken({commit}) {
 			request({

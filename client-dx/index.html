@@ -21,10 +21,12 @@
 
 <body style="font-family: 'Roboto', sans-serif;">
   <div id="genetraps-app">
+    <v-app>
     <wait></wait>
     <toolbar></toolbar>
     <!--<transition enter-active-class="animated flipInX" leave-active-class="animated flipInY">-->
     <router-view></router-view>
+  </v-app>
   <!--</transition>-->
   </div>
 
@@ -40,7 +42,7 @@
   <script src="vue/logger.js"></script>
   <script src="vue/google-analytics.js"></script>
   <script src="vue/axios.js"></script>
-  
+
   <script src="vue/vuex-module-security.vue.js"></script>
   <script src="vue/vuex-module-user.vue.js"></script>
   <script src="vue/vuex-module-sample.vue.js"></script>
