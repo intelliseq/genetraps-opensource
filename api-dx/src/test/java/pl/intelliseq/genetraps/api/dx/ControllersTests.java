@@ -18,12 +18,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
+import java.util.stream.StreamSupport;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 
 
 @RunWith(SpringRunner.class)
@@ -140,6 +144,22 @@ public class ControllersTests {
         assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
 
         return waitUntilJobIsDone(response.get("id").textValue());
+    }
+
+    @Test
+    public void priviligesTest() {
+        ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/samples");
+        assertTrue(psyduck.getStatusCode().is2xxSuccessful());
+
+        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/samples");
+        assertTrue(admin.getStatusCode().is2xxSuccessful());
+        admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
+    }
+
+    @Test
+    public void simpleUpload(){
+        Integer sampleid = mkDir();
+        DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
     }
 
     @Test

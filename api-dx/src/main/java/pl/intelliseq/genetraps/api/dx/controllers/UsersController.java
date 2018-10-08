@@ -2,6 +2,7 @@ package pl.intelliseq.genetraps.api.dx.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -40,5 +41,15 @@ public class UsersController {
         log.debug(String.format("{\"client\": \"%s\"}", clientId));
 
         return auroraDBManager.getUserSimpleDetails(username).toString();
+    }
+
+    @RequestMapping(value = "/user/samples", method = RequestMethod.GET)
+    public String userSamples(OAuth2Authentication auth){
+        String username = auth.getUserAuthentication().getPrincipal().toString();
+        ObjectNode result = new ObjectMapper().createObjectNode();
+
+        //map to json
+        auroraDBManager.getUserPriviliges(username).forEach((key, value) -> result.put(key.toString(), value.toString()));
+        return result.toString();
     }
 }
