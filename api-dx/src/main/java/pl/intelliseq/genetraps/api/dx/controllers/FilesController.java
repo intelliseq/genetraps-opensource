@@ -62,7 +62,8 @@ public class FilesController {
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
-//        log.debug(auth.getUserAuthentication().getPrincipal().toString());
+        String username = auth.getUserAuthentication().getPrincipal().toString();
+        log.debug(username);
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
     }

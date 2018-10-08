@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -33,6 +34,9 @@ public class CoreTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private AuroraDBManager auroraDBManager;
 
     @Test
     public void empty() {
@@ -66,6 +70,19 @@ public class CoreTests {
         assertThat(response.getBody().get("Username").asText(), is(equalToIgnoringCase(PSYDUCK.toString())));
 
 
+    }
+
+    @Test
+    public void sipleUserTest(){
+        SimpleUser psyduck = auroraDBManager.createNewSimpleUser(PSYDUCK.toString());
+        log.info(psyduck);
+        log.info(auroraDBManager.getUserPriviliges(psyduck));
+        log.info(auroraDBManager.getUserPriviliges("deadman"));
+    }
+
+    @Test
+    public void rootPriviliges(){
+        log.info(auroraDBManager.getRootPriviliges());
     }
 
     @Test
