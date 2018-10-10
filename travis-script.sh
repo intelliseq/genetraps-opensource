@@ -1,7 +1,10 @@
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
 #
-echo $LOG_PREFIX "PYTHON VERSION: " `/usr/bin/python --version`
+echo $LOG_PREFIX "PYTHON VERSION: " `python --version`
+echo $LOG_PREFIX "PYTHON2.7 VERSION: " `python2.7 --version`
+alias python=`which python2.7`
+echo $LOG_PREFIX "PYTHON VERSION: " `python --version`
 echo $LOG_PREFIX "JAVA VERSION: " `javac -version`
 echo $LOG_PREFIX"Starting travis script"
 if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
