@@ -22,14 +22,15 @@ before_install:
 - sudo ./configure --enable-optimizations
 - sudo make altinstall
 - cd ..
+- sudo apt-get install python3
 - sudo apt-get install python-six
 - sudo apt-get install python-requests
-- sudo apt-get install python-pip
+- sudo apt-get install python3-pip
 - sudo apt-get install python-dev libffi-dev libssl-dev
 - sudo -H pip install urllib3[secure]
 - sudo -H pip install --upgrade --force-reinstall pip==9.0.3
-- sudo -H pip install awscli --upgrade
-- sudo -H pip install dxpy --upgrade
+- sudo -H pip3 install awscli --upgrade
+- sudo -H pip3 install dxpy --upgrade
 - sudo -H pip install 'requests[security]'
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
