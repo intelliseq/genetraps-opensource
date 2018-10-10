@@ -19,10 +19,10 @@ before_install:
 - sudo apt-get install python-pip
 - sudo apt-get install python-dev libffi-dev libssl-dev
 - sudo -H pip install urllib3[secure]
-- sudo -H pip install --user --upgrade --force-reinstall pip==9.0.3
-- sudo -H pip install --user awscli --upgrade
-- sudo -H pip install --user dxpy --upgrade
-- sudo -H pip install --user 'requests[security]'
+- sudo -H pip install --upgrade --force-reinstall pip==9.0.3
+- sudo -H pip install awscli --upgrade
+- sudo -H pip install dxpy --upgrade
+- sudo -H pip install 'requests[security]'
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
 - sdk install gradle 4.10.2
