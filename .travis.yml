@@ -16,6 +16,7 @@ before_install:
 - sudo apt-get -qq update
 - sudo apt-get install python3
 - sudo apt-get install python3-pip
+- sudo apt-get install python3-cryptography
 - sudo -H pip3 install awscli --upgrade
 - sudo -H pip3 install setuptools --upgrade
 - pip3 list
