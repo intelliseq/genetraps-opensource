@@ -17,6 +17,8 @@ before_install:
 - sudo apt-get install python3
 - sudo apt-get install python3-pip
 - sudo -H pip3 install awscli --upgrade
+- sudo -H pip3 install setuptools --upgrade
+- pip3 list
 - sudo -H pip3 install dxpy --upgrade
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
