@@ -5,12 +5,8 @@ shopt -s expand_aliases
 #
 echo $LOG_PREFIX "PYTHON VERSION: "
 echo $LOG_PREFIX `python --version | head -1`
-echo $LOG_PREFIX "PYTHON2.7 VERSION: "
-echo $LOG_PREFIX `python2.7 --version | head -1`
-echo $LOG_PREFIX "PYTHON2.7 PATH:" 
-echo $LOG_PREFIX `which python2.7 | head -1`
 echo $LOG_PREFIX "Aliasing python"
-alias python=`which python2.7`
+alias python=`which python3`
 echo $LOG_PREFIX "PYTHON VERSION: "
 echo $LOG_PREFIX `python --version | head -1`
 echo $LOG_PREFIX "JAVA VERSION: " `javac -version`
