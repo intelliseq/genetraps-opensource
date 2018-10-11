@@ -8,7 +8,7 @@ Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.s
 
 ## Services status
 [![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)](http://genetraps.intelliseq.pl)\
-[![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/status)](http://genetraps.intelliseq.pl:8086/hello)\
+[![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/status?v=1)](http://genetraps.intelliseq.pl:8086/hello)\
 [![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/status)](http://genetraps.intelliseq.pl:8088/hello)
 
 ## Usage
