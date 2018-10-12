@@ -11,7 +11,9 @@ import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log4j2
@@ -61,56 +63,29 @@ public class FilesController {
     public String upload(
             OAuth2Authentication auth,
             @RequestParam String url,
-            @RequestParam String sampleid,
+            @RequestParam String sampleId,
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
         String username = auth.getUserAuthentication().getPrincipal().toString();
         log.debug(username);
 
-        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
+        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleId, tag).getId()).toString();
     }
 
+    // document me in master:readme
     @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
     public String uploadfile(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "sampleid") int sampleid,
+            @RequestParam(value = "file") MultipartFile file,
+            @RequestParam(value = "sampleId") int sampleId,
             @RequestParam(value = "newfilename", required = false) String newfilename,
             @RequestParam(value = "tag", required = false) List<String> tags) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, sampleid, newfilename, tags)).toString();
+            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, sampleId, newfilename, tags)).toString();
         } catch (IOException e) {
             return new ObjectMapper().createObjectNode().put("id", "").toString();
         }
-    }
-
-    @RequestMapping(value = "/describe/{id}", method = RequestMethod.GET)
-    public String describe(
-            @PathVariable String id) {
-        return processManager.JSONDescribe(id).toString();
-    }
-
-    @RequestMapping(value = "/fastqc", method = RequestMethod.POST)
-    public String fastqc(@RequestParam String fileId) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
-    }
-
-//    test me not in use
-//    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2"})
-//    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2) {
-//        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2).getId()).toString();
-//    }
-
-    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"sampleid"})
-    public String bwa(@RequestParam int sampleid) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(sampleid).getId()).toString();
-    }
-
-    @RequestMapping(value = "/gatkhc", method = RequestMethod.POST)
-    public String gatkhc(@RequestParam int sampleid,
-                         @RequestParam(required = false) String interval) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runGatkHC(sampleid, interval).getId()).toString();
     }
 
     @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
@@ -119,10 +94,41 @@ public class FilesController {
         return String.format("{\"response\":%s}", filesManager.mkdir());
     }
 
-    @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
-    public String samplels(@PathVariable("no") int sampleid,
-                            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
-        return processManager.sampleLs(sampleid, byNames);
+    // document me change in master:endpoints,readme
+    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
+    public String describe(
+            @PathVariable String id) {
+        return processManager.JSONDescribe(id).toString();
     }
+
+    // document me change in master:endpoints,readme
+    @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
+    public String samples(@PathVariable("no") int sampleNo,
+                            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
+        return processManager.sampleLs(sampleNo, byNames);
+    }
+
+    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.POST)
+    public String sampletagpost(@PathVariable("no") int sampleNo,
+                                @RequestBody LinkedHashMap<String, String> properties) {
+        return processManager.propertiesPost(sampleNo, properties);
+    }
+
+    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.GET)
+    public String sampletagget(@PathVariable("no") int sampleNo) {
+        return processManager.propertiesGet(sampleNo).toString();
+    }
+
+    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.PUT)
+    public String sampletagput(@PathVariable("no") int sampleNo,
+                                @RequestBody LinkedHashMap<String, String> properties) {
+        return processManager.propertiesPut(sampleNo, properties).toString();
+    }
+/*
+    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.DELETE)
+    public String sampletagdelete(@PathVariable("no") int sampleNo,
+                                @RequestBody LinkedHashMap<String, String> properties) {
+        return processManager.propertiesDelete(sampleNo, properties).toString();
+    }*/
 
 }

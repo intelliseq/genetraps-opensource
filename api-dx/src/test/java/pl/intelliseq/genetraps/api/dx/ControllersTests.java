@@ -12,22 +12,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
-import java.util.stream.StreamSupport;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
-import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 
 
 @RunWith(SpringRunner.class)
