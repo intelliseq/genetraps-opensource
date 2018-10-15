@@ -12,7 +12,7 @@ Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.s
 [![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/status)](http://genetraps.intelliseq.pl:8088/hello)
 
 ### genetraps folders and files structure  
-[IMAGE](https://github.com/intelliseq/genetraps-opensource/blob/main/api-dx/src/main/resources/images/genetraps%20folders%20and%20files%20structure.jpg)
+[IMAGE](https://github.com/intelliseq/genetraps-opensource/blob/master/api-dx/src/main/resources/images/genetraps%20folders%20and%20files%20structure.jpg)
 
 ## Usage
 Build project
