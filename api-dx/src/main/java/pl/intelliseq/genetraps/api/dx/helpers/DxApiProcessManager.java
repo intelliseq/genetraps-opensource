@@ -182,7 +182,7 @@ public class DxApiProcessManager {
     public String sampleLs(Integer sampleNo, boolean byNames) {
         List filesList = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + sampleNo.toString() + "/rawdata").execute().asList();
         Map<String, Object> responseMap = new HashMap<>();
-        String samplelsOutputResponse;
+        String sampleLsOutputResponse;
 
         if(filesList.size() > 0) {
             Map<String, Object> filesMap = new HashMap<>();
@@ -201,27 +201,37 @@ public class DxApiProcessManager {
             }
         } 
         try {
-                samplelsOutputResponse = new ObjectMapper().writeValueAsString(responseMap);
+            sampleLsOutputResponse = new ObjectMapper().writeValueAsString(responseMap);
 //       TODO: check if it can stay like this
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                samplelsOutputResponse = "{}";
-            }
-        return samplelsOutputResponse;
+        } catch(JsonProcessingException e) {
+            e.printStackTrace();
+            sampleLsOutputResponse = new ObjectMapper().createObjectNode().toString();
+        }
+        return sampleLsOutputResponse;
     }
 
-    public String propertiesPost(Integer sampleNo, LinkedHashMap<String, String> properties) throws PropertiesException {
+    public String propertiesPost(Integer sampleNo, LinkedHashMap<String, String> properties) {
 
-        if(DXSearch.findDataObjects().nameMatchesExactly("properties").inFolder(DXContainer.getInstance(env.getProperty("dx-project")), String.format("samples/%s", sampleNo.toString())).execute().asList().size() != 0) {
-            throw new PropertiesException("already exist");
+        List propertiesFileSearch = DXSearch.findDataObjects().nameMatchesExactly("properties").inFolder(DXContainer.getInstance(env.getProperty("dx-project")), String.format("samples/%s", sampleNo.toString())).execute().asList();
+        DXFile file;
+        if(propertiesFileSearch.size() == 0) {
+            DXFile.Builder builder = DXFile.newFile().setName("properties")
+                    .setFolder(String.format("/samples/%s", sampleNo.toString()))
+                    .setProject(DXContainer.getInstance(env.getProperty("dx-project")))
+                    .putAllProperties(properties);
+            file = builder.build();
         }
-        DXFile.Builder builder = DXFile.newFile().setName("properties")
-                .setFolder(String.format("/samples/%s", sampleNo.toString()))
-                .setProject(DXContainer.getInstance(env.getProperty("dx-project")))
-                .putAllProperties(properties);
-//        todo: can we assume that the particular sample folder exists for sure? (ResourceNotFoundException)
-        DXFile file = builder.build();
+        else {
+            file = (DXFile) propertiesFileSearch.get(0);
+            Map propertiesMap = file.describe().getProperties();
+            for (String key: properties.keySet()) {
+                if(!propertiesMap.containsKey(key)) {
+                    file.putProperty(key, properties.get(key));
+                }
+            }
+        }
         return file.describe().getProperties().toString();
+//        todo: can we assume that the particular sample folder exists for sure? (ResourceNotFoundException)
     }
 
     public String propertiesGet(Integer sampleNo) throws PropertiesException {
@@ -246,12 +256,21 @@ public class DxApiProcessManager {
             }
         }
         return file.describe().getProperties().toString();
+//        todo: shouldnt put method add or update (not only update)?
     }
-/*
-    public String propertiesDelete(Integer sampleNo, LinkedHashMap<String, String> properties) throws PropertiesException {
-        if(DXSearch.findDataObjects().nameMatchesExactly("properties").inFolder(DXContainer.getInstance(env.getProperty("dx-project")), String.format("samples/%s", sampleNo.toString())).execute().asList().size() != 0) {
 
+    public String propertiesDelete(Integer sampleNo, LinkedHashMap<String, String> properties) throws PropertiesException {
+        List propertiesFileSearch = DXSearch.findDataObjects().nameMatchesExactly("properties").inFolder(DXContainer.getInstance(env.getProperty("dx-project")), String.format("samples/%s", sampleNo.toString())).execute().asList();
+        if(propertiesFileSearch.size() == 0) {
+            throw new PropertiesException("does not exist");
         }
-        return
-    }*/
+        DXFile file = (DXFile) propertiesFileSearch.get(0);
+        Map propertiesMap = file.describe().getProperties();
+        for (String key: properties.keySet()) {
+            if(propertiesMap.containsKey(key)) {
+                file.removeProperty(key);
+            }
+        }
+        return file.describe().getProperties().toString();
+    }
 }

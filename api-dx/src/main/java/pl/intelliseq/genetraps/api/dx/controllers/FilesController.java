@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
+import com.dnanexus.exceptions.PropertiesException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,7 @@ public class FilesController {
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleId, tag).getId()).toString();
     }
 
-    // document me in master:readme
+    // document me change in master:readme
     @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
     public String uploadfile(
             @RequestParam(value = "file") MultipartFile file,
@@ -103,32 +104,44 @@ public class FilesController {
 
     // document me change in master:endpoints,readme
     @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
-    public String samples(@PathVariable("no") int sampleNo,
+    public String sampleLs(@PathVariable("no") int sampleNo,
                             @RequestParam(required = false, defaultValue = "false") boolean byNames) {
         return processManager.sampleLs(sampleNo, byNames);
     }
 
     @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.POST)
-    public String sampletagpost(@PathVariable("no") int sampleNo,
+    public String samplePropertiesPost(@PathVariable("no") int sampleNo,
                                 @RequestBody LinkedHashMap<String, String> properties) {
         return processManager.propertiesPost(sampleNo, properties);
     }
 
     @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.GET)
-    public String sampletagget(@PathVariable("no") int sampleNo) {
-        return processManager.propertiesGet(sampleNo).toString();
+    public String samplePropertiesGet(@PathVariable("no") int sampleNo) {
+        try {
+            return processManager.propertiesGet(sampleNo);
+        } catch (PropertiesException e) {
+            return new ObjectMapper().createObjectNode().toString();
+        }
     }
 
     @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.PUT)
-    public String sampletagput(@PathVariable("no") int sampleNo,
+    public String samplePropertiesPut(@PathVariable("no") int sampleNo,
                                 @RequestBody LinkedHashMap<String, String> properties) {
-        return processManager.propertiesPut(sampleNo, properties).toString();
+        try {
+            return processManager.propertiesPut(sampleNo, properties);
+        } catch (PropertiesException e) {
+            return new ObjectMapper().createObjectNode().toString();
+        }
     }
-/*
+
     @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.DELETE)
-    public String sampletagdelete(@PathVariable("no") int sampleNo,
+    public String samplePropertiesDelete(@PathVariable("no") int sampleNo,
                                 @RequestBody LinkedHashMap<String, String> properties) {
-        return processManager.propertiesDelete(sampleNo, properties).toString();
-    }*/
+        try {
+            return processManager.propertiesDelete(sampleNo, properties);
+        } catch (PropertiesException e) {
+            return new ObjectMapper().createObjectNode().toString();
+        }
+    }
 
 }
