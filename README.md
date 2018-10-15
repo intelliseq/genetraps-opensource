@@ -11,6 +11,9 @@ Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.s
 [![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/status?v=1)](http://genetraps.intelliseq.pl:8086/hello)\
 [![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/status)](http://genetraps.intelliseq.pl:8088/hello)
 
+### genetraps folders and files structure  
+[IMAGE](https://github.com/intelliseq/genetraps-opensource/blob/main/api-dx/src/main/resources/images/genetraps%20folders%20and%20files%20structure.jpg)
+
 ## Usage
 Build project
 ```
@@ -81,6 +84,13 @@ curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/ls
 To list out contents of a given sample's rawdata folder (in reverse order)
 ```
 curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/revls
+```
+
+To upload a file
+```
+curl -H "Authorization: Bearer $TOKEN" -F  file=@untitled2 -F sampleId=$SAMPLEID localhost:8086/uploadfile  
+curl -H "Authorization: Bearer $TOKEN" -F  file=@untitled2 -F sampleId=$SAMPLEID -F newfilename=newfile localhost:8086/uploadfile  
+UFID=$(curl -H "Authorization: Bearer $TOKEN" -F  file=@untitled2 -F sampleId=$SAMPLEID -F newfilename=newfile -F tag=new -F tag=else localhost:8086/uploadfile | jq -r ".id")  
 ```
 
 ## Ports
