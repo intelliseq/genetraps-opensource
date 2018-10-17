@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx;
 
+import lombok.Getter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -10,11 +11,16 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public enum TestUser {
-    ADMIN, DEVIL, PSYDUCK;
+    ADMIN(1), DEVIL(3), PSYDUCK(8);
 
     private JSONObject token;
 
-    TestUser(){
+    @Getter
+    private Integer id;
+
+    TestUser(Integer id){
+        this.id = id;
+
         Resource resource = new ClassPathResource(String.format("tokens/%s.json", toString().toLowerCase()));
 
         JSONParser parser = new JSONParser();
@@ -27,6 +33,10 @@ public enum TestUser {
 
     public String getAccessToken(){
         return (String) token.get("access_token");
+    }
+
+    public String getUsername(){
+        return this.toString().toLowerCase();
     }
 
 }

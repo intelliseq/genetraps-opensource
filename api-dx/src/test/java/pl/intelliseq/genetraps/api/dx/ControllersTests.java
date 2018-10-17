@@ -3,6 +3,7 @@ package pl.intelliseq.genetraps.api.dx;
 import com.dnanexus.DXJob;
 import com.dnanexus.JobState;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.log4j.Log4j2;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -185,6 +186,14 @@ public class ControllersTests {
         log.info(bwa(PSYDUCK, sampleid));
         log.info(gatkhc(PSYDUCK, sampleid, interval));
 
+    }
+
+    @Test
+    public void usersGroupsTest(){
+        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/groups");
+        assertTrue(admin.getStatusCode().is2xxSuccessful());
+        JsonNode node = admin.getBody();
+        assertEquals(node.size(), 2);
     }
 
 

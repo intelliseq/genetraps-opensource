@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.intelliseq.genetraps.api.dx.Roles;
+import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
@@ -22,6 +24,9 @@ public class FilesController {
 
     @Autowired
     private FilesManager filesManager;
+
+    @Autowired
+    private AuroraDBManager auroraDBManager;
 
 //TODO: For future features
 //    private String matchFileAndGetName(String filename, String regex) {
@@ -56,6 +61,18 @@ public class FilesController {
 //            throw new DxRunnerException("Incompatible files");
 //        }
 //    }
+
+    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
+    @ResponseBody
+    public String mkDir(OAuth2Authentication auth) {
+        String username = auth.getUserAuthentication().getPrincipal().toString();
+
+        Integer sampleId = filesManager.mkdir();
+
+        auroraDBManager.setUserPrivilegesToSample(username, sampleId, Roles.ADMIN);
+
+        return String.format("{\"response\":%s}", sampleId);
+    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(
@@ -111,12 +128,6 @@ public class FilesController {
     public String gatkhc(@RequestParam int sampleid,
                          @RequestParam(required = false) String interval) {
         return new ObjectMapper().createObjectNode().put("id", processManager.runGatkHC(sampleid, interval).getId()).toString();
-    }
-
-    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
-    @ResponseBody
-    public String mkDir() {
-        return String.format("{\"response\":%s}", filesManager.mkdir());
     }
 
     @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)

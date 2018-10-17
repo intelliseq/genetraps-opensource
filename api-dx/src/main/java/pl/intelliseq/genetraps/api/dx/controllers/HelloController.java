@@ -24,7 +24,7 @@ public class HelloController {
 //        return new ResponseEntity(HttpStatus.OK);
 //    }
 
-    @RequestMapping(value = "/api-dx-online-svg-badge", method = RequestMethod.GET)
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
     public Resource getBadge() {
         Resource resource = new FileSystemResource("src/main/resources/api--dx-online-brightgreen.svg");
         return resource;
