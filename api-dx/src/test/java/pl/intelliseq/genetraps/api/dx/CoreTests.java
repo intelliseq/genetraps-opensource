@@ -64,6 +64,8 @@ public class CoreTests {
 
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
+        log.debug(restTemplate.exchange("/user", HttpMethod.GET, entity, JsonNode.class));
+
         ResponseEntity<JsonNode> response = restTemplate.exchange("/user", HttpMethod.GET, entity, JsonNode.class);
 
         assertTrue(response.getStatusCode().is2xxSuccessful());
@@ -76,14 +78,15 @@ public class CoreTests {
     public void sipleUserTest(){
         SimpleUser psyduck = auroraDBManager.createNewSimpleUser(PSYDUCK.toString());
         log.info(psyduck);
-        log.info(auroraDBManager.getUserPriviliges(psyduck));
-        log.info(auroraDBManager.getUserPriviliges("deadman"));
+        log.info(auroraDBManager.getUserPrivileges(psyduck));
+        log.info(auroraDBManager.getUserPrivileges("deadman"));
+        log.info(auroraDBManager.getUserPrivilegesToSample(1,1));
     }
 
-    @Test
-    public void rootPriviliges(){
-        log.info(auroraDBManager.getRootPriviliges());
-    }
+//    @Test
+//    public void rootPrivileges(){
+//        log.info(auroraDBManager.getRootPrivileges());
+//    }
 
     @Test
     public void logging(){
