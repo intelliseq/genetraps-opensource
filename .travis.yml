@@ -20,6 +20,10 @@ after_failure:
 - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
 - chmod +x send.sh
 - ./send.sh failure $WEBHOOK_URL
+after_script:
+- wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+- chmod +x send.sh
+- ./send.sh done $WEBHOOK_URL
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get install python3
