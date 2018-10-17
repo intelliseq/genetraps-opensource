@@ -9,7 +9,7 @@ branches:
 sudo: required
 language: java
 jdk:
-- oraclejdk10
+- oraclejdk11
 services:
 - docker
 before_install:
@@ -33,7 +33,14 @@ before_install:
 - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
 - sudo chmod a+x /usr/local/bin/ecs-cli
 script: "./travis-script.sh"
-
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
 notifications:
   webhooks: https://discordapp.com/api/webhooks/501330169751928832/fsg87s2Atazj9k2LFdMJZIUG2ZF_S9CzKYFmyNdOXGJjm1bD7ubjM_8w3pP5SwQ3D61a
   slack:
