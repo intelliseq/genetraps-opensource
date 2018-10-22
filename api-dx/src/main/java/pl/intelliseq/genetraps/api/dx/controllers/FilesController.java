@@ -104,14 +104,14 @@ public class FilesController {
     }
 
     // document me change in master:endpoints,readme
-    @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
-    public String sampleLs(@PathVariable("no") int sampleId,
+    @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
+    public String sampleLs(@PathVariable("id") int sampleId,
                             @RequestParam(required = false, defaultValue = "false") boolean byNames) {
         return processManager.sampleLs(sampleId, byNames).toString();
     }
 
-    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.POST)
-    public String samplePropertiesPost(@PathVariable("no") int sampleId,
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
+    public String samplePropertiesPost(@PathVariable("id") int sampleId,
                                 @RequestBody LinkedHashMap<String, String> properties) {
         try {
             return processManager.propertiesPost(sampleId, properties).toString();
@@ -120,8 +120,8 @@ public class FilesController {
         }
     }
 
-    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.GET)
-    public String samplePropertiesGet(@PathVariable("no") int sampleId) {
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.GET)
+    public String samplePropertiesGet(@PathVariable("id") int sampleId) {
         try {
             return processManager.propertiesGet(sampleId).toString();
         } catch (PropertiesException e) {
@@ -129,8 +129,8 @@ public class FilesController {
         }
     }
 
-    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.PUT)
-    public String samplePropertiesPut(@PathVariable("no") int sampleId,
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.PUT)
+    public String samplePropertiesPut(@PathVariable("id") int sampleId,
                                 @RequestBody LinkedHashMap<String, String> properties) {
         try {
             return processManager.propertiesPut(sampleId, properties).toString();
@@ -139,8 +139,8 @@ public class FilesController {
         }
     }
 
-    @RequestMapping(value = "/sample/{no}/properties", method = RequestMethod.DELETE)
-    public String samplePropertiesDelete(@PathVariable("no") int sampleId,
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.DELETE)
+    public String samplePropertiesDelete(@PathVariable("id") int sampleId,
                                 @RequestBody LinkedHashMap<String, String> properties) {
         try {
             return processManager.propertiesDelete(sampleId, properties).toString();
