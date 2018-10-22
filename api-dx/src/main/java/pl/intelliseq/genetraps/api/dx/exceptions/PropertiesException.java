@@ -1,4 +1,4 @@
-package com.dnanexus.exceptions;
+package pl.intelliseq.genetraps.api.dx.exceptions;
 
 /**
  * A problem with existence of 'properties' file (specified in message) has occured
