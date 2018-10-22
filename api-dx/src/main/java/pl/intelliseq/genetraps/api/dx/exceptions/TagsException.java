@@ -1,4 +1,4 @@
-package com.dnanexus.exceptions;
+package pl.intelliseq.genetraps.api.dx.exceptions;
 
 /**
  * A problem with tags (specified in message) has occured

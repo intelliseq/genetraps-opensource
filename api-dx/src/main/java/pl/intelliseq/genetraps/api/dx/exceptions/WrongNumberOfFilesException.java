@@ -1,4 +1,4 @@
-package com.dnanexus.exceptions;
+package pl.intelliseq.genetraps.api.dx.exceptions;
 
 /**
  * The number of files found is incorrect/unexpected
