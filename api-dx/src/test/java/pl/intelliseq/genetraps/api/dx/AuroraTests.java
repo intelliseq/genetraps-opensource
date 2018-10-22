@@ -38,19 +38,19 @@ public class AuroraTests {
         assertEquals(psyduck.get("Root"), 1);
 
 
-        Map<String, Object> admin = auroraDBManager.getUserDetails(ADMIN.getUsername());
+        Map<String, Object> admin = auroraDBManager.getUserDetails(ADMIN.getId());
         assertEquals(admin.get("Username"), ADMIN.getUsername());
         assertEquals(admin.get("UserID"), ADMIN.getId());
         assertEquals(admin.get("Root"), 1);
 
 
-        Map<String, Object> devil = auroraDBManager.getUserDetails(DEVIL.getUsername());
+        Map<String, Object> devil = auroraDBManager.getUserDetails(DEVIL.getId());
         assertEquals(devil.get("Username"), DEVIL.getUsername());
         assertEquals(devil.get("UserID"), DEVIL.getId());
         assertEquals(devil.get("Root"), 0);
 
 
-        Map<Integer, Roles> adminRoles = auroraDBManager.getUserPrivileges(auroraDBManager.createNewSimpleUser("admin"));
+        Map<Integer, Roles> adminRoles = auroraDBManager.getUserPrivileges(auroraDBManager.createNewSimpleUser(ADMIN.getId()));
         assertEquals(adminRoles.get(1), Roles.ADMIN);
 
     }

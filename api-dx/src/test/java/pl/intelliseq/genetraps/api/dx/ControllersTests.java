@@ -20,6 +20,7 @@ import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
@@ -144,10 +145,11 @@ public class ControllersTests {
 
     @Test
     public void priviligesTest() {
-        ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/samples");
+        ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/privileges");
+        log.debug(psyduck);
         assertTrue(psyduck.getStatusCode().is2xxSuccessful());
 
-        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/samples");
+        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/privileges");
         assertTrue(admin.getStatusCode().is2xxSuccessful());
         admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
     }
@@ -157,6 +159,8 @@ public class ControllersTests {
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
     }
+
+//BUG mkDir can fain - no sync!!!!
 
     @Test
     public void upload() {

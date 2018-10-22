@@ -48,11 +48,6 @@ public class AuroraDBManager {
         User managment
      */
 
-    public SimpleUser createNewSimpleUser(String username) {
-        Map<String, Object> userDetails = getUserDetails(username);
-        return new SimpleUser((Integer) userDetails.get("UserID"), username, userDetails.get("Root").equals(1));
-    }
-
     public SimpleUser createNewSimpleUser(Integer userId) {
         Map<String, Object> userDetails = getUserDetails(userId);
         return new SimpleUser((Integer) userDetails.get("UserID"), (String) userDetails.get("username"), userDetails.get("Root").equals(1));
@@ -72,20 +67,6 @@ public class AuroraDBManager {
 
     }
 
-    public Map<String, Object> getUserDetails(String username) {
-        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
-                .withProcedureName("GetUserDetailsByUsername")
-                .declareParameters(new SqlParameter("Username", Types.VARCHAR));
-
-        jdbcCall.compile();
-
-        Map<String, Object> inParamMap = new HashMap<>();
-        inParamMap.put("Username", username);
-
-
-        return ((List<Map<String, Object>>) jdbcCall.execute(inParamMap).get("#result-set-1")).get(0);
-    }
-
     public void getUsers() {
         jdbcTemplate.query("SELECT * FROM Users", (rs, rn) -> System.out.printf("%s:\t%s %s\n", rn, rs.getString("FirstName"), rs.getString("LastName")));
     }
@@ -93,19 +74,6 @@ public class AuroraDBManager {
     /*
         Group managment
      */
-
-    public JsonNode getUsersGroups(String username){
-        return getUsersGroupsFromQuery(String.format(
-                "SELECT G.* FROM Users AS U\n" +
-                "LEFT JOIN Security AS S\n" +
-                "ON U.UserID = S.UserID\n" +
-                "LEFT JOIN UserGroups AS UG\n" +
-                "ON U.UserID = UG.UserID\n" +
-                "LEFT JOIN Groups AS G\n" +
-                "ON UG.GroupID = G.GroupID\n" +
-                "WHERE S.Username = \"%s\";", username
-        ));
-    }
 
     public JsonNode getUsersGroups(Integer userId){
         return getUsersGroupsFromQuery(String.format(
@@ -135,10 +103,6 @@ public class AuroraDBManager {
         Priviledges
      */
 
-    public Roles getUserPrivilegesToSample(String username, Integer sampleID) {
-        return getUserPrivilegesToSample(createNewSimpleUser(username), sampleID);
-    }
-
     public Roles getUserPrivilegesToSample(Integer userId, Integer sampleID) {
         return getUserPrivilegesToSample(createNewSimpleUser(userId), sampleID);
     }
@@ -164,16 +128,16 @@ public class AuroraDBManager {
         return Roles.valueOf(((List<Map<String, String>>) jdbcCall.execute(inParamMap).get("#result-set-1")).get(0).get("RoleName"));
     }
 
-    public Integer setUserPrivilegesToSample(String username, Integer sampleId, Roles role) {
-        return setUserPrivilegesToSample(createNewSimpleUser(username).getId(), sampleId, role.getId());
-    }
-
-    public Integer setUserPrivilegesToSample(Integer userId, Integer sampleId, Integer roleId) {
-        return jdbcTemplate.update("INSERT INTO UserPrivileges VALUES (?, ?, ?)", userId, sampleId, roleId);
+    public Integer setUserPrivilegesToSample(Integer userId, Integer sampleId, Roles role) {
+        return jdbcTemplate.update("INSERT INTO UserPrivileges VALUES (?, ?, ?)", userId, sampleId, role.getId());
     }
 
     private Map<Integer, Roles> getRootPrivileges() {
         return filesManager.getNumericDirectories().stream().collect(Collectors.toMap(e -> e, e -> Roles.ADMIN));
+    }
+
+    public Map<Integer, Roles> getUserPrivileges(Integer userID) {
+        return getUserPrivileges(createNewSimpleUser(userID));
     }
 
     public Map<Integer, Roles> getUserPrivileges(SimpleUser user) {
@@ -208,13 +172,5 @@ public class AuroraDBManager {
 
         return result;
 
-    }
-
-    public Map<Integer, Roles> getUserPrivileges(String username) {
-        return getUserPrivileges(createNewSimpleUser(username));
-    }
-
-    public Map<Integer, Roles> getUserPrivileges(Integer userID) {
-        return getUserPrivileges(createNewSimpleUser(userID));
     }
 }

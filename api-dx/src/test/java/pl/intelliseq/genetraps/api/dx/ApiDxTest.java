@@ -98,7 +98,9 @@ public class ApiDxTest {
 
         Integer folderToDelete = filesManager.getNumericDirectories().size() / 2;
 
-        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/" + folderToDelete);
+        log.debug("Folder to delete: "+folderToDelete);
+
+        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/" + folderToDelete, true);
 
         assertEquals(filesManager.mkdir(), folderToDelete);
 
