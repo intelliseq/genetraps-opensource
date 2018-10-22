@@ -17,7 +17,6 @@ import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
 import static pl.intelliseq.genetraps.api.dx.TestUser.DEVIL;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2

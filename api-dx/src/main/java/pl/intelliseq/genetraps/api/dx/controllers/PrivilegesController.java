@@ -46,6 +46,8 @@ public class PrivilegesController {
         SimpleUser user = auroraDBManager.createNewSimpleUser(userId);
         Roles loggedUserRole = auroraDBManager.getUserPrivilegesToSample(user.getId(), sampleId);
 
+
+//TODO: remove exception
         if (!loggedUserRole.equals(Roles.ADMIN)){
             throw new ForbiddenException("User don't have permissions to share sample");
         }
