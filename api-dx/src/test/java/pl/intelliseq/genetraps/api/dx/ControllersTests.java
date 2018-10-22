@@ -149,10 +149,11 @@ public class ControllersTests {
 
     @Test
     public void priviligesTest() {
-        ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/samples");
+        ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/privileges");
+        log.debug(psyduck);
         assertTrue(psyduck.getStatusCode().is2xxSuccessful());
 
-        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/samples");
+        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/privileges");
         assertTrue(admin.getStatusCode().is2xxSuccessful());
         admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
     }

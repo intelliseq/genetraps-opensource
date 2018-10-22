@@ -30,9 +30,9 @@ public class UsersController {
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String user(OAuth2Authentication auth) throws JsonProcessingException {
         //TODO: Choose better option
-        String username = auth.getUserAuthentication().getPrincipal().toString();
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
-        log.debug(String.format("{\"username\": \"%s\"}", username));
+        log.debug(String.format("{\"userId\": \"%s\"}", userId));
 
 //        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
 //        OAuth2AccessToken accessToken = tokenStore.readAccessToken(details.getTokenValue());
@@ -41,13 +41,13 @@ public class UsersController {
         String clientId = auth.getOAuth2Request().getClientId();
         log.debug(String.format("{\"client\": \"%s\"}", clientId));
 
-        return new ObjectMapper().writeValueAsString(auroraDBManager.getUserDetails(username));
+        return new ObjectMapper().writeValueAsString(auroraDBManager.getUserDetails(userId));
     }
 
     @RequestMapping(value = "groups", method = RequestMethod.GET)
     public String getUsersGroups(OAuth2Authentication auth) {
-        String username = auth.getUserAuthentication().getPrincipal().toString();
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
-        return auroraDBManager.getUsersGroups(username).toString();
+        return auroraDBManager.getUsersGroups(userId).toString();
     }
 }

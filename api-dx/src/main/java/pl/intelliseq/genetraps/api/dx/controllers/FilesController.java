@@ -65,11 +65,11 @@ public class FilesController {
     @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
     @ResponseBody
     public String mkDir(OAuth2Authentication auth) {
-        String username = auth.getUserAuthentication().getPrincipal().toString();
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
         Integer sampleId = filesManager.mkdir();
 
-        auroraDBManager.setUserPrivilegesToSample(username, sampleId, Roles.ADMIN);
+        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
 
         return String.format("{\"response\":%s}", sampleId);
     }
@@ -82,8 +82,8 @@ public class FilesController {
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
-        String username = auth.getUserAuthentication().getPrincipal().toString();
-        log.debug(username);
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+        log.debug(userId);
 
         return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
     }

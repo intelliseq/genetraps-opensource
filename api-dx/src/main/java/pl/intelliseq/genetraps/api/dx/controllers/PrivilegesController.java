@@ -27,30 +27,30 @@ public class PrivilegesController {
 
     @RequestMapping(value = "/user/privileges", method = RequestMethod.GET)
     public String getUserPrivileges(OAuth2Authentication auth){
-        String username = auth.getUserAuthentication().getPrincipal().toString();
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         ObjectNode result = new ObjectMapper().createObjectNode();
 
         //map to json
-        auroraDBManager.getUserPrivileges(username).forEach((key, value) -> result.put(key.toString(), value.toString()));
+        auroraDBManager.getUserPrivileges(userId).forEach((key, value) -> result.put(key.toString(), value.toString()));
         return result.toString();
     }
 
     @RequestMapping(value = "user/privileges", method = RequestMethod.POST)
     public String giveUserPriviliges(
             OAuth2Authentication auth,
-            @RequestParam String targetUser,
+            @RequestParam Integer targetUserId,
             @RequestParam Integer sampleId,
             @RequestParam Roles role){
 
-        String username = auth.getUserAuthentication().getPrincipal().toString();
-        SimpleUser user = auroraDBManager.createNewSimpleUser(username);
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+        SimpleUser user = auroraDBManager.createNewSimpleUser(userId);
         Roles loggedUserRole = auroraDBManager.getUserPrivilegesToSample(user.getId(), sampleId);
 
         if (!loggedUserRole.equals(Roles.ADMIN)){
             throw new ForbiddenException("User don't have permissions to share sample");
         }
 
-        return String.format("{\"response\":%s}", auroraDBManager.setUserPrivilegesToSample(targetUser, sampleId, role));
+        return String.format("{\"response\":%s}", auroraDBManager.setUserPrivilegesToSample(targetUserId, sampleId, role));
     }
 
 }
