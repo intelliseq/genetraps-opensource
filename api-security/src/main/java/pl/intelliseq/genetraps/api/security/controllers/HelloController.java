@@ -15,7 +15,7 @@ public class HelloController {
         return "{\"status\": \"up\"}";
     }
 
-    @RequestMapping(value = "/api-security-online-svg-badge", method = RequestMethod.GET)
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
     public Resource getBadge(HttpServletResponse response) {
 
         Resource resource = new FileSystemResource("src/main/resources/api--security-online-brightgreen.svg");
