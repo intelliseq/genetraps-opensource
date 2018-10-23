@@ -56,7 +56,9 @@ public class ControllersTests {
     }
 
     private Integer mkDir() {
-        return getForResponseEnity(PSYDUCK, "/mkdir").getBody().get("response").asInt();
+        ResponseEntity<JsonNode> out = getForResponseEnity(PSYDUCK, "/mkdir");
+        log.debug(out);
+        return out.getBody().get("response").asInt();
     }
 
     private DXJob.Describe waitUntilJobIsDone(String jobId) {
@@ -154,13 +156,13 @@ public class ControllersTests {
         admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
     }
 
+//BUG mkDir can fain - no sync!!!! BUG
+
     @Test
     public void simpleUpload(){
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
     }
-
-//BUG mkDir can fain - no sync!!!!
 
     @Test
     public void upload() {

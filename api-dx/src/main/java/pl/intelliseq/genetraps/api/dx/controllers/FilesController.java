@@ -1,4 +1,4 @@
-
+package pl.intelliseq.genetraps.api.dx.controllers;
 
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,6 +69,7 @@ public class FilesController {
     @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
     @ResponseBody
     public String mkDir(OAuth2Authentication auth) {
+        log.debug("mkdir");
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
         Integer sampleId = filesManager.mkdir();
@@ -105,12 +106,6 @@ public class FilesController {
         } catch (IOException e) {
             return new ObjectMapper().createObjectNode().put("id", "").toString();
         }
-    }
-
-    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
-    @ResponseBody
-    public String mkDir() {
-        return String.format("{\"response\":%s}", filesManager.mkdir());
     }
 
     // document me change in master:endpoints,readme
