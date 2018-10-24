@@ -118,28 +118,6 @@ genetraps.intelliseq.pl:8086/gatkhc
   * **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
 
 ----
-### api-dx sample ls
-```
-genetraps.intelliseq.pl:8086/sample/:sampleid/ls
-```
-> List out the contents of a sample's rawdata folder by file ids ('byNames' is false by default). If optional parameter 'byNames' is set to true, listing proceeds by file names.  
-* **URL**  
-  * `/sample/:sampleid/ls`  
-* **Method:** `GET`  
-*  **URL Params**  
-   **Required:**  
-   * `sampleid=[string]`  
-   **Not required:**  
-   * `byNames=[boolean]`  
-* **Success Response:**  
-  * **Code:** 200  
-  * **Content:**    
-Sample ls  
-`{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`  
-Sample ls (with byNames as true)  
-`{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
-
-----
 ### api-dx upload file
 ```
 genetraps.intelliseq.pl:8086/uploadfile
@@ -153,10 +131,107 @@ genetraps.intelliseq.pl:8086/uploadfile
    * `file=@[filename]`  
    * `sampleid=[string]`  
    **Not required:**  
-   * `newfilename=[string]` 
+   * `newfilename=[string]`
    * `tag=[string]` (can be multiple)  
 * **Success Response:**  
   * **Code:** 200  
   * **Content:**    
 Sample ls  
 `{"id":"file-XXXXXXXXXXXXXXXXXXXXXXXX"}`  
+
+----
+### api-dx sample ls
+```
+genetraps.intelliseq.pl:8086/sample/:sampleid/ls
+```
+> List out the contents of a sample's rawdata folder by file ids ('byNames' is false by default). If optional parameter 'byNames' is set to true, listing proceeds by file names.  
+* **URL**  
+* `/sample/:sampleid/ls`  
+* **Method:** `GET`  
+*  **URL Params**  
+ **Required:**  
+ * `sampleid=[string]`  
+ **Not required:**  
+ * `byNames=[boolean]`  
+* **Success Response:**  
+* **Code:** 200  
+* **Content:**    
+Sample ls  
+`{"file-XXXXXXXXXXXXXXXXXXXXXXXX":{"fileName":"file.fq.gz","tags":["tag"]}}`  
+Sample ls (with byNames as true)  
+`{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
+
+----
+### api-dx properties (POST)
+```
+genetraps.intelliseq.pl:8086/sample/:sampleid/properties
+```
+> Sets or adds new properties to a sample and returns eventual map of properties (the sample must exist, otherwise returns exception) (returns exception if any property already exists)  
+* **URL**  
+  * `/sample/:sampleid/properties`  
+* **Method:** `POST`  
+*  **URL Params**  
+   **Required:**  
+   * `sampleid=[string]`  
+   * `properties=[map]`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
+Post properties  
+`{"key1":"value1","key2":"value2",...}`  
+
+----
+### api-dx properties (GET)
+```
+genetraps.intelliseq.pl:8086/sample/:sampleid/properties
+```
+> Returns the map of properties (the sample must exist, otherwise returns exception) (returns exception if t)  
+* **URL**  
+  * `/sample/:sampleid/properties`  
+* **Method:** `GET`  
+*  **URL Params**  
+   **Required:**  
+   * `sampleid=[string]`   
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
+Get properties  
+`{"key1":"value1","key2":"value2",...}`  
+
+----
+### api-dx properties (PUT)
+```
+genetraps.intelliseq.pl:8086/sample/:sampleid/properties
+```
+> Changes values of already existing, specified properties of a sample and returns eventual map of properties (the sample must exist, otherwise returns exception) (returns exception if any of properties doesn't exists)  
+* **URL**  
+  * `/sample/:sampleid/properties`  
+* **Method:** `PUT`  
+*  **URL Params**  
+   **Required:**  
+   * `sampleid=[string]`  
+   * `properties=[map]`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
+Put properties  
+`{"key1":"value1","key2":"value2",...}`    
+
+----
+### api-dx properties (DELETE)
+```
+genetraps.intelliseq.pl:8086/sample/:sampleid/properties
+```
+> Deletes already existing, specified properties of a sample and returns eventual map of properties (the sample must exist, otherwise returns exception) (returns exception if any of properties doesn't exists)  
+* **URL**  
+  * `/sample/:sampleid/properties`  
+* **Method:** `DELETE`  
+*  **URL Params**  
+   **Required:**  
+   * `sampleid=[string]`  
+   * `properties=[map]`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
+Delete properties  
+`{"key1":"value1","key2":"value2",...}`    

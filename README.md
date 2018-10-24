@@ -1,18 +1,18 @@
-# genetraps-opensource
+# genetraps-opensource  
 System  for automated WGS and WES analysis
 copyright by intelliseq
 
-## Build status
+## Build status  
 Master [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.svg?branch=master)](https://travis-ci.org/intelliseq/genetraps-opensource)\
 Develop [![Build Status](https://travis-ci.org/intelliseq/genetraps-opensource.svg?branch=develop)](https://travis-ci.org/intelliseq/genetraps-opensource)
 
-## Services status
+## Services status  
 [![CLIENT-INDEX NOT ONLINE](http://genetraps.intelliseq.pl/client--index-online-brightgreen.svg)](http://genetraps.intelliseq.pl)\
 [![API-DX NOT ONLINE](http://genetraps.intelliseq.pl:8086/status?v=1)](http://genetraps.intelliseq.pl:8086/hello)\
 [![API-SECURITY NOT ONLINE](http://genetraps.intelliseq.pl:8088/status)](http://genetraps.intelliseq.pl:8088/hello)
 
 ### genetraps folders and files structure  
-[IMAGE](https://github.com/intelliseq/genetraps-opensource/blob/master/api-dx/src/main/resources/images/genetraps%20folders%20and%20files%20structure.jpg)
+[Link to the image on google drive](https://drive.google.com/open?id=14pfuMSoLBAS1UqoMqB9O_thL0WsGaCr2)
 
 ## Usage
 Build project
@@ -66,10 +66,6 @@ With tags: "left" i "right"
 ```
 BWAID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?sampleid=$SAMPLEID" | jq -r ".id")
 ```
-With files' ids:  
-```
-BWAID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/bwa?fastq_file_1=$F1ID&fastq_file_2=$F2ID" | jq -r ".id")
-```
 
 To run gatk hc
 *reference and vcfs (their ids) in properties; interval not required*  
@@ -77,13 +73,13 @@ To run gatk hc
 GATKID=$(curl -X POST -H "Authorization: Bearer $TOKEN" "localhost:8086/gatkhc?sampleid=$SAMPLEID&interval=chr15:42377802-42397802" | jq -r ".id")
 ```
 
-To list out contents of a given sample's rawdata folder
+To list out contents of a sample's rawdata folder
 ```
 curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/ls
 ```
-To list out contents of a given sample's rawdata folder (in reverse order)
+To list out contents of a sample's rawdata folder (in "by names" order)
 ```
-curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/revls
+curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/ls -byNames=true
 ```
 
 To upload a file
@@ -91,6 +87,23 @@ To upload a file
 curl -H "Authorization: Bearer $TOKEN" -F  file=@untitled2 -F sampleId=$SAMPLEID localhost:8086/uploadfile  
 curl -H "Authorization: Bearer $TOKEN" -F  file=@untitled2 -F sampleId=$SAMPLEID -F newfilename=newfile localhost:8086/uploadfile  
 UFID=$(curl -H "Authorization: Bearer $TOKEN" -F  file=@untitled2 -F sampleId=$SAMPLEID -F newfilename=newfile -F tag=new -F tag=else localhost:8086/uploadfile | jq -r ".id")  
+```
+
+To add properties to a sample
+```
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"first":"old","second":"ok"}' localhost:8086/sample/$SAMPLEID/properties
+```
+To get properties of a sample
+```
+curl -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/properties
+```
+To update existing properties of a sample
+```
+curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"first":"new"}' localhost:8086/sample/$SAMPLEID/properties
+```
+To delete existing properties of a sample
+```
+curl -X DELETE -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"second":""}' localhost:8086/sample/$SAMPLEID/properties
 ```
 
 ## Ports
