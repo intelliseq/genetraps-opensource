@@ -1,14 +1,31 @@
+
 ### Endpoints
 #### api-dx endpoints
 [api-dx/hello](#api-dx-hello)  
+[api-dx/status](#api-dx-status)
+
 [api-dx/mkdir](#api-dx-mkdir)  
 [api-dx/upload](#api-dx-upload)  
-[api-dx/describe](#api-dx-describe)  
+[api-dx/uploadfile](#api-dx-upload-file)
+
 [api-dx/fastqc](#api-dx-fastqc)  
 [api-dx/bwa](#api-dx-bwa)  
 [api-dx/gatkhc](#api-dx-gatkhc)  
-[api-dx/ls](#api-dx-sample-ls)  
-[api-dx/uploadfile](#api-dx-upload-file)  
+
+[api-dx/sample/:sampleid/describe](#api-dx-describe)  
+[api-dx/sample/:sampleid/ls](#api-dx-sample-ls)  
+[api-dx/sample/:sampleid/properties POST](#api-dx-properties-post)
+[api-dx/sample/:sampleid/properties GET](#api-dx-properties-get)
+[api-dx/sample/:sampleid/properties PUT](#api-dx-properties-put)
+[api-dx/sample/:sampleid/properties DELETE](#api-dx-properties-delete)
+
+[api-dx/user/privileges GET](#api-dx-user-privileges-get)
+[api-dx/user/privileges POST](#api-dx-user-privileges-post)
+[api-dx/user GET](#api-dx-user-get)
+~~[api-dx/user POST](#api-dx-user-post)~~
+
+[api-dx/groups GET](#api-dx-groups-get)
+~~[api-dx/groups POST](#api-dx-groups-get)~~
 
 ----
 #### api-dx hello
@@ -21,6 +38,18 @@ genetraps.intelliseq.pl:8086/hello
 * **Success Response:**
   * **Code:** `200\`
   * **Content:** `{"status": "up"}`
+
+----
+#### api-dx status
+```
+genetraps.intelliseq.pl:8086/status
+```
+> Checks if server is up
+* **URL:** `/status`
+* **Method:** `GET`
+* **Success Response:**
+  * **Code:** `200\`
+  * **Content:** [resource]
 
 ----
 #### api-dx mkdir
@@ -55,10 +84,10 @@ genetraps.intelliseq.pl:8086/mkdir
 ----
 #### api-dx describe
 ```
-genetraps.intelliseq.pl:8086/describe
+genetraps.intelliseq.pl:8086/sample/:sampleid/describe
 ```
 > Get a full description of file/job/... in JSON
-* **URL** `/describe/:id`
+* **URL** `sample/:sampleid/describe`
 * **Method:** `GET`
 *  **URL Params**
    **Required:**
@@ -118,28 +147,6 @@ genetraps.intelliseq.pl:8086/gatkhc
   * **Content:** `{"id": "job-XXXXXXXXXXXXXXXXXXXXXXXX"}`
 
 ----
-### api-dx upload file
-```
-genetraps.intelliseq.pl:8086/uploadfile
-```
-> Upload a given file, all params must be passed using '-F' (form) option.  
-* **URL**  
-  * `/uploadfile`  
-* **Method:** `POST`  
-*  **URL Params**  
-   **Required:**  
-   * `file=@[filename]`  
-   * `sampleid=[string]`  
-   **Not required:**  
-   * `newfilename=[string]`
-   * `tag=[string]` (can be multiple)  
-* **Success Response:**  
-  * **Code:** 200  
-  * **Content:**    
-Sample ls  
-`{"id":"file-XXXXXXXXXXXXXXXXXXXXXXXX"}`  
-
-----
 ### api-dx sample ls
 ```
 genetraps.intelliseq.pl:8086/sample/:sampleid/ls
@@ -162,7 +169,29 @@ Sample ls (with byNames as true)
 `{"file.fq.gz":{"fileId":"file-XXXXXXXXXXXXXXXXXXXXXXXX","tags":["tag"]}}`
 
 ----
-### api-dx properties (POST)
+### api-dx upload file
+```
+genetraps.intelliseq.pl:8086/uploadfile
+```
+> Upload a given file, all params must be passed using '-F' (form) option.  
+* **URL**  
+  * `/uploadfile`  
+* **Method:** `POST`  
+*  **URL Params**  
+   **Required:**  
+   * `file=@[filename]`  
+   * `sampleid=[string]`  
+   **Not required:**  
+   * `newfilename=[string]`
+   * `tag=[string]` (can be multiple)  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**    
+Sample ls  
+`{"id":"file-XXXXXXXXXXXXXXXXXXXXXXXX"}`  
+
+----
+### api-dx properties POST
 ```
 genetraps.intelliseq.pl:8086/sample/:sampleid/properties
 ```
@@ -181,7 +210,7 @@ Post properties
 `{"key1":"value1","key2":"value2",...}`  
 
 ----
-### api-dx properties (GET)
+### api-dx properties GET
 ```
 genetraps.intelliseq.pl:8086/sample/:sampleid/properties
 ```
@@ -199,7 +228,7 @@ Get properties
 `{"key1":"value1","key2":"value2",...}`  
 
 ----
-### api-dx properties (PUT)
+### api-dx properties PUT
 ```
 genetraps.intelliseq.pl:8086/sample/:sampleid/properties
 ```
@@ -218,7 +247,7 @@ Put properties
 `{"key1":"value1","key2":"value2",...}`    
 
 ----
-### api-dx properties (DELETE)
+### api-dx properties DELETE
 ```
 genetraps.intelliseq.pl:8086/sample/:sampleid/properties
 ```
@@ -235,3 +264,64 @@ genetraps.intelliseq.pl:8086/sample/:sampleid/properties
   * **Content:**    
 Delete properties  
 `{"key1":"value1","key2":"value2",...}`    
+
+----
+### api-dx user privileges GET
+```
+genetraps.intelliseq.pl:8086/user/privileges
+```
+> Gets users privileges
+* **URL**  
+  * `user/privileges`  
+* **Method:** `GET`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**      
+`{"sample1":"role1","sample2":"role2",...}` 
+
+----
+### api-dx user privileges POST
+```
+genetraps.intelliseq.pl:8086/user/privileges
+```
+> Give access to sample to other user (must be admin to do that, in other case FORBIDDEN)
+* **URL**  
+  * `user/privileges`  
+* **Method:** `GET`  
+*  **URL Params**  
+   **Required:**  
+   * `targetUserId=[integer]`  
+   * `sampleId=[integer]`  
+   * `role=[role]`
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**      
+`{"response":[integer]}` 
+
+----
+### api-dx user GET
+```
+genetraps.intelliseq.pl:8086/user
+```
+> Gets user details
+* **URL**  
+  * `user`  
+* **Method:** `GET`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**      
+`{"userId": 1, "LastName": "Winters", "FirstName": "Lana", "Email": "lana.winters@gmail.com", "Root": 1, "Username": "admin"}` 
+
+----
+### api-dx groups GET
+```
+genetraps.intelliseq.pl:8086/groups
+```
+> Gets users groups
+* **URL**  
+  * `groups`  
+* **Method:** `GET`  
+* **Success Response:**  
+  * **Code:** 200  
+  * **Content:**      
+`[{"GroupID": 2, "GroupName": "Asylium", "Root": 0}, ...]` 
