@@ -14,18 +14,18 @@
  
 [api-dx/sample/:sampleid/describe](#api-dx-describe)  
 [api-dx/sample/:sampleid/ls](#api-dx-sample-ls)  
-[api-dx/sample/:sampleid/properties POST](#api-dx-properties-post) 
-[api-dx/sample/:sampleid/properties GET](#api-dx-properties-get) 
-[api-dx/sample/:sampleid/properties PUT](#api-dx-properties-put) 
-[api-dx/sample/:sampleid/properties DELETE](#api-dx-properties-delete) 
+[api-dx/sample/:sampleid/properties POST](#api-dx-properties-post)  
+[api-dx/sample/:sampleid/properties GET](#api-dx-properties-get)  
+[api-dx/sample/:sampleid/properties PUT](#api-dx-properties-put)  
+[api-dx/sample/:sampleid/properties DELETE](#api-dx-properties-delete)  
  
-[api-dx/user/privileges GET](#api-dx-user-privileges-get) 
-[api-dx/user/privileges POST](#api-dx-user-privileges-post) 
-[api-dx/user GET](#api-dx-user-get) 
-~~[api-dx/user POST](#api-dx-user-post)~~ 
+[api-dx/user/privileges GET](#api-dx-user-privileges-get)  
+[api-dx/user/privileges POST](#api-dx-user-privileges-post)  
+[api-dx/user GET](#api-dx-user-get)  
+~~[api-dx/user POST](#api-dx-user-post)~~  
  
-[api-dx/groups GET](#api-dx-groups-get) 
-~~[api-dx/groups POST](#api-dx-groups-get)~~ 
+[api-dx/groups GET](#api-dx-groups-get)  
+~~[api-dx/groups POST](#api-dx-groups-post)~~ 
 
 ----
 #### api-dx hello
