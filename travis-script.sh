@@ -39,6 +39,9 @@ echo $LOG_PREFIX "logging to ecr..."
 echo $LOG_PREFIX $LOG_APP "ecs-cli configuring"
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
 
+./decrypt.sh secret-data/test.zip.enc
+cat secret-data/decrypted/test.txt
+
 #############################
 ### BUILDING CLIENT_INDEX ###
 #############################
