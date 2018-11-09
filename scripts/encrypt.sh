@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# use . ./encrypt.sh directory/file
+# use . source encrypt.sh directory/file
 
 PASSED=$1
 DESTINATION="secret-data"
@@ -8,6 +8,7 @@ PASS=$SECRET_PASS
 NAME=`echo "$PASSED" | rev | cut -d'/' -f1 | rev | cut -d'.' -f1`
 
 if [[ -d $PASSED ]]; then
+  WHERE=`pwd`
   cd $PASSED/..
   zip -r $NAME $NAME
 else
@@ -23,3 +24,7 @@ if [ ! -d "$DIR/$DESTINATION" ]; then
 fi
 mv $ENCARCHIVE $DIR/$DESTINATION
 rm "$NAME.zip"
+
+if [[ -d $PASSED ]]; then
+  cd $WHERE
+fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# use . ./decrypt.sh name.enc
+# use . source decrypt.sh name.enc
 
 PASSED=$1
 DESTINATION="secret-data/decrypted"
