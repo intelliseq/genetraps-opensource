@@ -95,7 +95,11 @@ if [ $API_SECURITY_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
+    echo $LOG_PREFIX"dry run"
+    gradle --dry-run build
+    echo $LOG_PREFIX"exact build"
     gradle build -x test -q -p api-security #2>&1 | grep -v "WARNING:"
+    echo $LOG_PREFIX"finished build"
     cp `ls api-security/build/libs/api-security*` api-security/build/libs/app.jar
     docker build api-security/ -t $API_SECURITY_TAG -q
     echo $LOG_PREFIX $LOG_APP "security tag: " $API_SECURITY_TAG

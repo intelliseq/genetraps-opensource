@@ -11,7 +11,7 @@ echo $PASS | openssl enc -in $PASSED -d -aes-256-cbc -pass stdin > $DECARCHIVE
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null && pwd )"
 if [ ! -d "$DIR/$DESTINATION" ]; then
-  mkdir $DIR/$DESTINATION
+  mkdir -p $DIR/$DESTINATION
 fi
 
 unzip $DECARCHIVE -d $DIR/$DESTINATION

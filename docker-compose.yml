@@ -1,12 +1,16 @@
 version: '2'
 services:
-  client-dx:
-    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-client-dx:62d85dd3c88706f5f8dedb14e0e799d8
+  api-dx:
+    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:6df60912c0496b2bdbbb50292b460643
     ports:
-      - "8085:8085"
+      - "8086:8086"
     logging:
       driver: awslogs
       options:
         awslogs-group: genetraps-logs
         awslogs-region: us-east-1
         awslogs-stream-prefix: api-security-log
+    environment:
+      - AURORA_GENETRAPS_CLIENT_PASSWD
+      - AURORA_GENETRAPS_CLIENT_LOGIN
+      - DNANEXUS_TOKEN_TEST
