@@ -101,7 +101,10 @@ else
     gradle build -x test -q -p api-security #2>&1 | grep -v "WARNING:"
     echo $LOG_PREFIX"finished build"
     cp `ls api-security/build/libs/api-security*` api-security/build/libs/app.jar
+    echo $LOG_PREFIX"copied jar"
+    docker version
     docker build api-security/ -t $API_SECURITY_TAG -q
+    echo $LOG_PREFIX"finished build"
     echo $LOG_PREFIX $LOG_APP "security tag: " $API_SECURITY_TAG
     docker push $API_SECURITY_TAG | cat
     cat aws-conf/docker-compose-template.yml | \
