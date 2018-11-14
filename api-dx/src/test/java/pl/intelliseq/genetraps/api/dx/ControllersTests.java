@@ -3,32 +3,35 @@ package pl.intelliseq.genetraps.api.dx;
 import com.dnanexus.DXJob;
 import com.dnanexus.JobState;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 @Log4j2
 //@ActiveProfiles("test")
 public class ControllersTests {
@@ -145,6 +148,82 @@ public class ControllersTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void propertiesAndUploadMultipartTest(){
+        Integer sampleId = mkDir();
+        try {
+            MockMultipartFile multipartFile = new MockMultipartFile("file","multipart", "text/plain", "multipartTest - good".getBytes());
+            String response = new ObjectMapper().readTree(
+                    mockMvc.perform(MockMvcRequestBuilders.multipart("/uploadfile")
+                    .file(multipartFile)
+                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken())
+                    .param("sampleId", sampleId.toString())
+                    .param("newfilename", "multipartTest")
+                    .param("tag", "tag1")
+                    .param("tag", "tag2"))
+                    .andReturn().getResponse().getContentAsString()
+            ).get("id").textValue();
+            assertThat(response, Matchers.matchesPattern("file-\\w*"));
+            log.info(response);
+
+            String jsonString = "{\"first\":\"ok\", \"second\":\"notok\"}";
+            log.info(jsonString);
+            response = new ObjectMapper().readTree(
+                    mockMvc.perform(MockMvcRequestBuilders.post(String.format("/sample/%s/properties", sampleId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString).header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                    .andReturn().getResponse().getContentAsString()
+            ).toString();
+            assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
+            log.info(response);
+            response = new ObjectMapper().readTree(
+                    mockMvc.perform(MockMvcRequestBuilders.get(String.format("/sample/%s/properties", sampleId))
+                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                    .andReturn().getResponse().getContentAsString()
+            ).toString();
+            assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
+            log.info(response);
+
+            String jsonStringPost = "{\"third\":\"good\"}";
+            response = new ObjectMapper().readTree(
+                    mockMvc.perform(MockMvcRequestBuilders.post(String.format("/sample/%s/properties", sampleId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonStringPost)
+                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                    .andReturn().getResponse().getContentAsString()
+            ).toString();
+            assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\",\"third\":\"good\"\\}"));
+            log.info(response);
+
+            String jsonStringPut = "{\"second\":\"ok\"}";
+            response = new ObjectMapper().readTree(
+                    mockMvc.perform(MockMvcRequestBuilders.put(String.format("/sample/%s/properties", sampleId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonStringPut)
+                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                    .andReturn().getResponse().getContentAsString()
+            ).toString();
+            assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"ok\",\"third\":\"good\"\\}"));
+            log.info(response);
+
+            String jsonStringDelete = "{\"second\":\"ok\"}";
+            response = new ObjectMapper().readTree(
+                    mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/sample/%s/properties", sampleId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonStringDelete)
+                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                    .andReturn().getResponse().getContentAsString()
+            ).toString();
+            assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"third\":\"good\"\\}"));
+            log.info(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     public void priviligesTest() {
         ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/privileges");
@@ -156,7 +235,7 @@ public class ControllersTests {
         admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
     }
 
-//BUG mkDir can fain - no sync!!!! BUG
+//BUG mkDir can faint - no sync!!!! BUG
 
     @Test
     public void simpleUpload(){
@@ -166,13 +245,13 @@ public class ControllersTests {
 
     @Test
     public void upload() {
-        Integer sampleid = mkDir();
-        DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
-        DXJob.Describe upload2 = upload(PSYDUCK, sampleRight, sampleid, "right");
+        Integer sampleId = mkDir();
+        DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleId, "left");
+        DXJob.Describe upload2 = upload(PSYDUCK, sampleRight, sampleId, "right");
 
-        ResponseEntity<JsonNode> ls = getForResponseEnity(PSYDUCK, String.format("/sample/%s/ls", sampleid));
+        ResponseEntity<JsonNode> ls = getForResponseEnity(PSYDUCK, String.format("/sample/%s/ls", sampleId));
         assertTrue(ls.getStatusCode().is2xxSuccessful());
-        ResponseEntity<JsonNode> lsByNames = getForResponseEnity(PSYDUCK, String.format("/sample/%s/ls?byNames=true", sampleid));
+        ResponseEntity<JsonNode> lsByNames = getForResponseEnity(PSYDUCK, String.format("/sample/%s/ls?byNames=true", sampleId));
         assertTrue(lsByNames.getStatusCode().is2xxSuccessful());
         log.info(ls.getBody());
         log.info(lsByNames.getBody());
@@ -184,8 +263,8 @@ public class ControllersTests {
         log.info(describe.getBody());
 
         log.info(fastqc(PSYDUCK, file1Id));
-        log.info(bwa(PSYDUCK, sampleid));
-        log.info(gatkhc(PSYDUCK, sampleid, interval));
+        log.info(bwa(PSYDUCK, sampleId));
+        log.info(gatkhc(PSYDUCK, sampleId, interval));
 
     }
 
