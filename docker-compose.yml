@@ -1,7 +1,7 @@
 version: '2'
 services:
   client-dx:
-    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-client-dx:6f8bb0f4a7f0137507bc82a909b3ada5
+    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-client-dx:62d85dd3c88706f5f8dedb14e0e799d8
     ports:
       - "8085:8085"
     logging:
