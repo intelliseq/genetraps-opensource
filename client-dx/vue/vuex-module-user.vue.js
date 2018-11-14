@@ -23,10 +23,17 @@ const userModule = {
 			request({
 				waitingText: "Verifying user credentials",
 				endpoint: "user",
-				callback: function(data) {
-					store.commit('user/setUserData', data)
-				} // calback:{}
-			}) // request()
-    }, // getUser()
+				callback: function(data) {store.commit('user/setUserData', data)}
+			})
+    },
+		getSamples({commit}) {
+			logger.debug("vue.vuex.sample.getSamples")
+			request({
+				method: "get",
+				waitingText: "Fetching samples information",
+				endpoint: "user/privileges",
+				callback: function(data){console.log(data)}
+			})
+		},
   } // actions:{}
 }

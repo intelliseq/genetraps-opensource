@@ -18,7 +18,7 @@ const sampleModule = {
 			logger.debug("vue.vuex.sample.getSamples")
 			request({
 				waitingText: "Fetching samples information",
-				endpoint: "user/samples",
+				endpoint: "user/privileges",
 				callback: function(data){console.log(data)}
 			})
 		},

@@ -11,9 +11,9 @@ const welcomeComponent = {
         <v-flex xs8>
           <v-card-title primary-title>
           <div>
-            <div class="headline">Create sample</div>
+            <div class="headline">Get samples</div>
             <div>Create sample, describe sample, upload fastq</div>
-            <v-btn v-on:click.prevent="createSample" dark color="grey darken-3">Create now</v-btn>
+            <v-btn v-on:click.prevent="getSamples" dark color="grey darken-3">Create now</v-btn>
           </div>
           </v-card-title>
         </v-flex>
@@ -102,7 +102,7 @@ const welcomeComponent = {
       },
       getSamples: function (event) {
         logger.debug("vue.welcome.getSamples")
-        store.dispatch('sample/getSamples')
+        store.dispatch('user/getSamples')
       },
     },
     created: function () {
