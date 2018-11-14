@@ -3,6 +3,7 @@ package pl.intelliseq.genetraps.api.dx;
 import com.dnanexus.DXJob;
 import com.dnanexus.JobState;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.log4j.Log4j2;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,6 +23,7 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
@@ -55,7 +56,9 @@ public class ControllersTests {
     }
 
     private Integer mkDir() {
-        return getForResponseEnity(PSYDUCK, "/mkdir").getBody().get("response").asInt();
+        ResponseEntity<JsonNode> out = getForResponseEnity(PSYDUCK, "/mkdir");
+        log.debug(out);
+        return out.getBody().get("response").asInt();
     }
 
     private DXJob.Describe waitUntilJobIsDone(String jobId) {
@@ -143,6 +146,25 @@ public class ControllersTests {
     }
 
     @Test
+    public void priviligesTest() {
+        ResponseEntity<JsonNode> psyduck = getForResponseEnity(PSYDUCK, "/user/privileges");
+        log.debug(psyduck);
+        assertTrue(psyduck.getStatusCode().is2xxSuccessful());
+
+        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/privileges");
+        assertTrue(admin.getStatusCode().is2xxSuccessful());
+        admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
+    }
+
+//BUG mkDir can fain - no sync!!!! BUG
+
+    @Test
+    public void simpleUpload(){
+        Integer sampleid = mkDir();
+        DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
+    }
+
+    @Test
     public void upload() {
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
@@ -165,6 +187,14 @@ public class ControllersTests {
         log.info(bwa(PSYDUCK, sampleid));
         log.info(gatkhc(PSYDUCK, sampleid, interval));
 
+    }
+
+    @Test
+    public void usersGroupsTest(){
+        ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/groups");
+        assertTrue(admin.getStatusCode().is2xxSuccessful());
+        JsonNode node = admin.getBody();
+        assertEquals(node.size(), 2);
     }
 
 

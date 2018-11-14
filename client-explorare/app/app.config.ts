@@ -7,6 +7,6 @@ export interface IAppConfig {
 }
 
 export const AppConfig: IAppConfig = {
-    //apiEndpoint: "http://localhost:8080"
-    apiEndpoint: "http://genetraps.intelliseq.pl:8082"
+    apiEndpoint: "http://localhost:8082"
+    //apiEndpoint: "http://genetraps.intelliseq.pl:8082"
 };

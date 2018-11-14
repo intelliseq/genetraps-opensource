@@ -1,7 +1,9 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -26,11 +28,11 @@ public class UsersController {
 
     //@CrossOrigin
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public String user(OAuth2Authentication auth) {
+    public String user(OAuth2Authentication auth) throws JsonProcessingException {
         //TODO: Choose better option
-        String username = auth.getUserAuthentication().getPrincipal().toString();
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
-        log.debug(String.format("{\"username\": \"%s\"}", username));
+        log.debug(String.format("{\"userId\": \"%s\"}", userId));
 
 //        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
 //        OAuth2AccessToken accessToken = tokenStore.readAccessToken(details.getTokenValue());
@@ -39,6 +41,13 @@ public class UsersController {
         String clientId = auth.getOAuth2Request().getClientId();
         log.debug(String.format("{\"client\": \"%s\"}", clientId));
 
-        return auroraDBManager.getUserSimpleDetails(username).toString();
+        return new ObjectMapper().writeValueAsString(auroraDBManager.getUserDetails(userId));
+    }
+
+    @RequestMapping(value = "groups", method = RequestMethod.GET)
+    public String getUsersGroups(OAuth2Authentication auth) {
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+
+        return auroraDBManager.getUsersGroups(userId).toString();
     }
 }

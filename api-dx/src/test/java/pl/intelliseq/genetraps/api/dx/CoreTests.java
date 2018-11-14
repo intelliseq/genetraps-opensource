@@ -18,10 +18,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static pl.intelliseq.genetraps.api.dx.TestUser.DEVIL;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
@@ -33,6 +35,9 @@ public class CoreTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private AuroraDBManager auroraDBManager;
 
     @Test
     public void empty() {
@@ -62,11 +67,27 @@ public class CoreTests {
 
         ResponseEntity<JsonNode> response = restTemplate.exchange("/user", HttpMethod.GET, entity, JsonNode.class);
 
+        log.debug(response);
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        assertThat(response.getBody().get("Username").asText(), is(equalToIgnoringCase(PSYDUCK.toString())));
+        assertEquals(response.getBody().get("UserID").asInt(), PSYDUCK.getId().intValue());
 
 
     }
+
+    @Test
+    public void sipleUserTest(){
+        SimpleUser psyduck = auroraDBManager.createNewSimpleUser(PSYDUCK.getId());
+        log.info(psyduck);
+        log.info(auroraDBManager.getUserPrivileges(psyduck));
+        log.info(auroraDBManager.getUserPrivileges(DEVIL.getId()));
+        log.info(auroraDBManager.getUserPrivilegesToSample(1,1));
+    }
+
+//    @Test
+//    public void rootPrivileges(){
+//        log.info(auroraDBManager.getRootPrivileges());
+//    }
 
     @Test
     public void logging(){

@@ -9,20 +9,18 @@ branches:
 sudo: required
 language: java
 jdk:
-- oraclejdk10
+- oraclejdk11
 services:
 - docker
 before_install:
 - sudo apt-get -qq update
-- sudo apt-get install python-six
-- sudo apt-get install python-requests
-- sudo apt-get install python-pip
-- sudo apt-get install python-dev libffi-dev libssl-dev
-- sudo -H pip install urllib3[secure]
-- sudo -H pip install --user --upgrade --force-reinstall pip==9.0.3
-- sudo -H pip install --user awscli --upgrade
-- sudo -H pip install --user dxpy --upgrade
-- sudo -H pip install --user 'requests[security]'
+- sudo apt-get install python3
+- sudo apt-get install python3-pip
+- sudo -H pip3 install awscli --upgrade
+- sudo -H pip3 install setuptools --upgrade
+- sudo -H pip3 install cryptography --upgrade
+- pip3 list
+- sudo -H pip3 install dxpy --upgrade
 - curl -s api.sdkman.io | bash
 - source /home/travis/.sdkman/bin/sdkman-init.sh
 - sdk install gradle 4.10.2
@@ -35,6 +33,15 @@ before_install:
 - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
 - sudo chmod a+x /usr/local/bin/ecs-cli
 script: "./travis-script.sh"
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
 notifications:
+  webhooks: https://discordapp.com/api/webhooks/501330169751928832/fsg87s2Atazj9k2LFdMJZIUG2ZF_S9CzKYFmyNdOXGJjm1bD7ubjM_8w3pP5SwQ3D61a
   slack:
     secure: Akw/kwB4hyxb9tBpc6BCQeqEzkPmlUH52hgfmRL+JS3M+vAI3SFvoeSQveIgtxkrbhb3J2fsuyAHERA91/QdBv/dm+9urQjW3Koy4J27Je0YXpb7LDnKr5oRjTuQcB5pds8HTtMDcozjSmLsvOsctGx/mzPuyEFx7HBXKZn8fjboKL0tWHoDJJ9NekxZpTfiFRZdDCVrS2fLZJFBMFdHJZJiyxxRE8PQH4VoVf9WgCYGtnNCPoP5GeGx3mABwqR3b9mepvHBdkY+HRdylcFWK/04Oun1cUfOz2BtfTfd4LirEzx4+zDFZT6NWN8HZARhWbQKfFxDFfkeIDsUY2fP0FbVlyAdEMEpXScWoHVByfJqObEZPxuA/lORtVoJnRZ2osUEK6+8j8Gc0BUiNzsi+RN97VX0AGwXrvWE/nIiY8tK5dNt0K0gaNnA//8oVKYZXqQ9bZAgaq/H6/33Ca8/JIeFVy++OPlNk0XZHA9RVCr5IxRfjH9aneYNdvZhXZi5ulgxR6xtndYNCmWHfncUWTFTs817UC64eN0uRY7jG3qe8waHZQgJZ7xyQ4qcq5OmwWVISovddQ5BbL0e8z5hEnWV7uT7fO1CjPEBL0NF12Dc1A05Ji62mxJVJ9KRj7aYes0LmcfNBS9y42nZwN28Gun7mdKVSk0zeDSnnyS+Z0o=

@@ -4,6 +4,7 @@ const router = new VueRouter({
     { path: '/', component: welcomeComponent },
     { path: '/login', component: loginComponent },
     { path: '/cookies', component: cookiesComponent }
+    { path: '/samples', component: samplesComponent }
   ]
 })
 
@@ -40,8 +41,11 @@ const app = new Vue({
 
   },
   components: {
-    'wait': waitComponent,
-    'toolbar': toolbarComponent
+    'wait-component': waitComponent,
+    'toolbar-component': toolbarComponent,
+    'footer-component': footerComponent,
+    'samples-component': samplesComponent,
+    'left-toolbar-component': leftToolbarComponent
   },
   methods: {
 

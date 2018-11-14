@@ -48,6 +48,10 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/hello").permitAll()
                 .antMatchers("/status").permitAll()
+<<<<<<< HEAD
+=======
+                //.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+>>>>>>> 0c0a5ccdeb45e1759476d2727d3c114081d3ceed
                 .antMatchers("/**").authenticated();
     }
 

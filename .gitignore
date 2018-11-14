@@ -198,3 +198,6 @@ gradle-app.setting
 *.jks
 *.cert
 
+# Decrypted
+secret-data/decrypted
+

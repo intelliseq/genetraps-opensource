@@ -1,7 +1,14 @@
 LOG_PREFIX="===== TRAVIS LOG ===== "
 LOG_APP=" no-app: "
+echo $LOG_PREFIX "Setting expand_aliases flag"
+shopt -s expand_aliases
 #
-echo $LOG_PREFIX "PYTHON VERSION: " `/usr/bin/python --version`
+echo $LOG_PREFIX "PYTHON VERSION: "
+echo $LOG_PREFIX `python --version | head -1`
+echo $LOG_PREFIX "Aliasing python"
+alias python=`which python3`
+echo $LOG_PREFIX "PYTHON VERSION: "
+echo $LOG_PREFIX `python --version | head -1`
 echo $LOG_PREFIX "JAVA VERSION: " `javac -version`
 echo $LOG_PREFIX"Starting travis script"
 if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
@@ -31,6 +38,9 @@ echo $LOG_PREFIX "logging to ecr..."
 ### CONFIGURING ECS ###
 echo $LOG_PREFIX $LOG_APP "ecs-cli configuring"
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
+
+source scripts/decrypt.sh secret-data/test.zip.enc
+cat secret-data/decrypted/test.txt
 
 #############################
 ### BUILDING CLIENT_INDEX ###

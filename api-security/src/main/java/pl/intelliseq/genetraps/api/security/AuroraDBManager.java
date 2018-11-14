@@ -45,6 +45,6 @@ public class AuroraDBManager {
                         "Security AS S " +
                         "JOIN Users AS U ON S.UserID=U.USerID " +
                         "WHERE S.Username = \"%s\" OR U.Email = \"%s\";", username, username),
-                (rs, rowNum) -> new User(username, rs.getString("Password"), Collections.singletonList(new SimpleGrantedAuthority("user")))).get(0);
+                (rs, rowNum) -> new User(rs.getString("UserID"), rs.getString("Password"), Collections.singletonList(new SimpleGrantedAuthority("user")))).get(0);
     }
 }
