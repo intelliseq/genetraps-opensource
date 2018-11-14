@@ -6,8 +6,8 @@ RUN apt-get update && \
     apt-get install -y  gradle && \
     add-apt-repository ppa:linuxuprising/java -y && \
     apt-get update && \
-    echo oracle-java10-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
-    apt-get install -y oracle-java10-installer && \
+    echo oracle-java11-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-get install -y oracle-java11-installer && \
     apt-get clean && \
     apt-get install -y python-pip python-dev build-essential && \
     apt-get install -y python-dev libffi-dev libssl-dev && \
