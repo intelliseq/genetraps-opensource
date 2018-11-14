@@ -103,7 +103,7 @@ else
     cp `ls api-security/build/libs/api-security*` api-security/build/libs/app.jar
     echo $LOG_PREFIX"copied jar"
     docker version
-    docker build api-security/ -t $API_SECURITY_TAG -q
+    docker build api-security/ -t $API_SECURITY_TAG
     echo $LOG_PREFIX"finished build"
     echo $LOG_PREFIX $LOG_APP "security tag: " $API_SECURITY_TAG
     docker push $API_SECURITY_TAG | cat
