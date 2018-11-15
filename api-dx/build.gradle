@@ -59,7 +59,7 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+//    compile group: 'com.google.guava', name: 'guava', version: '18.0'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.3.RELEASE'
     compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.3.RELEASE'
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
@@ -74,6 +74,11 @@ dependencies {
     compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.390'
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.9.RELEASE'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+
+
 
 
 }

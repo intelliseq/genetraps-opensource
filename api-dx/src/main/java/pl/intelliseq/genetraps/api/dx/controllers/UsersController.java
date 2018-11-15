@@ -44,7 +44,7 @@ public class UsersController {
         return new ObjectMapper().writeValueAsString(auroraDBManager.getUserDetails(userId));
     }
 
-    @RequestMapping(value = "groups", method = RequestMethod.GET)
+    @RequestMapping(value = "user/groups", method = RequestMethod.GET)
     public String getUsersGroups(OAuth2Authentication auth) {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 

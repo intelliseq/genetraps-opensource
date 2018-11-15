@@ -15,6 +15,11 @@ import org.springframework.util.FileCopyUtils;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -23,6 +28,7 @@ import java.io.IOException;
  * Created by intelliseq on 07/12/2017.
  */
 @Configuration
+@EnableSwagger2
 public class BeansConfiguration {
     @Bean
     FilesManager filesManager() {
@@ -74,5 +80,14 @@ public class BeansConfiguration {
         }
         converter.setVerifierKey(publicKey);
         return converter;
+    }
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build();
     }
 }

@@ -29,4 +29,10 @@ public class HelloController {
         Resource resource = new FileSystemResource("src/main/resources/api--dx-online-brightgreen.svg");
         return resource;
     }
+
+    @RequestMapping(value = "/swagger", method = RequestMethod.GET)
+    public Resource getSwagger() {
+        Resource resource = new FileSystemResource("src/main/resources/swagger/api-doc.yaml");
+        return resource;
+    }
 }

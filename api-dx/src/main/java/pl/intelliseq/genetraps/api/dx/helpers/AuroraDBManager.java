@@ -71,6 +71,10 @@ public class AuroraDBManager {
         jdbcTemplate.query("SELECT * FROM Users", (rs, rn) -> System.out.printf("%s:\t%s %s\n", rn, rs.getString("FirstName"), rs.getString("LastName")));
     }
 
+    public Integer addUserToGroup(Integer userId, Integer groupId) {
+        return jdbcTemplate.update("INSERT INTO UserGroups VALUES (?, ?)", userId, groupId);
+    }
+
     /*
         Group managment
      */
@@ -97,6 +101,10 @@ public class AuroraDBManager {
         log.debug(node);
 
         return node;
+    }
+
+    public Integer createGroup(String groupName, Boolean root){
+        return jdbcTemplate.update("INSERT INTO Groups VALUES (?, ?, ?)", 0, groupName, root?1:0);
     }
 
     /*
@@ -126,10 +134,6 @@ public class AuroraDBManager {
         log.debug(jdbcCall.getInParameterNames());
 
         return Roles.valueOf(((List<Map<String, String>>) jdbcCall.execute(inParamMap).get("#result-set-1")).get(0).get("RoleName"));
-    }
-
-    public Integer setUserPrivilegesToSample(Integer userId, Integer sampleId, Roles role) {
-        return jdbcTemplate.update("INSERT INTO UserPrivileges VALUES (?, ?, ?)", userId, sampleId, role.getId());
     }
 
     private Map<Integer, Roles> getRootPrivileges() {
@@ -173,4 +177,11 @@ public class AuroraDBManager {
         return result;
 
     }
+
+
+    public Integer setUserPrivilegesToSample(Integer userId, Integer sampleId, Roles role) {
+        return jdbcTemplate.update("INSERT INTO UserPrivileges VALUES (?, ?, ?)", userId, sampleId, role.getId());
+    }
+
+
 }

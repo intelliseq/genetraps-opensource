@@ -35,11 +35,11 @@ public class PrivilegesController {
         return result.toString();
     }
 
-    @RequestMapping(value = "user/privileges", method = RequestMethod.POST)
+    @RequestMapping(value = "/sample/{id}/grandprivileges", method = RequestMethod.POST)
     public String giveUserPriviliges(
             OAuth2Authentication auth,
             @RequestParam Integer targetUserId,
-            @RequestParam Integer sampleId,
+            @PathVariable Integer sampleId,
             @RequestParam Roles role){
 
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());

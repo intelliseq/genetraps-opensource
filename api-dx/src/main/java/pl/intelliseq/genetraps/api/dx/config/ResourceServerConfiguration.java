@@ -46,10 +46,16 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/").permitAll()
                 .antMatchers("/hello").permitAll()
                 .antMatchers("/status").permitAll()
+                .antMatchers("/webjars/**").permitAll()
+                .antMatchers("/v2/**").permitAll()
+                .antMatchers("/swagger**/**").permitAll()
                 //.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .antMatchers("/**").authenticated();
+                .antMatchers("/**")
+//                .permitAll();
+                .authenticated();
     }
 
     @Override

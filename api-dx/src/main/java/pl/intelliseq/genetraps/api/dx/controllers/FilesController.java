@@ -66,7 +66,7 @@ public class FilesController {
 //        }
 //    }
 
-    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
+    @RequestMapping(value = "/sample/new", method = RequestMethod.GET)
     @ResponseBody
     public String mkDir(OAuth2Authentication auth) {
         log.debug("mkdir");
@@ -79,30 +79,30 @@ public class FilesController {
         return String.format("{\"response\":%s}", sampleId);
     }
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
     public String upload(
             OAuth2Authentication auth,
             @RequestParam String url,
-            @RequestParam String sampleId,
+            @PathVariable String id,
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         log.debug(userId);
 
-        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleId, tag).getId()).toString();
+        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, id, tag).getId()).toString();
     }
 
     // document me change in master:readme
-    @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
+    @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
     public String uploadfile(
-            @RequestParam(value = "file") MultipartFile file,
-            @RequestParam(value = "sampleId") int sampleId,
-            @RequestParam(value = "newfilename", required = false) String newfilename,
+            @RequestParam MultipartFile file,
+            @PathVariable int id,
+            @RequestParam(required = false) String newfilename,
             @RequestParam(value = "tag", required = false) List<String> tags) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, sampleId, newfilename, tags)).toString();
+            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, id, newfilename, tags)).toString();
         } catch (IOException e) {
             return new ObjectMapper().createObjectNode().put("id", "").toString();
         }
