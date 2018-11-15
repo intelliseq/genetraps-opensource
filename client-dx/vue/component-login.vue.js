@@ -1,18 +1,8 @@
 const loginComponent = {
   template: `
-  <v-app>
-  <v-alert :value="error" type="error" dismissible transition="scale-transition" v-model="alert_visibility">
-    {{error_message}}
-    <br/>
-    {{error_description}}
-  </v-alert>
-
-        <v-layout column align-center justify-center>
-          <v-flex text-xs-center transition="scale-transition">
-            <img src="images/logo.svg" class="float-center" style="width: 25%;"></img>
-          </v-flex>
+      <v-layout>
           <v-flex>
-            <v-dialog v-model="dialog_visibility" persistent max-width="500px">
+            <v-dialog v-model="loginDialogVisibility" persistent max-width="500px">
             <v-card class="elevation-6">
               <v-toolbar dark color="primary">
                 <v-toolbar-title>Sign in</v-toolbar-title>
@@ -30,39 +20,25 @@ const loginComponent = {
             </v-card>
             </v-dialog>
           </v-flex>
-        </v-layout>
-        </v-app>
+          </v-layout>
   `,
   methods: {
           getToken: function (event) {
-              logger("DEBUG", "vue.login.getToken")
+              logger.debug("vue.login.getToken")
+              this.loginDialogVisibility = false
               var credentials = {login: this.login, password: this.password}
               store.dispatch('security/loginWithCredentials', credentials)
-
-
           }
       },
       data: function () {
         return {
           login: '',
           password: '',
-          dialog_visibility: false,
-          error: false,
-          error_message: '',
-          error_description: '',
-          alert_visibility: false
-        }
-      },
-      watch: {
-        alert_visibility (val) {
-          console.log("LOG: Vue.Login.watch().alert_visibility("+val+")")
-          if (!val) {
-            this.dialog_visibility = true
-          }
+          loginDialogVisibility: false
         }
       },
       mounted() {
-        logger("DEBUG", "vue.login.mounted")
-        this.dialog_visibility = true
+        logger.debug("vue.login.mounted")
+        this.loginDialogVisibility = true
       }
 }

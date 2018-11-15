@@ -42,17 +42,17 @@ const cookiesComponent = {
 
     methods: {
             setCookies: function () {
-              logger("DEBUG", "vue.cookies.setCookies")
-              logger("DEBUG", "vue.cookies.setCookies necessary " + this.necessary)
-              logger("DEBUG", "vue.cookies.setCookies prefrences " + this.preferences)
-              logger("DEBUG", "vue.cookies.setCookies statistics " + this.statistics)
+              logger.debug("vue.cookies.setCookies")
+              logger.debug("vue.cookies.setCookies necessary " + this.necessary)
+              logger.debug("vue.cookies.setCookies prefrences " + this.preferences)
+              logger.debug("vue.cookies.setCookies statistics " + this.statistics)
               this.$cookies.set("cookies_necessary", true)
               if(this.preferences) {
-                logger("DEBUG", "vue.cookies.setCookies preferences")
+                logger.debug("vue.cookies.setCookies preferences")
                 this.$cookies.set("cookies_preferences", true)
               }
               if(this.statistics) {
-                logger("DEBUG", "vue.cookies.setCookies statistics")
+                logger.debug("vue.cookies.setCookies statistics")
                 this.$cookies.set("cookies_statistics", true)
                 loadGoogleAnalytics()
               }

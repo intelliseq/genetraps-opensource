@@ -12,6 +12,6 @@ const waitComponent = {
     </v-layout>`,
     computed: Vuex.mapState(['waitingVisibility','waitingText']),
     created: function () {
-      logger("DEBUG", "vue.wait.created")
+      logger.debug("vue.wait.created")
     }
 }

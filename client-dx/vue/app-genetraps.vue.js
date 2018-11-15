@@ -3,7 +3,8 @@ const router = new VueRouter({
   routes: [
     { path: '/', component: welcomeComponent },
     { path: '/login', component: loginComponent },
-    { path: '/cookies', component: cookiesComponent }
+    { path: '/cookies', component: cookiesComponent },
+    { path: '/samples', component: samplesComponent }
   ]
 })
 
@@ -15,16 +16,16 @@ const app = new Vue({
     access_token: ""
   },
   created() {
-    logger("DEBUG", "vue.app.created")
+    logger.debug("vue.app.created")
   },
   mounted() {
 
     /* first we check for cookies */
     /* then we check for google anlytics */
     /* finally we check for refresh token */
-    logger("DEBUG", "vue.app.mounted")
+    logger.debug("vue.app.mounted")
     if(this.$cookies.get("cookies_necessary") == null) {
-      logger("DEBUG", "vue.app no agreement for cookies")
+      logger.debug("vue.app no agreement for cookies")
       this.$router.push("/cookies")
     } else {
       if(this.$cookies.get("cookies_statistics") != null) {
@@ -40,8 +41,11 @@ const app = new Vue({
 
   },
   components: {
-    'wait': waitComponent,
-    'toolbar': toolbarComponent
+    'wait-component': waitComponent,
+    'toolbar-component': toolbarComponent,
+    'footer-component': footerComponent,
+    'samples-component': samplesComponent,
+    'left-toolbar-component': leftToolbarComponent
   },
   methods: {
 

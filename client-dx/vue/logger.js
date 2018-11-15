@@ -1,4 +1,5 @@
-function logger(level, text) {
+function Logger() {}
+Logger.prototype.log = function (level, text) {
   let debug = true
   let info = true
   let warn = true
@@ -14,3 +15,19 @@ function logger(level, text) {
     console.log("LOG: " + date_string + " " + level + " " + text)
   }
 }
+Logger.prototype.debug = function(text) {
+  this.log("DEBUG", text)
+}
+Logger.prototype.info = function(text) {
+  this.log("INFO", text)
+}
+Logger.prototype.warn = function(text) {
+  this.log("WARN", text)
+}
+Logger.prototype.error = function(text) {
+  this.log("ERROR", text)
+}
+/*Logger.prototype.log = function(text) {
+  this.debug(text)
+}*/
+logger = new Logger()

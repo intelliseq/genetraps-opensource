@@ -16,15 +16,35 @@
   <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
   <link href="styles/animate.css" rel="stylesheet">
 
+  <style>
+  div.v-toolbar__content {
+   padding-left: 0!important
+  }
+  </style>
 
 </head>
 
 <body style="font-family: 'Roboto', sans-serif;">
   <div id="genetraps-app">
-    <wait></wait>
-    <toolbar></toolbar>
-    <!--<transition enter-active-class="animated flipInX" leave-active-class="animated flipInY">-->
-    <router-view></router-view>
+    <v-app>
+    <!-- top toolbar -->
+    <toolbar-component></toolbar-component>
+    <!--<v-container fluid grid-list-md>-->
+      <v-layout row wrap fill-height >
+        <!-- left toolbar -->
+        <left-toolbar-component></left-toolbar-component>
+
+        <!-- workspace -->
+        <v-flex d-flex>
+          <router-view></router-view>
+        </v-flex>
+      </v-layout>
+    <!--</v-container>-->
+    <!-- waiting popup -->
+    <wait-component></wait-component>
+    <!-- footer -->
+    <footer-component></footer-component>
+  </v-app>
   <!--</transition>-->
   </div>
 
@@ -39,15 +59,21 @@
 
   <script src="vue/logger.js"></script>
   <script src="vue/google-analytics.js"></script>
+  <script src="vue/axios.js"></script>
 
   <script src="vue/vuex-module-security.vue.js"></script>
   <script src="vue/vuex-module-user.vue.js"></script>
+  <script src="vue/vuex-module-sample.vue.js"></script>
   <script src="vue/vuex-store.vue.js"></script>
 
   <script src="vue/component-cookies.vue.js"></script>
   <script src="vue/component-login.vue.js"></script>
   <script src="vue/component-wait.vue.js"></script>
   <script src="vue/component-toolbar.vue.js"></script>
+  <script src="vue/component-toolbar-button.vue.js"></script>
+  <script src="vue/component-toolbar-left.vue.js"></script>
+  <script src="vue/component-samples.vue.js"></script>
+  <script src="vue/component-footer.vue.js"></script>
   <script src="vue/component-welcome.vue.js"></script>
 
   <script src="vue/app-genetraps.vue.js"></script>
