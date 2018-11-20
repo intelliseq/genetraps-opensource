@@ -83,7 +83,7 @@ public class FilesController {
     public String upload(
             OAuth2Authentication auth,
             @RequestParam String url,
-            @PathVariable String id,
+            @PathVariable Integer id,
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
@@ -96,8 +96,8 @@ public class FilesController {
     // document me change in master:readme
     @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
     public String uploadfile(
+            @PathVariable Integer id,
             @RequestParam MultipartFile file,
-            @PathVariable int id,
             @RequestParam(required = false) String newfilename,
             @RequestParam(value = "tag", required = false) List<String> tags) {
 
@@ -111,51 +111,56 @@ public class FilesController {
     // document me change in master:endpoints,readme
     @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
     public String describe(
-            @PathVariable String id) {
+            @PathVariable Integer id) {
         return processManager.JSONDescribe(id).toString();
     }
 
     // document me change in master:endpoints,readme
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
-    public String sampleLs(@PathVariable("id") int sampleId,
-                            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
-        return processManager.sampleLs(sampleId, byNames).toString();
+    public String sampleLs(
+            @PathVariable Integer id,
+            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
+        return processManager.sampleLs(id, byNames).toString();
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
-    public String samplePropertiesPost(@PathVariable("id") int sampleId,
-                                @RequestBody LinkedHashMap<String, String> properties) {
+    public String samplePropertiesPost(
+            @PathVariable Integer id,
+            @RequestBody LinkedHashMap<String, String> properties) {
         try {
-            return processManager.propertiesPost(sampleId, properties).toString();
+            return processManager.propertiesPost(id, properties).toString();
         } catch(PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.GET)
-    public String samplePropertiesGet(@PathVariable("id") int sampleId) {
+    public String samplePropertiesGet(
+            @PathVariable Integer id) {
         try {
-            return processManager.propertiesGet(sampleId).toString();
+            return processManager.propertiesGet(id).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.PUT)
-    public String samplePropertiesPut(@PathVariable("id") int sampleId,
-                                @RequestBody LinkedHashMap<String, String> properties) {
+    public String samplePropertiesPut(
+            @PathVariable Integer id,
+            @RequestBody LinkedHashMap<String, String> properties) {
         try {
-            return processManager.propertiesPut(sampleId, properties).toString();
+            return processManager.propertiesPut(id, properties).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.DELETE)
-    public String samplePropertiesDelete(@PathVariable("id") int sampleId,
-                                @RequestBody LinkedHashMap<String, String> properties) {
+    public String samplePropertiesDelete(
+            @PathVariable Integer id,
+            @RequestBody LinkedHashMap<String, String> properties) {
         try {
-            return processManager.propertiesDelete(sampleId, properties).toString();
+            return processManager.propertiesDelete(id, properties).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }

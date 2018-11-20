@@ -59,7 +59,7 @@ public class ControllersTests {
     }
 
     private Integer mkDir() {
-        ResponseEntity<JsonNode> out = getForResponseEnity(PSYDUCK, "/mkdir");
+        ResponseEntity<JsonNode> out = getForResponseEnity(PSYDUCK, "/sample/new");
         log.debug(out);
         return out.getBody().get("response").asInt();
     }
@@ -86,7 +86,7 @@ public class ControllersTests {
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("url", sampleUrl);
-        uploadValueMap.add("sampleid", sampleid.toString());
+        uploadValueMap.add("id", sampleid.toString());
         for (String tag : tags) {
             uploadValueMap.add("tag", tag);
         }
@@ -121,7 +121,7 @@ public class ControllersTests {
         uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
-        uploadValueMap.add("sampleid", sampleid.toString());
+        uploadValueMap.add("id", sampleid.toString());
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
 
@@ -137,7 +137,7 @@ public class ControllersTests {
         uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
-        uploadValueMap.add("sampleid", sampleid.toString());
+        uploadValueMap.add("id", sampleid.toString());
         uploadValueMap.add("interval", interval);
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
@@ -152,15 +152,14 @@ public class ControllersTests {
     private MockMvc mockMvc;
 
     @Test
-    public void propertiesAndUploadMultipartTest(){
+    public void propertiesAndFileUploadTest(){
         Integer sampleId = mkDir();
         try {
             MockMultipartFile multipartFile = new MockMultipartFile("file","multipart", "text/plain", "multipartTest - good".getBytes());
             String response = new ObjectMapper().readTree(
-                    mockMvc.perform(MockMvcRequestBuilders.multipart("/uploadfile")
+                    mockMvc.perform(MockMvcRequestBuilders.multipart(String.format("/sample/%s/fileupload", sampleId))
                     .file(multipartFile)
                     .header("Authorization", "Bearer " + PSYDUCK.getAccessToken())
-                    .param("sampleId", sampleId.toString())
                     .param("newfilename", "multipartTest")
                     .param("tag", "tag1")
                     .param("tag", "tag2"))

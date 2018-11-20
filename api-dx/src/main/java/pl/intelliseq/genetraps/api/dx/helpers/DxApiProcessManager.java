@@ -21,7 +21,7 @@ public class DxApiProcessManager {
     @Autowired
     Environment env;
 
-    public DXJob runUrlFetch(String inputUrl, String sampleId, String... tags) {
+    public DXJob runUrlFetch(String inputUrl, Integer sampleId, String... tags) {
         var input = new HashMap<>();
 
         boolean leftTag = Arrays.asList(tags).contains("left");
@@ -173,9 +173,9 @@ public class DxApiProcessManager {
         return (DXApplet) DXSearch.findDataObjects().nameMatchesExactly(appletName).execute().asList().get(0);
     }
 
-    public JsonNode JSONDescribe(String id) {
+    public JsonNode JSONDescribe(Integer sampleId) {
         return DXJSON.safeTreeToValue(
-                new DXHTTPRequest(DXEnvironment.create()).request("/" + id + "/" + "describe",
+                new DXHTTPRequest(DXEnvironment.create()).request("/" + sampleId + "/" + "describe",
                         new ObjectMapper().createObjectNode(), DXHTTPRequest.RetryStrategy.SAFE_TO_RETRY), JsonNode.class);
     }
 

@@ -26,13 +26,15 @@ public class PipelineController {
 //    }
 
     @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"sampleId"})
-    public String bwa(@RequestParam int sampleId) {
+    public String bwa(
+            @RequestParam Integer sampleId) {
         return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(sampleId).getId()).toString();
     }
 
     @RequestMapping(value = "/gatkhc", method = RequestMethod.POST)
-    public String gatkhc(@RequestParam int sampleId,
-                         @RequestParam(required = false) String interval) {
+    public String gatkhc(
+            @RequestParam Integer sampleId,
+            @RequestParam(required = false) String interval) {
         return new ObjectMapper().createObjectNode().put("id", processManager.runGatkHC(sampleId, interval).getId()).toString();
     }
 

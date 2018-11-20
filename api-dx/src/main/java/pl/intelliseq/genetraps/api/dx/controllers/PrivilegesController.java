@@ -38,13 +38,13 @@ public class PrivilegesController {
     @RequestMapping(value = "/sample/{id}/grandprivileges", method = RequestMethod.POST)
     public String giveUserPriviliges(
             OAuth2Authentication auth,
+            @PathVariable Integer id,
             @RequestParam Integer targetUserId,
-            @PathVariable Integer sampleId,
             @RequestParam Roles role){
 
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         SimpleUser user = auroraDBManager.createNewSimpleUser(userId);
-        Roles loggedUserRole = auroraDBManager.getUserPrivilegesToSample(user.getId(), sampleId);
+        Roles loggedUserRole = auroraDBManager.getUserPrivilegesToSample(user.getId(), id);
 
 
 //TODO: remove exception
@@ -52,7 +52,7 @@ public class PrivilegesController {
             throw new ForbiddenException("User don't have permissions to share sample");
         }
 
-        return String.format("{\"response\":%s}", auroraDBManager.setUserPrivilegesToSample(targetUserId, sampleId, role));
+        return String.format("{\"response\":%s}", auroraDBManager.setUserPrivilegesToSample(targetUserId, id, role));
     }
 
 }
