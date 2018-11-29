@@ -177,14 +177,14 @@ public class ControllersTests {
                     .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
-            log.info(response);
+            log.info("POST(new): " + response);
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.get(String.format("/sample/%s/properties", sampleId))
                     .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
                     .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
-            log.info(response);
+            log.info("GET: " + response);
 
             String jsonStringPost = "{\"third\":\"good\"}";
             response = new ObjectMapper().readTree(
@@ -195,7 +195,7 @@ public class ControllersTests {
                     .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\",\"third\":\"good\"\\}"));
-            log.info(response);
+            log.info("POST(add): " + response);
 
             String jsonStringPut = "{\"second\":\"ok\"}";
             response = new ObjectMapper().readTree(
@@ -206,7 +206,7 @@ public class ControllersTests {
                     .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"ok\",\"third\":\"good\"\\}"));
-            log.info(response);
+            log.info("PUT: " + response);
 
             String jsonStringDelete = "{\"second\":\"ok\"}";
             response = new ObjectMapper().readTree(
@@ -217,7 +217,7 @@ public class ControllersTests {
                     .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"third\":\"good\"\\}"));
-            log.info(response);
+            log.info("DELETE: " + response);
         } catch (Exception e) {
             e.printStackTrace();
         }

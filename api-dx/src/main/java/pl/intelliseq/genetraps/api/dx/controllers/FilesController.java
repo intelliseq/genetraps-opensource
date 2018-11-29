@@ -99,10 +99,10 @@ public class FilesController {
             @PathVariable Integer id,
             @RequestParam MultipartFile file,
             @RequestParam(required = false) String newfilename,
-            @RequestParam(value = "tag", required = false) List<String> tags) {
+            @RequestParam(required = false) List<String> tag) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, id, newfilename, tags)).toString();
+            return new ObjectMapper().createObjectNode().put("id", processManager.runFileUpload(file, id, newfilename, tag)).toString();
         } catch (IOException e) {
             return new ObjectMapper().createObjectNode().put("id", "").toString();
         }
