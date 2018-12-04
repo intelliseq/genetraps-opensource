@@ -40,7 +40,15 @@ echo $LOG_PREFIX $LOG_APP "ecs-cli configuring"
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
 
 source scripts/decrypt.sh secret-data/test.zip.enc
-cat secret-data/decrypted/test.txt
+if [[ -f secret-data/decrypted/test.txt && "test szyfrowania" = `cat secret-data/decrypted/test.txt` ]]; then
+  cat secret-data/decrypted/test.txt
+elif [[ ! -f secret-data/decrypted/test.txt ]]; then
+  echo "decrypted file does not exist"
+  exit 1
+else
+  echo "decryption is not correct"
+  exit 1
+fi
 
 #############################
 ### BUILDING CLIENT_INDEX ###

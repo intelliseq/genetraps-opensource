@@ -45,8 +45,6 @@ public class DxApiProcessManager {
     }
 
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newfilename, List<String> tags) throws IOException {
-
-
         if(newfilename == null) {
             newfilename = mfile.getOriginalFilename();
         }
