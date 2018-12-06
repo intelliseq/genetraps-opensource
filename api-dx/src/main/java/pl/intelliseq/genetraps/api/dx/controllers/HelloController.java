@@ -21,6 +21,11 @@ public class HelloController {
         return "{\"status\": \"up\"}";
     }
 
+    @RequestMapping(value = "/secure-hello", method = RequestMethod.GET)
+    public String secureHello() {
+        return "{\"status\": \"ok\"}";
+    }
+
     /* preflight */
 //    @RequestMapping(
 //            value = "/**",

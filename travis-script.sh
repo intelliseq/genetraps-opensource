@@ -50,6 +50,14 @@ else
   exit 1
 fi
 
+TOKEN=$(curl --request POST --url http://localhost:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded"  --data "grant_type=password&username=$STAGING_USERNAME&password=$STAGING_PASSWORD" | jq -r ".access_token")
+if [[ "`curl -H "Authorization: Bearer $TOKEN" localhost:8086/secure-hello | jq -r ".status"`" = "ok" ]]; then
+  echo "auth token - ok"
+else
+  echo "auth token - failure"
+  exit 1
+fi
+
 #############################
 ### BUILDING CLIENT_INDEX ###
 #############################
