@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.log4j.Log4j2;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.*;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
 import static org.junit.Assert.assertEquals;
@@ -27,11 +26,11 @@ import static pl.intelliseq.genetraps.api.dx.TestUser.DEVIL;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
 //@ActiveProfiles("test")
-public class CoreTests {
+public class CoreTests extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -70,16 +69,16 @@ public class CoreTests {
         log.debug(response);
 
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        assertEquals(response.getBody().get("UserID").asInt(), PSYDUCK.getId().intValue());
+        assertEquals(response.getBody().get("id").asInt(), PSYDUCK.getId().intValue());
 
 
     }
 
     @Test
     public void sipleUserTest(){
-        SimpleUser psyduck = auroraDBManager.createNewSimpleUser(PSYDUCK.getId());
+        User psyduck = auroraDBManager.getUserDetails(PSYDUCK.getId());
         log.info(psyduck);
-        log.info(auroraDBManager.getUserPrivileges(psyduck));
+        log.info(auroraDBManager.getUserPrivileges(psyduck.getId()));
         log.info(auroraDBManager.getUserPrivileges(DEVIL.getId()));
         log.info(auroraDBManager.getUserPrivilegesToSample(1,1));
     }

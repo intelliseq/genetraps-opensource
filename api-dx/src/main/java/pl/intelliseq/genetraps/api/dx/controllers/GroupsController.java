@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @Log4j2
@@ -24,14 +25,14 @@ public class GroupsController {
     private AuroraDBManager auroraDBManager;
 
     @RequestMapping(value = "groups", method = RequestMethod.GET)
-    public String getGroups(OAuth2Authentication auth) {
+    public String getGroups(@ApiIgnore OAuth2Authentication auth) {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
         return auroraDBManager.getUsersGroups(userId).toString();
     }
 
     @RequestMapping(value = "groups", method = RequestMethod.POST)
-    public String createGroup(OAuth2Authentication auth,
+    public String createGroup(@ApiIgnore OAuth2Authentication auth,
                               @RequestParam String groupName,
                               @RequestParam(required = false, defaultValue = "false") Boolean root){
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
@@ -40,7 +41,7 @@ public class GroupsController {
     }
 
     @RequestMapping(value = "group/{id}", method = RequestMethod.GET)
-    public String getGroupInfo(OAuth2Authentication auth){
+    public String getGroupInfo(@ApiIgnore OAuth2Authentication auth){
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
         return null;

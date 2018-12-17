@@ -13,6 +13,7 @@ import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -68,7 +69,7 @@ public class FilesController {
 
     @RequestMapping(value = "/sample/new", method = RequestMethod.GET)
     @ResponseBody
-    public String mkDir(OAuth2Authentication auth) {
+    public String mkDir(@ApiIgnore OAuth2Authentication auth) {
         log.debug("mkdir");
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
@@ -81,7 +82,7 @@ public class FilesController {
 
     @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
     public String upload(
-            OAuth2Authentication auth,
+            @ApiIgnore OAuth2Authentication auth,
             @RequestParam String url,
             @PathVariable Integer id,
             @RequestParam String... tag) {
@@ -111,7 +112,7 @@ public class FilesController {
     // document me change in master:endpoints,readme
     @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
     public String describe(
-            @PathVariable Integer id) {
+            @PathVariable String id) {
         return processManager.JSONDescribe(id).toString();
     }
 

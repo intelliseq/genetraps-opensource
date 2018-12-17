@@ -6,15 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @Log4j2
@@ -28,7 +28,7 @@ public class UsersController {
 
     //@CrossOrigin
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public String user(OAuth2Authentication auth) throws JsonProcessingException {
+    public String user(@ApiIgnore OAuth2Authentication auth) throws JsonProcessingException {
         //TODO: Choose better option
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
@@ -44,8 +44,13 @@ public class UsersController {
         return new ObjectMapper().writeValueAsString(auroraDBManager.getUserDetails(userId));
     }
 
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    public String createUser(){
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).toString();
+    }
+
     @RequestMapping(value = "user/groups", method = RequestMethod.GET)
-    public String getUsersGroups(OAuth2Authentication auth) {
+    public String getUsersGroups(@ApiIgnore OAuth2Authentication auth) {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 
         return auroraDBManager.getUsersGroups(userId).toString();

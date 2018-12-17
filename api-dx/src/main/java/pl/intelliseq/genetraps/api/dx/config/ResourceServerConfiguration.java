@@ -52,6 +52,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/v2/**").permitAll()
                 .antMatchers("/swagger**/**").permitAll()
+                .antMatchers("/api").permitAll()
+                .antMatchers(HttpMethod.POST,"/user").permitAll()
                 //.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .antMatchers("/**")
 //                .permitAll();

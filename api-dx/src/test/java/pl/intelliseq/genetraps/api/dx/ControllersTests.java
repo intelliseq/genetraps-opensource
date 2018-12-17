@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,26 +13,29 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.testng.annotations.Test;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Log4j2
 //@ActiveProfiles("test")
-public class ControllersTests {
+public class ControllersTests extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -86,14 +87,14 @@ public class ControllersTests {
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("url", sampleUrl);
-        uploadValueMap.add("id", sampleid.toString());
         for (String tag : tags) {
             uploadValueMap.add("tag", tag);
         }
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
 
-        JsonNode response = this.restTemplate.postForObject("/upload", uploadEntity, JsonNode.class);
+        JsonNode response = this.restTemplate.postForObject(String.format("/sample/%s/urlupload", sampleid.toString()), uploadEntity, JsonNode.class);
+        log.debug(response);
         assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
 
         return waitUntilJobIsDone(response.get("id").textValue());
@@ -121,11 +122,12 @@ public class ControllersTests {
         uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
-        uploadValueMap.add("id", sampleid.toString());
+        uploadValueMap.add("sampleId", sampleid.toString());
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
 
         JsonNode response = this.restTemplate.postForObject("/bwa", uploadEntity, JsonNode.class);
+        log.debug("R "+response);
         assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
 
         return waitUntilJobIsDone(response.get("id").textValue());
@@ -137,7 +139,7 @@ public class ControllersTests {
         uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
-        uploadValueMap.add("id", sampleid.toString());
+        uploadValueMap.add("sampleId", sampleid.toString());
         uploadValueMap.add("interval", interval);
 
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
@@ -240,6 +242,11 @@ public class ControllersTests {
     public void simpleUpload(){
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
+
+        String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
+
+        ResponseEntity<JsonNode> describe = getForResponseEnity(PSYDUCK, String.format("/sample/%s/describe/", file1Id));
+        log.debug("D: " + describe);
     }
 
     @Test
@@ -257,7 +264,8 @@ public class ControllersTests {
 
         String file1Id = upload1.getOutput(JsonNode.class).get("file").get("$dnanexus_link").asText();
 
-        ResponseEntity<JsonNode> describe = getForResponseEnity(PSYDUCK, "/describe/" + file1Id);
+        ResponseEntity<JsonNode> describe = getForResponseEnity(PSYDUCK, String.format("/sample/%s/describe/", file1Id));
+        log.debug("D: " + describe);
         assertTrue(describe.getStatusCode().is2xxSuccessful());
         log.info(describe.getBody());
 
