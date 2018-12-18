@@ -171,7 +171,7 @@ public class DxApiProcessManager {
         return (DXApplet) DXSearch.findDataObjects().nameMatchesExactly(appletName).execute().asList().get(0);
     }
 
-    public JsonNode JSONDescribe(Integer sampleId) {
+    public JsonNode JSONDescribe(String sampleId) {
         return DXJSON.safeTreeToValue(
                 new DXHTTPRequest(DXEnvironment.create()).request("/" + sampleId + "/" + "describe",
                         new ObjectMapper().createObjectNode(), DXHTTPRequest.RetryStrategy.SAFE_TO_RETRY), JsonNode.class);

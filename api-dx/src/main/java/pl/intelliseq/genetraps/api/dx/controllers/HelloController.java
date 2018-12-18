@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 public class HelloController {
@@ -35,6 +36,11 @@ public class HelloController {
 //        return new ResponseEntity(HttpStatus.OK);
 //    }
 
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public RedirectView root(){
+        return new RedirectView("/swagger-ui.html");
+    }
+
     @RequestMapping(value = "/status", method = RequestMethod.GET, produces="image/svg+xml")
     public Resource getBadge(final HttpServletResponse response) {
     	SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
@@ -44,9 +50,9 @@ public class HelloController {
         return resource;
     }
 
-    @RequestMapping(value = "/swagger", method = RequestMethod.GET)
-    public Resource getSwagger() {
-        Resource resource = new FileSystemResource("src/main/resources/swagger/api-doc.yaml");
-        return resource;
-    }
+//    @RequestMapping(value = "/swagger", method = RequestMethod.GET)
+//    public Resource getSwagger() {
+//        Resource resource = new FileSystemResource("src/main/resources/swagger/api-doc.yaml");
+//        return resource;
+//    }
 }

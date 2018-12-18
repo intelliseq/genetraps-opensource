@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.Roles;
-import pl.intelliseq.genetraps.api.dx.SimpleUser;
+import pl.intelliseq.genetraps.api.dx.User;
 import pl.intelliseq.genetraps.api.dx.exceptions.ForbiddenException;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @Log4j2
@@ -26,7 +27,7 @@ public class PrivilegesController {
     private AuroraDBManager auroraDBManager;
 
     @RequestMapping(value = "/user/privileges", method = RequestMethod.GET)
-    public String getUserPrivileges(OAuth2Authentication auth){
+    public String getUserPrivileges(@ApiIgnore OAuth2Authentication auth){
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         ObjectNode result = new ObjectMapper().createObjectNode();
 
@@ -37,13 +38,13 @@ public class PrivilegesController {
 
     @RequestMapping(value = "/sample/{id}/grandprivileges", method = RequestMethod.POST)
     public String giveUserPriviliges(
-            OAuth2Authentication auth,
+            @ApiIgnore OAuth2Authentication auth,
             @PathVariable Integer id,
             @RequestParam Integer targetUserId,
             @RequestParam Roles role){
 
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
-        SimpleUser user = auroraDBManager.createNewSimpleUser(userId);
+        User user = auroraDBManager.getUserDetails(userId);
         Roles loggedUserRole = auroraDBManager.getUserPrivilegesToSample(user.getId(), id);
 
 

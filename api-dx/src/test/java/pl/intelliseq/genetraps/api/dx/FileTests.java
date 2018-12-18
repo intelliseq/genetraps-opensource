@@ -4,8 +4,6 @@ import com.dnanexus.DXContainer;
 import com.dnanexus.DXFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.log4j.Log4j2;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -17,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -28,11 +28,11 @@ import static org.junit.Assert.*;
 import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
 //@ActiveProfiles("test")
-public class FileTests {
+public class FileTests extends AbstractTestNGSpringContextTests {
 
     @Autowired
     Environment env;

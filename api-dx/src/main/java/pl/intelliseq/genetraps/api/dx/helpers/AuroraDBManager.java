@@ -3,7 +3,6 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -11,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import pl.intelliseq.genetraps.api.dx.Roles;
-import pl.intelliseq.genetraps.api.dx.SimpleUser;
+import pl.intelliseq.genetraps.api.dx.User;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -48,12 +47,15 @@ public class AuroraDBManager {
         User managment
      */
 
-    public SimpleUser createNewSimpleUser(Integer userId) {
-        Map<String, Object> userDetails = getUserDetails(userId);
-        return new SimpleUser((Integer) userDetails.get("UserID"), (String) userDetails.get("username"), userDetails.get("Root").equals(1));
+    public User putUserToDB(User user, String password){
+        jdbcTemplate.update("INSERT INTO Users VALUES (?, ?, ?, ?)", 0, user.getLastName(), user.getFirstName(), user.getEmail());
+        Integer userId = jdbcTemplate.queryForObject(String.format("SELECT UserID FROM Users WHERE Email = \"%s\"", user.getEmail()), Integer.class);
+        user.setId(userId);
+        jdbcTemplate.update("INSERT INTO Security VALUES (?, ?, ?, ?)", userId, user.getUserName(), password, user.getRoot()?1:0);
+        return user;
     }
 
-    public Map<String, Object> getUserDetails(Integer userId) {
+    public User getUserDetails(Integer userId) {
         SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
                 .withProcedureName("GetUserDetailsByUserID")
                 .declareParameters(new SqlParameter("UserID", Types.SMALLINT));
@@ -63,7 +65,19 @@ public class AuroraDBManager {
         Map<String, Object> inParamMap = new HashMap<>();
         inParamMap.put("UserID", userId);
 
-        return ((List<Map<String, Object>>) jdbcCall.execute(inParamMap).get("#result-set-1")).get(0);
+        Map<String, Object> map = ((List<Map<String, Object>>) jdbcCall.execute(inParamMap).get("#result-set-1")).get(0);
+
+        log.debug("User"+userId+" "+map.toString());
+        log.debug(map.get("Root").getClass());
+
+        return User.builder()
+                .withId(userId)
+                .withEmail((String) map.get("Email"))
+                .withFirstName((String) map.get("FirstName"))
+                .withLastName((String) map.get("LastName"))
+                .withUserName((String) map.get("UserName"))
+                .withRoot(map.get("Root").equals(1)).build();
+
 
     }
 
@@ -111,11 +125,9 @@ public class AuroraDBManager {
         Priviledges
      */
 
-    public Roles getUserPrivilegesToSample(Integer userId, Integer sampleID) {
-        return getUserPrivilegesToSample(createNewSimpleUser(userId), sampleID);
-    }
+    public Roles getUserPrivilegesToSample(Integer userID, Integer sampleID) {
+        User user = getUserDetails(userID);
 
-    public Roles getUserPrivilegesToSample(SimpleUser user, Integer sampleID) {
         if(user.getRoot()){
             return Roles.ADMIN;
         }
@@ -141,10 +153,8 @@ public class AuroraDBManager {
     }
 
     public Map<Integer, Roles> getUserPrivileges(Integer userID) {
-        return getUserPrivileges(createNewSimpleUser(userID));
-    }
+        User user = getUserDetails(userID);
 
-    public Map<Integer, Roles> getUserPrivileges(SimpleUser user) {
         if (user.getRoot()) {
             return getRootPrivileges();
         }

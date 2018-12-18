@@ -7,14 +7,14 @@ import com.dnanexus.DXJSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
@@ -26,11 +26,11 @@ import java.util.stream.IntStream;
 import static org.junit.Assert.assertEquals;
 
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
 @ActiveProfiles("test")
-public class ApiDxTest {
+public class ApiDxTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     FilesManager filesManager;
