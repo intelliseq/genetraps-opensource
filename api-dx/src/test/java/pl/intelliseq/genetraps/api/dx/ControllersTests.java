@@ -16,6 +16,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.testng.annotations.Test;
@@ -153,8 +154,9 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     @Autowired
     private MockMvc mockMvc;
 
+
     @Test
-    public void propertiesAndFileUploadTest(){
+    public void propertiesAndFileUploadTest() {
         Integer sampleId = mkDir();
         try {
             MockMultipartFile multipartFile = new MockMultipartFile("file","multipart", "text/plain", "multipartTest - good".getBytes());
@@ -165,7 +167,8 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
                     .param("newfilename", "multipartTest")
                     .param("tag", "tag1")
                     .param("tag", "tag2"))
-                    .andReturn().getResponse().getContentAsString()
+                            .andExpect(MockMvcResultMatchers.status().isAccepted())
+                            .andReturn().getResponse().getContentAsString()
             ).get("id").textValue();
             assertThat(response, Matchers.matchesPattern("file-\\w*"));
             log.info(response);
@@ -176,17 +179,18 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
                     mockMvc.perform(MockMvcRequestBuilders.post(String.format("/sample/%s/properties", sampleId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonString).header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
-                    .andReturn().getResponse().getContentAsString()
+                            .andExpect(MockMvcResultMatchers.status().isCreated())
+                            .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
-            log.info(response);
+            log.info("POST(new): " + response);
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.get(String.format("/sample/%s/properties", sampleId))
                     .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
-                    .andReturn().getResponse().getContentAsString()
+                            .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
-            log.info(response);
+            log.info("GET: " + response);
 
             String jsonStringPost = "{\"third\":\"good\"}";
             response = new ObjectMapper().readTree(
@@ -194,10 +198,11 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonStringPost)
                     .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
-                    .andReturn().getResponse().getContentAsString()
+                            .andExpect(MockMvcResultMatchers.status().isCreated())
+                            .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\",\"third\":\"good\"\\}"));
-            log.info(response);
+            log.info("POST(add): " + response);
 
             String jsonStringPut = "{\"second\":\"ok\"}";
             response = new ObjectMapper().readTree(
@@ -205,10 +210,10 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonStringPut)
                     .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
-                    .andReturn().getResponse().getContentAsString()
+                            .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"ok\",\"third\":\"good\"\\}"));
-            log.info(response);
+            log.info("PUT: " + response);
 
             String jsonStringDelete = "{\"second\":\"ok\"}";
             response = new ObjectMapper().readTree(
@@ -216,10 +221,10 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonStringDelete)
                     .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
-                    .andReturn().getResponse().getContentAsString()
+                            .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"third\":\"good\"\\}"));
-            log.info(response);
+            log.info("DELETE: " + response);
         } catch (Exception e) {
             e.printStackTrace();
         }

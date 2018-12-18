@@ -81,6 +81,7 @@ public class FilesController {
     }
 
     @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public String upload(
             @ApiIgnore OAuth2Authentication auth,
             @RequestParam String url,
@@ -96,14 +97,15 @@ public class FilesController {
 
     // document me change in master:readme
     @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public String uploadfile(
             @PathVariable Integer id,
             @RequestParam MultipartFile file,
             @RequestParam(required = false) String newfilename,
-            @RequestParam(value = "tag", required = false) List<String> tags) {
+            @RequestParam(required = false) List<String> tag) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", processManager.runUploadFile(file, id, newfilename, tags)).toString();
+            return new ObjectMapper().createObjectNode().put("id", processManager.runFileUpload(file, id, newfilename, tag)).toString();
         } catch (IOException e) {
             return new ObjectMapper().createObjectNode().put("id", "").toString();
         }
@@ -125,10 +127,12 @@ public class FilesController {
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
     public String samplePropertiesPost(
             @PathVariable Integer id,
             @RequestBody LinkedHashMap<String, String> properties) {
         try {
+            //return new ResponseEntity<>(processManager.propertiesPost(id, properties), HttpStatus.CREATED).toString();
             return processManager.propertiesPost(id, properties).toString();
         } catch(PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();

@@ -39,8 +39,6 @@ echo $LOG_PREFIX "logging to ecr..."
 echo $LOG_PREFIX $LOG_APP "ecs-cli configuring"
 ecs-cli configure --cluster genetraps --default-launch-type FARGATE --region us-east-1 --config-name genetraps
 
-source scripts/decrypt.sh secret-data/test.zip.enc
-cat secret-data/decrypted/test.txt
 
 #############################
 ### BUILDING CLIENT_INDEX ###
@@ -206,6 +204,30 @@ else
             --timeout 1
 fi
 
+################################
+### TESTS  #####################
+################################
+
+source scripts/decrypt.sh secret-data/test.zip.enc
+if [[ -f secret-data/decrypted/test.txt && "test szyfrowania" = `cat secret-data/decrypted/test.txt` ]]; then
+  cat secret-data/decrypted/test.txt
+elif [[ ! -f secret-data/decrypted/test.txt ]]; then
+  echo "decrypted file does not exist"
+  exit 1
+else
+  echo "decryption is not correct"
+  exit 1
+fi
+
+REFRESH_TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded"  --data "grant_type=password&username=$STAGING_USERNAME&password=$STAGING_PASSWORD" | jq -r ".refresh_token")
+TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded" --data "grant_type=refresh_token&refresh_token=$REFRESH_TOKEN" | jq -r ".access_token")
+STATUS=$(curl -H "Authorization: Bearer $TOKEN" http://genetraps.intelliseq.pl:8086/secure-hello | jq -r ".status")
+if [[ "$STATUS" = "ok" ]]; then
+  echo "auth token - ok"
+else
+  echo "auth token - failure"
+  exit 1
+fi
 
 
 

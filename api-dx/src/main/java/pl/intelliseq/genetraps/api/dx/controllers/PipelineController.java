@@ -2,10 +2,8 @@ package pl.intelliseq.genetraps.api.dx.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 
 @RestController
@@ -15,6 +13,7 @@ public class PipelineController {
     private DxApiProcessManager processManager;
 
     @RequestMapping(value = "/fastqc", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public String fastqc(@RequestParam String fileId) {
         return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
     }
@@ -26,12 +25,14 @@ public class PipelineController {
 //    }
 
     @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"sampleId"})
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public String bwa(
             @RequestParam Integer sampleId) {
         return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(sampleId).getId()).toString();
     }
 
     @RequestMapping(value = "/gatkhc", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public String gatkhc(
             @RequestParam Integer sampleId,
             @RequestParam(required = false) String interval) {
