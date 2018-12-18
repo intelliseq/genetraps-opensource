@@ -26,10 +26,10 @@ public class DxApiProcessManager {
 
         boolean leftTag = Arrays.asList(tags).contains("left");
         boolean rightTag = Arrays.asList(tags).contains("right");
-        if(leftTag && rightTag) {
+        if (leftTag && rightTag) {
             throw new TagsException("both 'left' and 'right' tags cannot be used at same time");
         }
-        if(!leftTag && !rightTag) {
+        if (!leftTag && !rightTag) {
             throw new TagsException("neither 'left' nor 'right' tag was used");
         }
 
@@ -45,7 +45,7 @@ public class DxApiProcessManager {
     }
 
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newfilename, List<String> tags) throws IOException {
-        if(newfilename == null) {
+        if (newfilename == null) {
             newfilename = mfile.getOriginalFilename();
         }
 
@@ -54,14 +54,13 @@ public class DxApiProcessManager {
                 .setName(newfilename).setFolder(String.format("/samples/%s/rawdata", sampleId.toString()))
                 .setProject(DXContainer.getInstance(env.getProperty("dx-project")));
 
-        if(tags != null)
-                filebuilder.addTags(tags);
+        if (tags != null)
+            filebuilder.addTags(tags);
 
         DXFile file;
         try {
             file = filebuilder.upload(mfile.getBytes()).build();
-        }
-        catch (ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             DXContainer.getInstance(env.getProperty("dx-project")).newFolder(String.format("/samples/%s/rawdata", sampleId.toString()), true);
             file = filebuilder.upload(mfile.getBytes()).build();
         }
@@ -114,13 +113,13 @@ public class DxApiProcessManager {
     public DXJob runBwa(Integer sampleId) {
         var input = new HashMap<>();
         List fileListLeft = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + sampleId.toString() + "/rawdata").withTag("left").execute().asList();
-        if(fileListLeft.size() != 1) {
+        if (fileListLeft.size() != 1) {
             throw new WrongNumberOfFilesException("expected: 1 with 'left' tag ; found: " + fileListLeft.size());
         }
         DXFile fastqFile1 = (DXFile) fileListLeft.get(0);
 
         List fileListRight = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + sampleId.toString() + "/rawdata").withTag("right").execute().asList();
-        if(fileListRight.size() != 1) {
+        if (fileListRight.size() != 1) {
             throw new WrongNumberOfFilesException("expected: 1 with 'right' tag ; found: " + fileListRight.size());
         }
         DXFile fastqFile2 = (DXFile) fileListRight.get(0);
@@ -148,14 +147,14 @@ public class DxApiProcessManager {
 
         String[] vcfsIds = env.getProperty("dx-vcfsgz", String[].class);
         DXFile[] vcfs = new DXFile[vcfsIds.length];
-        for(int i = 0; i < vcfs.length; i++) {
+        for (int i = 0; i < vcfs.length; i++) {
             vcfs[i] = DXFile.getInstance(vcfsIds[i]);
         }
 
         input.put("vcfs", vcfs);
         input.put("bam", bam);
         input.put("reference", ref);
-        if(interval != null)
+        if (interval != null)
             input.put("interval", interval);
 
 
@@ -182,7 +181,7 @@ public class DxApiProcessManager {
         List filesList = DXSearch.findDataObjects().inFolder(DXContainer.getInstance(env.getProperty("dx-project")), "/samples/" + sampleId.toString() + "/rawdata").execute().asList();
         Map<String, Object> responseMap = new HashMap<>();
 
-        if(filesList.size() > 0) {
+        if (filesList.size() > 0) {
             HashMap<String, Object> filesMap = new HashMap<>();
             DXFile dxFile;
             for (Object file : filesList) {
@@ -205,29 +204,28 @@ public class DxApiProcessManager {
     public JsonNode propertiesPost(Integer sampleId, LinkedHashMap<String, String> properties) throws PropertiesException {
         List propertiesFileSearch = DXSearch.findDataObjects().nameMatchesExactly("properties").inFolder(DXContainer.getInstance(env.getProperty("dx-project")), String.format("/samples/%s", sampleId.toString())).execute().asList();
         DXFile file;
-        if(propertiesFileSearch.size() == 0) {
+        if (propertiesFileSearch.size() == 0) {
             DXFile.Builder builder = DXFile.newFile().setName("properties")
                     .setFolder(String.format("/samples/%s", sampleId.toString()))
                     .putAllProperties(properties)
                     .setProject(DXContainer.getInstance(env.getProperty("dx-project")));
             try {
                 file = builder.upload(new ByteArrayInputStream("properties".getBytes(StandardCharsets.UTF_8))).build().close();
-            } catch(ResourceNotFoundException e) {
+            } catch (ResourceNotFoundException e) {
                 throw new PropertiesException(String.format("cannot exist, because sample: %d does not exist", sampleId));
             }
-        }
-        else {
+        } else {
             file = (DXFile) propertiesFileSearch.get(0);
             Map<String, String> propertiesMap = file.describe(DXDataObject.DescribeOptions.get().withProperties()).getProperties();
             List<String> existingPropertiesMap = new LinkedList<>();
             int existingPropertiesCount = 0;
-            for (String key: properties.keySet()) {
-                if(propertiesMap.containsKey(key)) {
+            for (String key : properties.keySet()) {
+                if (propertiesMap.containsKey(key)) {
                     existingPropertiesCount++;
                     existingPropertiesMap.add(key);
                 }
             }
-            if(existingPropertiesCount != 0) {
+            if (existingPropertiesCount != 0) {
                 throw new PropertiesException(String.format("already contains properties of keys: %s", existingPropertiesMap.toString()));
             } else {
                 file.putAllProperties(properties);
@@ -242,10 +240,10 @@ public class DxApiProcessManager {
         try {
             // dummy variable to tell if the folder exists -> throws an exception if it doesn't
             DXContainer.FolderContents x = DXContainer.getInstance(env.getProperty("dx-project")).listFolder(String.format("/samples/%s", sampleId.toString()));
-        } catch(ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             throw new PropertiesException(String.format("cannot exist, because sample: %d does not exist", sampleId));
         }
-        if(propertiesFileSearch.size() == 0) {
+        if (propertiesFileSearch.size() == 0) {
             throw new PropertiesException("does not exist");
         }
         DXFile file = (DXFile) propertiesFileSearch.get(0);
@@ -258,14 +256,13 @@ public class DxApiProcessManager {
         try {
             // dummy variable to tell if the folder exists -> throws an exception if it doesn't
             DXContainer.FolderContents dummy = DXContainer.getInstance(env.getProperty("dx-project")).listFolder(String.format("/samples/%s", sampleId.toString()));
-        } catch(ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             throw new PropertiesException(String.format("cannot exist, because sample: %d does not exist", sampleId));
         }
         DXFile file;
-        if(propertiesFileSearch.size() == 0) {
+        if (propertiesFileSearch.size() == 0) {
             throw new PropertiesException(String.format("does not exist in sample: %d", sampleId));
-        }
-        else {
+        } else {
             file = (DXFile) propertiesFileSearch.get(0);
             Map<String, String> propertiesMap = file.describe(DXDataObject.DescribeOptions.get().withProperties()).getProperties();
             // will remember which properties couldn't be updated
@@ -293,14 +290,13 @@ public class DxApiProcessManager {
         try {
             // dummy variable to tell if the folder exists -> throws an exception if it doesn't
             DXContainer.FolderContents dummy = DXContainer.getInstance(env.getProperty("dx-project")).listFolder(String.format("/samples/%s", sampleId.toString()));
-        } catch(ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             throw new PropertiesException(String.format("cannot exist, because sample: %d does not exist", sampleId));
         }
         DXFile file;
-        if(propertiesFileSearch.size() == 0) {
+        if (propertiesFileSearch.size() == 0) {
             throw new PropertiesException(String.format("does not exist in sample: %d", sampleId));
-        }
-        else {
+        } else {
             file = (DXFile) propertiesFileSearch.get(0);
             Map<String, String> propertiesMap = file.describe(DXDataObject.DescribeOptions.get().withProperties()).getProperties();
             // will remember which properties couldn't be deleted

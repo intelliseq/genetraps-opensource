@@ -8,7 +8,7 @@ public enum Roles {
     @Getter
     Integer id;
 
-    Roles(Integer id){
+    Roles(Integer id) {
         this.id = id;
     }
 }

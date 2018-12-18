@@ -27,7 +27,7 @@ public class PrivilegesController {
     private AuroraDBManager auroraDBManager;
 
     @RequestMapping(value = "/user/privileges", method = RequestMethod.GET)
-    public String getUserPrivileges(@ApiIgnore OAuth2Authentication auth){
+    public String getUserPrivileges(@ApiIgnore OAuth2Authentication auth) {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         ObjectNode result = new ObjectMapper().createObjectNode();
 
@@ -41,7 +41,7 @@ public class PrivilegesController {
             @ApiIgnore OAuth2Authentication auth,
             @PathVariable Integer id,
             @RequestParam Integer targetUserId,
-            @RequestParam Roles role){
+            @RequestParam Roles role) {
 
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         User user = auroraDBManager.getUserDetails(userId);
@@ -49,7 +49,7 @@ public class PrivilegesController {
 
 
 //TODO: remove exception
-        if (!loggedUserRole.equals(Roles.ADMIN)){
+        if (!loggedUserRole.equals(Roles.ADMIN)) {
             throw new ForbiddenException("User don't have permissions to share sample");
         }
 

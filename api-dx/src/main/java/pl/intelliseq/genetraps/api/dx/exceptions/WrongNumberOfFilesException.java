@@ -10,7 +10,9 @@ public class WrongNumberOfFilesException extends RuntimeException {
     }
 
     @Override
-    public String toString() { return "WrongNumberOfFiles: " + this.getMessage(); }
+    public String toString() {
+        return "WrongNumberOfFiles: " + this.getMessage();
+    }
 
     private static final long serialVersionUID = 2676890341627817594L;
 }

@@ -1,22 +1,19 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.view.RedirectView;
+
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RestController
 public class HelloController {
-	
+
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String hello() {
         return "{\"status\": \"up\"}";
@@ -37,15 +34,15 @@ public class HelloController {
 //    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public RedirectView root(){
+    public RedirectView root() {
         return new RedirectView("/swagger-ui.html");
     }
 
-    @RequestMapping(value = "/status", method = RequestMethod.GET, produces="image/svg+xml")
+    @RequestMapping(value = "/status", method = RequestMethod.GET, produces = "image/svg+xml")
     public Resource getBadge(final HttpServletResponse response) {
-    	SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-    	response.setHeader("Cache-Control", "no-cache");
-    	response.setHeader("Last-Modified", format.format(new Date()));
+        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Last-Modified", format.format(new Date()));
         Resource resource = new FileSystemResource("src/main/resources/api--dx-online-brightgreen.svg");
         return resource;
     }

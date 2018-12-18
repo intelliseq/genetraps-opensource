@@ -47,11 +47,11 @@ public class AuroraDBManager {
         User managment
      */
 
-    public User putUserToDB(User user, String password){
+    public User putUserToDB(User user, String password) {
         jdbcTemplate.update("INSERT INTO Users VALUES (?, ?, ?, ?)", 0, user.getLastName(), user.getFirstName(), user.getEmail());
         Integer userId = jdbcTemplate.queryForObject(String.format("SELECT UserID FROM Users WHERE Email = \"%s\"", user.getEmail()), Integer.class);
         user.setId(userId);
-        jdbcTemplate.update("INSERT INTO Security VALUES (?, ?, ?, ?)", userId, user.getUserName(), password, user.getRoot()?1:0);
+        jdbcTemplate.update("INSERT INTO Security VALUES (?, ?, ?, ?)", userId, user.getUserName(), password, user.getRoot() ? 1 : 0);
         return user;
     }
 
@@ -67,7 +67,7 @@ public class AuroraDBManager {
 
         Map<String, Object> map = ((List<Map<String, Object>>) jdbcCall.execute(inParamMap).get("#result-set-1")).get(0);
 
-        log.debug("User"+userId+" "+map.toString());
+        log.debug("User" + userId + " " + map.toString());
         log.debug(map.get("Root").getClass());
 
         return User.builder()
@@ -93,32 +93,32 @@ public class AuroraDBManager {
         Group managment
      */
 
-    public JsonNode getUsersGroups(Integer userId){
+    public JsonNode getUsersGroups(Integer userId) {
         return getUsersGroupsFromQuery(String.format(
                 "SELECT G.* FROM Users AS U\n" +
-                "LEFT JOIN UserGroups AS UG\n" +
-                "ON U.UserID = UG.UserID\n" +
-                "LEFT JOIN Groups AS G\n" +
-                "ON UG.GroupID = G.GroupID\n" +
-                "WHERE U.UserID = %d;", userId
+                        "LEFT JOIN UserGroups AS UG\n" +
+                        "ON U.UserID = UG.UserID\n" +
+                        "LEFT JOIN Groups AS G\n" +
+                        "ON UG.GroupID = G.GroupID\n" +
+                        "WHERE U.UserID = %d;", userId
         ));
     }
 
-    private JsonNode getUsersGroupsFromQuery(String query){
+    private JsonNode getUsersGroupsFromQuery(String query) {
         ArrayNode node = new ObjectMapper().createArrayNode();
 
         jdbcTemplate.query(query, (resultSet, rowNum) -> node.add(new ObjectMapper().createObjectNode()
-            .put("GroupID", resultSet.getInt("GroupID"))
-            .put("GroupName", resultSet.getString("GroupName"))
-            .put("Root", resultSet.getInt("Root") == 1)));
+                .put("GroupID", resultSet.getInt("GroupID"))
+                .put("GroupName", resultSet.getString("GroupName"))
+                .put("Root", resultSet.getInt("Root") == 1)));
 
         log.debug(node);
 
         return node;
     }
 
-    public Integer createGroup(String groupName, Boolean root){
-        return jdbcTemplate.update("INSERT INTO Groups VALUES (?, ?, ?)", 0, groupName, root?1:0);
+    public Integer createGroup(String groupName, Boolean root) {
+        return jdbcTemplate.update("INSERT INTO Groups VALUES (?, ?, ?)", 0, groupName, root ? 1 : 0);
     }
 
     /*
@@ -128,7 +128,7 @@ public class AuroraDBManager {
     public Roles getUserPrivilegesToSample(Integer userID, Integer sampleID) {
         User user = getUserDetails(userID);
 
-        if(user.getRoot()){
+        if (user.getRoot()) {
             return Roles.ADMIN;
         }
 

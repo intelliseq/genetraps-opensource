@@ -20,11 +20,9 @@ import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import java.io.IOException;
 
@@ -45,7 +43,7 @@ public class BeansConfiguration {
     }
 
     @Bean
-    AuroraDBManager auroraDBManager(){
+    AuroraDBManager auroraDBManager() {
         return new AuroraDBManager();
     }
 
@@ -74,7 +72,7 @@ public class BeansConfiguration {
 
     @Bean
     protected JwtAccessTokenConverter jwtTokenEnhancer() {
-        JwtAccessTokenConverter converter =  new JwtAccessTokenConverter();
+        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
         Resource resource = new ClassPathResource("public.cert");
         String publicKey = null;
         try {

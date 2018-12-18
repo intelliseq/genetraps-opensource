@@ -10,7 +10,9 @@ public class PropertiesException extends RuntimeException {
     }
 
     @Override
-    public String toString() { return "The 'properties' file: " + this.getMessage(); }
+    public String toString() {
+        return "The 'properties' file: " + this.getMessage();
+    }
 
     private static final long serialVersionUID = 2376890343328017594L;
 }

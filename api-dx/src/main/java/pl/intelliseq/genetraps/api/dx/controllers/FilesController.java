@@ -1,6 +1,5 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
-import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.Roles;
+import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
@@ -134,7 +134,7 @@ public class FilesController {
         try {
             //return new ResponseEntity<>(processManager.propertiesPost(id, properties), HttpStatus.CREATED).toString();
             return processManager.propertiesPost(id, properties).toString();
-        } catch(PropertiesException e) {
+        } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
     }

@@ -51,7 +51,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     public ResponseEntity<JsonNode> getForResponseEnity(TestUser user, String url) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer "+user.getAccessToken());
+        headers.set("Authorization", "Bearer " + user.getAccessToken());
 
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
@@ -84,7 +84,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     private DXJob.Describe upload(TestUser user, String sampleUrl, Integer sampleid, String... tags) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
+        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("url", sampleUrl);
@@ -104,7 +104,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     private DXJob.Describe fastqc(TestUser user, String fileId) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
+        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
         uploadValueMap.add("fileId", fileId);
@@ -120,7 +120,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     private DXJob.Describe bwa(TestUser user, Integer sampleid) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
+        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
         uploadValueMap.add("sampleId", sampleid.toString());
@@ -128,7 +128,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
 
         JsonNode response = this.restTemplate.postForObject("/bwa", uploadEntity, JsonNode.class);
-        log.debug("R "+response);
+        log.debug("R " + response);
         assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
 
         return waitUntilJobIsDone(response.get("id").textValue());
@@ -137,7 +137,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     private DXJob.Describe gatkhc(TestUser user, Integer sampleid, String interval) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer "+user.getAccessToken());
+        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
 
         MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
         uploadValueMap.add("sampleId", sampleid.toString());
@@ -159,14 +159,14 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     public void propertiesAndFileUploadTest() {
         Integer sampleId = mkDir();
         try {
-            MockMultipartFile multipartFile = new MockMultipartFile("file","multipart", "text/plain", "multipartTest - good".getBytes());
+            MockMultipartFile multipartFile = new MockMultipartFile("file", "multipart", "text/plain", "multipartTest - good".getBytes());
             String response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.multipart(String.format("/sample/%s/fileupload", sampleId))
-                    .file(multipartFile)
-                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken())
-                    .param("newfilename", "multipartTest")
-                    .param("tag", "tag1")
-                    .param("tag", "tag2"))
+                            .file(multipartFile)
+                            .header("Authorization", "Bearer " + PSYDUCK.getAccessToken())
+                            .param("newfilename", "multipartTest")
+                            .param("tag", "tag1")
+                            .param("tag", "tag2"))
                             .andExpect(MockMvcResultMatchers.status().isAccepted())
                             .andReturn().getResponse().getContentAsString()
             ).get("id").textValue();
@@ -177,8 +177,8 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
             log.info(jsonString);
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.post(String.format("/sample/%s/properties", sampleId))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString).header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonString).header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
                             .andExpect(MockMvcResultMatchers.status().isCreated())
                             .andReturn().getResponse().getContentAsString()
             ).toString();
@@ -186,7 +186,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
             log.info("POST(new): " + response);
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.get(String.format("/sample/%s/properties", sampleId))
-                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                            .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
                             .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"notok\"\\}"));
@@ -195,9 +195,9 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
             String jsonStringPost = "{\"third\":\"good\"}";
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.post(String.format("/sample/%s/properties", sampleId))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonStringPost)
-                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonStringPost)
+                            .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
                             .andExpect(MockMvcResultMatchers.status().isCreated())
                             .andReturn().getResponse().getContentAsString()
             ).toString();
@@ -207,9 +207,9 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
             String jsonStringPut = "{\"second\":\"ok\"}";
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.put(String.format("/sample/%s/properties", sampleId))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonStringPut)
-                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonStringPut)
+                            .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
                             .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"second\":\"ok\",\"third\":\"good\"\\}"));
@@ -218,9 +218,9 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
             String jsonStringDelete = "{\"second\":\"ok\"}";
             response = new ObjectMapper().readTree(
                     mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/sample/%s/properties", sampleId))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonStringDelete)
-                    .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonStringDelete)
+                            .header("Authorization", "Bearer " + PSYDUCK.getAccessToken()))
                             .andReturn().getResponse().getContentAsString()
             ).toString();
             assertThat(response, Matchers.matchesPattern("\\{\"first\":\"ok\",\"third\":\"good\"\\}"));
@@ -244,7 +244,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
 //BUG mkDir can faint - no sync!!!! BUG
 
     @Test
-    public void simpleUpload(){
+    public void simpleUpload() {
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
 
@@ -281,14 +281,12 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void usersGroupsTest(){
+    public void usersGroupsTest() {
         ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/groups");
         assertTrue(admin.getStatusCode().is2xxSuccessful());
         JsonNode node = admin.getBody();
         assertEquals(node.size(), 2);
     }
-
-
 
 
 }
