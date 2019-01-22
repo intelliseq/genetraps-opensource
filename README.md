@@ -122,4 +122,4 @@ curl -X DELETE -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/j
 See `.travis.yml` and `travis-script.sh` for instructions
 
 ## Endpoints
-[Endpoints](https://github.com/intelliseq/genetraps-opensource/blob/master/docs/endpoints.md)
+[Endpoints](http://genetraps.intelliseq.pl:8086/swagger-ui.html)
