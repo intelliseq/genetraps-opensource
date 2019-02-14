@@ -208,6 +208,7 @@ fi
 ### TESTS  #####################
 ################################
 
+source scripts/decrypt.sh secret-data/test.zip.enc
 if [[ ! -f secret-data/decrypted/test.txt ]]; then
   echo "error - decrypted file does not exist"
   exit 1
