@@ -36,7 +36,7 @@ public class PrivilegesController {
         return result.toString();
     }
 
-    @RequestMapping(value = "/sample/{id}/grandprivileges", method = RequestMethod.POST)
+    @RequestMapping(value = "/sample/{id}/grantPrivileges", method = RequestMethod.POST)
     public String giveUserPriviliges(
             @ApiIgnore OAuth2Authentication auth,
             @PathVariable Integer id,

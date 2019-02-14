@@ -47,7 +47,7 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).toString();
     }
 
-    @RequestMapping(value = "user/groups", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/groups", method = RequestMethod.GET)
     public String getUsersGroups(@ApiIgnore OAuth2Authentication auth) {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
 

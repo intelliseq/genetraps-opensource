@@ -35,11 +35,11 @@ public class AuroraDBManager {
     private Logger logger = LoggerFactory.getLogger(AuroraDBManager.class);
 
     @PostConstruct
-    private void postConstruct(){
+    private void postConstruct() {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public User getUser(String username){
+    public User getUser(String username) {
         return jdbcTemplate.query(
                 String.format("SELECT S.* FROM " +
                         "Security AS S " +

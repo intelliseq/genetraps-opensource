@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
+import pl.intelliseq.genetraps.api.dx.helpers.AWSApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -25,7 +27,10 @@ import java.util.List;
 public class FilesController {
 
     @Autowired
-    private DxApiProcessManager processManager;
+    private DxApiProcessManager dxApiProcessManager;
+
+    @Autowired
+    private AWSApiProcessManager awsApiProcessManager;
 
     @Autowired
     private FilesManager filesManager;
@@ -58,14 +63,36 @@ public class FilesController {
 //        String rightName = matchFileAndGetName(right, rightRegex);
 //
 //        if (leftName != null && leftName.equals(rightName)) {
-//            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
-//            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
+//            DXJob leftId = dxApiProcessManager.runUrlFetch(left, sampleNumber, tag);
+//            DXJob rightId = dxApiProcessManager.runUrlFetch(right, sampleNumber, tag);
 //
 //            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
 //        } else {
 //            throw new DxRunnerException("Incompatible files");
 //        }
 //    }
+
+    // AWS S3
+    // list objects of default bucket (see app properties) if param bucket-name absent
+    @RequestMapping(value = "/list/objects", method = RequestMethod.GET)
+    @ResponseBody
+    public String listObjects(@RequestParam(value = "bucket-name", required = false) String bucketName) {
+        if(bucketName == null)
+            log.info("bucket: default");
+        else
+            log.info("bucket: " + bucketName);
+
+        return awsApiProcessManager.runListObjects(bucketName).toString();
+    }
+
+    // AWS S3
+    @RequestMapping(value = "/sample/create/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public String createFolder(@PathVariable Integer id) {
+
+        return String.format("{\"response\":\"%s\"}", awsApiProcessManager.runCreateSample(id));
+    }
+
 
     @RequestMapping(value = "/sample/new", method = RequestMethod.GET)
     @ResponseBody
@@ -92,38 +119,40 @@ public class FilesController {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
         log.debug(userId);
 
-        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, id, tag).getId()).toString();
+        return new ObjectMapper().createObjectNode().put("id", dxApiProcessManager.runUrlFetch(url, id, tag).getId()).toString();
     }
 
-    // document me change in master:readme
+    // AWS S3
+    // for now, it requires full path to a file (todo make it more relative)
     @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String uploadfile(
             @PathVariable Integer id,
-            @RequestParam MultipartFile file,
-            @RequestParam(required = false) String newfilename,
+            @RequestParam String fullPath,
+            // TO DO make it required = false
+            @RequestParam(value = "file-name") String fileName,
             @RequestParam(required = false) List<String> tag) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", processManager.runFileUpload(file, id, newfilename, tag)).toString();
-        } catch (IOException e) {
-            return new ObjectMapper().createObjectNode().put("id", "").toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(fullPath, id, fileName, tag)).toString();
+        } catch (Exception e) {
+            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
     }
 
-    // document me change in master:endpoints,readme
     @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
     public String describe(
-            @PathVariable String id) {
-        return processManager.JSONDescribe(id).toString();
+            @PathVariable Integer id) {
+        return dxApiProcessManager.JSONDescribe(id).toString();
     }
 
-    // document me change in master:endpoints,readme
+    // AWS S3
+    // TO DO
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
     public String sampleLs(
             @PathVariable Integer id,
             @RequestParam(required = false, defaultValue = "false") boolean byNames) {
-        return processManager.sampleLs(id, byNames).toString();
+        return awsApiProcessManager.runSampleLs(id).toString();
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
@@ -132,8 +161,7 @@ public class FilesController {
             @PathVariable Integer id,
             @RequestBody LinkedHashMap<String, String> properties) {
         try {
-            //return new ResponseEntity<>(processManager.propertiesPost(id, properties), HttpStatus.CREATED).toString();
-            return processManager.propertiesPost(id, properties).toString();
+            return dxApiProcessManager.propertiesPost(id, properties).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
@@ -143,7 +171,7 @@ public class FilesController {
     public String samplePropertiesGet(
             @PathVariable Integer id) {
         try {
-            return processManager.propertiesGet(id).toString();
+            return dxApiProcessManager.propertiesGet(id).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
@@ -154,7 +182,7 @@ public class FilesController {
             @PathVariable Integer id,
             @RequestBody LinkedHashMap<String, String> properties) {
         try {
-            return processManager.propertiesPut(id, properties).toString();
+            return dxApiProcessManager.propertiesPut(id, properties).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
@@ -165,7 +193,7 @@ public class FilesController {
             @PathVariable Integer id,
             @RequestBody LinkedHashMap<String, String> properties) {
         try {
-            return processManager.propertiesDelete(id, properties).toString();
+            return dxApiProcessManager.propertiesDelete(id, properties).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }

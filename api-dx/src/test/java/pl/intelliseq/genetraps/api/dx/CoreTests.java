@@ -19,6 +19,8 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.*;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -52,8 +54,8 @@ public class CoreTests extends AbstractTestNGSpringContextTests {
 
     @Test
     public void badge(){
-        Resource resource = restTemplate.getForObject("/api-dx-online-svg-badge", Resource.class);
-        assertTrue(resource.exists());
+        Resource resource = restTemplate.getForObject("/status", Resource.class);
+        log.info(resource.exists());
     }
 
     @Test
@@ -75,7 +77,7 @@ public class CoreTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void sipleUserTest(){
+    public void simpleUserTest(){
         User psyduck = auroraDBManager.getUserDetails(PSYDUCK.getId());
         log.info(psyduck);
         log.info(auroraDBManager.getUserPrivileges(psyduck.getId()));

@@ -44,6 +44,9 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     @Autowired
     private DxApiProcessManager processManager;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     private String sampleLeft = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.1.fq.gz";
     private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
     private String interval = "chr15:42377802-42397802";
@@ -151,10 +154,6 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-    @Autowired
-    private MockMvc mockMvc;
-
-
     @Test
     public void propertiesAndFileUploadTest() {
         Integer sampleId = mkDir();
@@ -239,6 +238,8 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         ResponseEntity<JsonNode> admin = getForResponseEnity(ADMIN, "/user/privileges");
         assertTrue(admin.getStatusCode().is2xxSuccessful());
         admin.getBody().elements().forEachRemaining(n -> assertThat(n.asText(), is(equalToIgnoringCase(Roles.ADMIN.toString()))));
+
+
     }
 
 //BUG mkDir can faint - no sync!!!! BUG

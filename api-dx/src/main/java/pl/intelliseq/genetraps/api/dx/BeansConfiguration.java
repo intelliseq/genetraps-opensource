@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.util.FileCopyUtils;
+import pl.intelliseq.genetraps.api.dx.helpers.AWSApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
@@ -41,6 +42,9 @@ public class BeansConfiguration {
     DxApiProcessManager dxApiProcessManager() {
         return new DxApiProcessManager();
     }
+
+    @Bean
+    AWSApiProcessManager awsApiProcessManager() { return new AWSApiProcessManager(); }
 
     @Bean
     AuroraDBManager auroraDBManager() {

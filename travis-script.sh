@@ -17,7 +17,7 @@ dx login --token $DNANEXUS_TOKEN_TEST --noprojects
 dx select genetraps-test
 
 echo $LOG_PREFIX"Cleaning DNANEXUS test space"
- dx rm -r -a /samples/
+dx rm -r -a /samples/
 #ls dx-apps/ | xargs -I {} bash -c "dx build dx-apps/{}"
 #echo `dx ls`
 
@@ -208,15 +208,14 @@ fi
 ### TESTS  #####################
 ################################
 
-source scripts/decrypt.sh secret-data/test.zip.enc
-if [[ -f secret-data/decrypted/test.txt && "test szyfrowania" = `cat secret-data/decrypted/test.txt` ]]; then
-  cat secret-data/decrypted/test.txt
-elif [[ ! -f secret-data/decrypted/test.txt ]]; then
-  echo "decrypted file does not exist"
+if [[ ! -f secret-data/decrypted/test.txt ]]; then
+  echo "error - decrypted file does not exist"
+  exit 1
+elif [[ ! `cat secret-data/decrypted/test.txt` = "test szyfrowania" ]]; then
+  echo "error - decryption is not correct"
   exit 1
 else
-  echo "decryption is not correct"
-  exit 1
+  cat secret-data/decrypted/test.txt
 fi
 
 REFRESH_TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded"  --data "grant_type=password&username=$STAGING_USERNAME&password=$STAGING_PASSWORD" | jq -r ".refresh_token")

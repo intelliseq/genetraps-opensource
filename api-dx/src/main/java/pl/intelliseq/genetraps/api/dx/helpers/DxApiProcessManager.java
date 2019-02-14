@@ -4,6 +4,7 @@ import com.dnanexus.*;
 import com.dnanexus.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
@@ -170,7 +171,7 @@ public class DxApiProcessManager {
         return (DXApplet) DXSearch.findDataObjects().nameMatchesExactly(appletName).execute().asList().get(0);
     }
 
-    public JsonNode JSONDescribe(String sampleId) {
+    public JsonNode JSONDescribe(Integer sampleId) {
         return DXJSON.safeTreeToValue(
                 new DXHTTPRequest(DXEnvironment.create()).request("/" + sampleId + "/" + "describe",
                         new ObjectMapper().createObjectNode(), DXHTTPRequest.RetryStrategy.SAFE_TO_RETRY), JsonNode.class);
