@@ -2,23 +2,34 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.ObjectTagging;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.SetObjectTaggingRequest;
+import com.amazonaws.services.s3.model.Tag;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import lombok.extern.log4j.Log4j2;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@Log4j2
 public class AWSApiProcessManager {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private AuroraDBManager auroraDBManager;
 
     final private AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
 
@@ -42,11 +53,10 @@ public class AWSApiProcessManager {
         }
     }
 
-
-
-    public String runFileUpload(String path, Integer sampleId, String fileName, List<String> tags) throws InterruptedException {
+    public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
 
         String bucketName = env.getProperty("bucket-name");
+        String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName;
         String fileKey = String.format("samples/%s/%s", sampleId, fileName);
 
         if(s3Client.doesObjectExist(bucketName, fileKey)) {
@@ -58,13 +68,21 @@ public class AWSApiProcessManager {
                 .withS3Client(s3Client)
                 .build();
 
-        Upload upload = tm.upload(bucketName, fileKey, new File(path));
+        File file;
+        try {
+            file = new File(mfile.getOriginalFilename());
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(mfile.getBytes());
+            fos.close();
+        } catch (Exception e) {
+            throw new InterruptedException("File failed to upload #1");
+        }
+        Upload upload = tm.upload(bucketName, fileKey, file);
 
         try {
             upload.waitForCompletion();
-//            System.out.println("File uploaded");
         } catch (InterruptedException e) {
-            throw new InterruptedException("File failed to upload");
+            throw new InterruptedException("File failed to upload #2");
         }
 
         if(tags != null) {
@@ -73,11 +91,56 @@ public class AWSApiProcessManager {
             for (String tag : tags) {
                 fileTags.add(new Tag(tag, ""));
             }
-            log.info(fileTags.toString());
             s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
         }
 
         return s3Client.getObject(bucketName, fileKey).getKey();
+    }
+
+    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels) throws InterruptedException {
+
+
+        // extracts a name of wdl from workflow url, even the ones like "wdl-name.1"
+        String wdlName = workflowUrl.replaceFirst(".*/([\\w+\\.\\-]+)\\.wdl.*","$1");
+        Integer wdlId = auroraDBManager.checkWdlId(wdlName);
+        if(wdlId == null) {
+            wdlId = auroraDBManager.getLastWdlId();
+            if(wdlId == null)
+                wdlId = 1;
+            else
+                wdlId += 1;
+            auroraDBManager.putWdlToDB(wdlName);
+        }
+
+        Integer jobId = auroraDBManager.getLastJobId();
+        if(jobId == null)
+            jobId = 1;
+        else
+            jobId += 1;
+        labels.put("jobid", jobId.toString());
+
+        try {
+            HttpResponse<String> response = Unirest.post(env.getProperty("ec2-cromwell-dns"))
+                    .header("accept", "application/json")
+                    .field("workflowUrl", workflowUrl)
+                    .field("workflowInputs", workflowInputs)
+                    .field("workflowType", new ByteArrayInputStream("WDL".getBytes()), "workflowtype")
+                    .field("labels",labels)
+                    .asString();
+            String responseBody = response.getBody();
+            if(response.getStatus() / 100 != 2)
+                throw new InterruptedException(responseBody);
+            // extracts the id of job like "7ab0-afd9" and similar
+            String cromwellId = responseBody.replaceFirst(".*id\":\"([a-zA-Z0-9\\-]+)\".*", "$1");
+
+            auroraDBManager.putJobToDB(userId, wdlId, cromwellId, labels.getInt("sampleid"));
+
+            return responseBody;
+
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            throw new InterruptedException(e.getMessage());
+        }
     }
 
     public List<String> runListObjects(String bucketName) {

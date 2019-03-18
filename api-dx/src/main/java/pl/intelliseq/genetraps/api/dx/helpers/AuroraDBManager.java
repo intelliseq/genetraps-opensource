@@ -3,10 +3,13 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import pl.intelliseq.genetraps.api.dx.Roles;
@@ -14,6 +17,8 @@ import pl.intelliseq.genetraps.api.dx.User;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +51,31 @@ public class AuroraDBManager {
     /*
         User managment
      */
+
+    public Integer getLastJobId() {
+        String sql = "SELECT MAX(JobID) AS JobID FROM Jobs";
+        return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("JobID") : null);
+//        return jdbcTemplate.queryForObject("SELECT MAX(JobID) FROM Jobs", Integer.class);
+    }
+
+    public Integer checkWdlId(String wdlName) {
+        String sql = String.format("SELECT WdlID FROM Wdls WHERE WdlName = \"%s\"", wdlName);
+        return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("WdlID") : null);
+//        return jdbcTemplate.queryForObject(String.format("SELECT WdlID FROM Wdls WHERE WdlName = \"%s\"", wdlName), Integer.class);
+    }
+
+    public Integer getLastWdlId() {
+        String sql = String.format("SELECT MAX(WdlID) AS WdlID FROM Wdls");
+        return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("WdlID") : null);
+    }
+
+    public void putJobToDB(Integer userId, Integer wdlId, String cromwellId, Integer sampleId) {
+        jdbcTemplate.update("INSERT INTO Jobs VALUES (?, ?, ?, ?, ?)", 0, userId, wdlId, cromwellId, sampleId);
+    }
+
+    public void putWdlToDB(String wdlName) {
+        jdbcTemplate.update("INSERT INTO Wdls VALUES (?, ?)", 0, wdlName);
+    }
 
     public User putUserToDB(User user, String password) {
         jdbcTemplate.update("INSERT INTO Users VALUES (?, ?, ?, ?)", 0, user.getLastName(), user.getFirstName(), user.getEmail());

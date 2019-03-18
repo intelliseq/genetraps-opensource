@@ -2,6 +2,7 @@ package pl.intelliseq.genetraps.api.dx.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,6 @@ import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -71,6 +70,22 @@ public class FilesController {
 //            throw new DxRunnerException("Incompatible files");
 //        }
 //    }
+
+    // AWS S3
+    @RequestMapping(value = "/wdl", method = RequestMethod.POST)
+    @ResponseBody
+    public String wdl(
+            @ApiIgnore OAuth2Authentication auth,
+            @RequestParam String workflowUrl,
+            @RequestParam JSONObject workflowInputs,
+            @RequestParam JSONObject labels) {
+        try {
+            Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+            return awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels);
+        } catch (Exception e) {
+            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
+        }
+    }
 
     // AWS S3
     // list objects of default bucket (see app properties) if param bucket-name absent
@@ -127,14 +142,13 @@ public class FilesController {
     @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String uploadfile(
+            @RequestParam MultipartFile mfile,
             @PathVariable Integer id,
-            @RequestParam String fullPath,
-            // TO DO make it required = false
-            @RequestParam(value = "file-name") String fileName,
+            @RequestParam(value = "file-name", required = false) String fileName,
             @RequestParam(required = false) List<String> tag) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(fullPath, id, fileName, tag)).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(mfile, id, fileName, tag)).toString();
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -147,7 +161,6 @@ public class FilesController {
     }
 
     // AWS S3
-    // TO DO
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
     public String sampleLs(
             @PathVariable Integer id,
