@@ -33,8 +33,6 @@ public class AWSApiProcessManager {
 
     final private AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
 
-    // one should be aware that in aws s3 there's no concept of folder-file system, it's more like a tree of keys
-    // (but it can be simplified to thinking about it as about folders and files)
     public String runCreateSample(Integer sampleId) {
 
         String bucketName = env.getProperty("bucket-name");
@@ -42,7 +40,8 @@ public class AWSApiProcessManager {
 
         if (!s3Client.doesObjectExist(bucketName, sampleFolder)) {
 
-            s3Client.copyObject(bucketName, "samples/0/", bucketName, sampleFolder);
+            s3Client.putObject(bucketName, sampleFolder, "");
+//            s3Client.copyObject(bucketName, "samples/0/", bucketName, sampleFolder);
 
 //            return s3Client.getObject(bucketName, sampleId.toString()).getKey();
             return sampleId.toString();
@@ -70,7 +69,8 @@ public class AWSApiProcessManager {
 
         File file;
         try {
-            file = new File(mfile.getOriginalFilename());
+            file = new File(System.currentTimeMillis()+"fileupload");
+//            file = new File(mfile.getOriginalFilename());
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(mfile.getBytes());
             fos.close();
@@ -84,6 +84,7 @@ public class AWSApiProcessManager {
         } catch (InterruptedException e) {
             throw new InterruptedException("File failed to upload #2");
         }
+        file.delete();
 
         if(tags != null) {
 //            GetObjectTaggingResult getTaggingResult = s3Client.getObjectTagging(new GetObjectTaggingRequest(bucketName, fileKey));

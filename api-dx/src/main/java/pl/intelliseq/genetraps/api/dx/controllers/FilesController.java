@@ -138,7 +138,6 @@ public class FilesController {
     }
 
     // AWS S3
-    // for now, it requires full path to a file (todo make it more relative)
     @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String uploadfile(
