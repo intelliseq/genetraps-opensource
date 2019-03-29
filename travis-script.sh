@@ -155,6 +155,9 @@ else
     echo "      - AURORA_GENETRAPS_CLIENT_PASSWD" >> docker-compose.yml
     echo "      - AURORA_GENETRAPS_CLIENT_LOGIN" >> docker-compose.yml
     echo "      - DNANEXUS_TOKEN_TEST" >> docker-compose.yml
+    echo "      - AWS_REGION" >> docker-compose.yml
+    echo "      - AWS_ACCESS_KEY_ID" >> docker-compose.yml
+    echo "      - AWS_SECRET_ACCESS_KEY" >> docker-compose.yml
     echo $LOG_PREFIX $LOG_APP "ecs-cli composing api-dx"
     ecs-cli compose \
         --project-name genetraps-api-dx \
