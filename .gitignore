@@ -201,3 +201,5 @@ gradle-app.setting
 # Decrypted
 secret-data/decrypted
 
+
+api-dx/src/main/resources/for-reference/

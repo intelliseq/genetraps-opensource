@@ -12,9 +12,11 @@ import com.amazonaws.services.s3.transfer.Upload;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -31,25 +33,15 @@ public class AWSApiProcessManager {
     @Autowired
     private AuroraDBManager auroraDBManager;
 
+    @Autowired
+    private FilesManager filesManager;
+
     final private AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
 
-    public String runCreateSample(Integer sampleId) {
+    public void runCreateSample(Integer sampleId) {
 
         String bucketName = env.getProperty("bucket-name");
-        String sampleFolder = String.format("samples/%s/", sampleId);
-
-        if (!s3Client.doesObjectExist(bucketName, sampleFolder)) {
-
-            s3Client.putObject(bucketName, sampleFolder, "");
-//            s3Client.copyObject(bucketName, "samples/0/", bucketName, sampleFolder);
-
-//            return s3Client.getObject(bucketName, sampleId.toString()).getKey();
-            return sampleId.toString();
-        }
-        else {
-            // can be changed to returning empty string if a sample of given id already exists (but what with the case of failed creation?)
-            return "A sample with given id already exists";
-        }
+        s3Client.putObject(bucketName, String.format("samples/%s/", sampleId), "");
     }
 
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
@@ -95,51 +87,47 @@ public class AWSApiProcessManager {
             s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
         }
 
+        // to do CAN it be just bucketname/filekey? to check-change
         return s3Client.getObject(bucketName, fileKey).getKey();
     }
 
-    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels) throws InterruptedException {
-
+    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject relevantOutput) throws InterruptedException {
 
         // extracts a name of wdl from workflow url, even the ones like "wdl-name.1"
         String wdlName = workflowUrl.replaceFirst(".*/([\\w+\\.\\-]+)\\.wdl.*","$1");
         Integer wdlId = auroraDBManager.checkWdlId(wdlName);
+        // TODO wdl-table empty row bug to fix
         if(wdlId == null) {
-            wdlId = auroraDBManager.getLastWdlId();
-            if(wdlId == null)
-                wdlId = 1;
-            else
-                wdlId += 1;
-            auroraDBManager.putWdlToDB(wdlName);
+            try {
+                auroraDBManager.putWdlToDB(wdlName);
+            } catch (DataIntegrityViolationException e) {
+                wdlId = auroraDBManager.checkWdlId(wdlName);
+            }
         }
 
-        Integer jobId = auroraDBManager.getLastJobId();
-        if(jobId == null)
-            jobId = 1;
-        else
-            jobId += 1;
-        labels.put("jobid", jobId.toString());
-
         try {
+            String responseBody;
+            String toHash = String.format("%d%d", userId, System.currentTimeMillis());
+            String jobId = DigestUtils.md5Hex(toHash);
+            labels.put("jobId", jobId);
+
             HttpResponse<String> response = Unirest.post(env.getProperty("ec2-cromwell-dns"))
                     .header("accept", "application/json")
                     .field("workflowUrl", workflowUrl)
                     .field("workflowInputs", workflowInputs)
                     .field("workflowType", new ByteArrayInputStream("WDL".getBytes()), "workflowtype")
-                    .field("labels",labels)
+                    .field("labels", labels)
                     .asString();
-            String responseBody = response.getBody();
-            if(response.getStatus() / 100 != 2)
+            responseBody = response.getBody();
+            if (response.getStatus() / 100 != 2)
                 throw new InterruptedException(responseBody);
-            // extracts the id of job like "7ab0-afd9" and similar
-            String cromwellId = responseBody.replaceFirst(".*id\":\"([a-zA-Z0-9\\-]+)\".*", "$1");
 
-            auroraDBManager.putJobToDB(userId, wdlId, cromwellId, labels.getInt("sampleid"));
-
+            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), relevantOutput);
             return responseBody;
 
         } catch (UnirestException e) {
-            e.printStackTrace();
+            throw new InterruptedException(e.getMessage());
+        } catch (Exception e) {
             throw new InterruptedException(e.getMessage());
         }
     }
@@ -154,19 +142,18 @@ public class AWSApiProcessManager {
         List<String> objects = new ArrayList<>();
         for (S3ObjectSummary object : objectSummaries) {
             objects.add("" + object.getKey());
-        };
-
+        }
         return objects;
     }
 
     public List<String> runSampleLs(Integer sampleId) {
 
         List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(env.getProperty("bucket-name"), String.format("samples/%s/", sampleId)).getObjectSummaries();
+        objectSummaries.remove(0);  // removes id of sample directory
         List<String> objects = new ArrayList<>();
         for (S3ObjectSummary object : objectSummaries) {
-            objects.add("" + object.getKey());
-        };
-
+            objects.add(object.getKey());
+        }
         return objects;
     }
 }

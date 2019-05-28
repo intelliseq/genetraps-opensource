@@ -3,21 +3,22 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j2;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.User;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 public class AuroraDBManager {
-
 
     @Autowired
     private Environment env;
@@ -48,34 +48,44 @@ public class AuroraDBManager {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    /*
-        User managment
-     */
+    public SqlRowSet checkJobsStatus() {
+        String sql = "SELECT JobId, SampleId, Output FROM Jobs WHERE JobStatus = 0";
+        // columns like: 1, 2, 3, ...
+        // so not so much programmer..
+        return jdbcTemplate.queryForRowSet(sql);
+    }
 
-    public Integer getLastJobId() {
-        String sql = "SELECT MAX(JobID) AS JobID FROM Jobs";
-        return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("JobID") : null);
-//        return jdbcTemplate.queryForObject("SELECT MAX(JobID) FROM Jobs", Integer.class);
+    public void updateJobsStatus(List<String> toUpdate) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        jdbcTemplate.batchUpdate("UPDATE Jobs SET JobStatus = 1 WHERE JobID = ?", new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, toUpdate.get(i));
+            }
+            @Override
+            public int getBatchSize() {
+                return toUpdate.size();
+            }
+        });
     }
 
     public Integer checkWdlId(String wdlName) {
         String sql = String.format("SELECT WdlID FROM Wdls WHERE WdlName = \"%s\"", wdlName);
         return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("WdlID") : null);
-//        return jdbcTemplate.queryForObject(String.format("SELECT WdlID FROM Wdls WHERE WdlName = \"%s\"", wdlName), Integer.class);
-    }
-
-    public Integer getLastWdlId() {
-        String sql = String.format("SELECT MAX(WdlID) AS WdlID FROM Wdls");
-        return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("WdlID") : null);
-    }
-
-    public void putJobToDB(Integer userId, Integer wdlId, String cromwellId, Integer sampleId) {
-        jdbcTemplate.update("INSERT INTO Jobs VALUES (?, ?, ?, ?, ?)", 0, userId, wdlId, cromwellId, sampleId);
     }
 
     public void putWdlToDB(String wdlName) {
         jdbcTemplate.update("INSERT INTO Wdls VALUES (?, ?)", 0, wdlName);
     }
+
+    //TODO or to put output json in wdl table?
+    public void putJobToDB(String jobId, Integer userId, Integer wdlId, Integer jobStatus, Integer sampleId, JSONObject output) {
+        jdbcTemplate.update("INSERT INTO Jobs VALUES (?, ?, ?, ?, ?, ?)", jobId, userId, wdlId, jobStatus, sampleId, output.toString());
+    }
+
+    /*
+        User management
+     */
 
     public User putUserToDB(User user, String password) {
         jdbcTemplate.update("INSERT INTO Users VALUES (?, ?, ?, ?)", 0, user.getLastName(), user.getFirstName(), user.getEmail());

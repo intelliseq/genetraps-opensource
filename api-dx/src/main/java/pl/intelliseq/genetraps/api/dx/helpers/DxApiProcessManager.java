@@ -69,11 +69,7 @@ public class DxApiProcessManager {
     }
 
     public void runMkDir(Integer sampleId) {
-        runMkDir(sampleId.toString());
-    }
-
-    public void runMkDir(String sampleId) {
-        DXContainer.getInstance(env.getProperty("dx-project")).newFolder("/samples/" + sampleId, true);
+        DXContainer.getInstance(env.getProperty("dx-project")).newFolder(String.format("/samples/%s", sampleId), true);
     }
 
     public DXJob runFastqc(String fileId) {

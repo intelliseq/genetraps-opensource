@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 import pl.intelliseq.genetraps.api.dx.helpers.AWSApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
@@ -78,10 +77,13 @@ public class FilesController {
             @ApiIgnore OAuth2Authentication auth,
             @RequestParam String workflowUrl,
             @RequestParam JSONObject workflowInputs,
-            @RequestParam JSONObject labels) {
+            @RequestParam JSONObject labels,
+            @RequestParam(name = "req-out") JSONObject requestedOutputs) {
         try {
+            if(requestedOutputs.length() == 0)
+                throw new Exception("No requested output set");
             Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
-            return awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels);
+            return awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs);
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -101,25 +103,18 @@ public class FilesController {
     }
 
     // AWS S3
-    @RequestMapping(value = "/sample/create/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/sample/create", method = RequestMethod.GET)
     @ResponseBody
-    public String createFolder(@PathVariable Integer id) {
-
-        return String.format("{\"response\":\"%s\"}", awsApiProcessManager.runCreateSample(id));
-    }
-
-
-    @RequestMapping(value = "/sample/new", method = RequestMethod.GET)
-    @ResponseBody
-    public String mkDir(@ApiIgnore OAuth2Authentication auth) {
-        log.debug("mkdir");
+    public String createFolder(@ApiIgnore OAuth2Authentication auth) {
         Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+//        Integer sampleId = awsApiProcessManager.runCreateSample();
 
         Integer sampleId = filesManager.mkdir();
 
-        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
+        //TO DO make creating samples synchronized with DB i.e. setUserPrivilegesToSample and removing it
+//        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
 
-        return String.format("{\"response\":%s}", sampleId);
+        return String.format("{\"response\":\"%s\"}", sampleId);
     }
 
     @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
@@ -153,18 +148,32 @@ public class FilesController {
         }
     }
 
-    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
-    public String describe(
-            @PathVariable Integer id) {
-        return dxApiProcessManager.JSONDescribe(id).toString();
-    }
-
     // AWS S3
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
     public String sampleLs(
             @PathVariable Integer id,
             @RequestParam(required = false, defaultValue = "false") boolean byNames) {
         return awsApiProcessManager.runSampleLs(id).toString();
+    }
+
+//    // DX
+//    @RequestMapping(value = "/sample/new", method = RequestMethod.GET)
+//    @ResponseBody
+//    public String mkDir(@ApiIgnore OAuth2Authentication auth) {
+//        log.debug("mkdir");
+//        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+//
+//        Integer sampleId = filesManager.mkdir();
+//
+//        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
+//
+//        return String.format("{\"response\":%s}", sampleId);
+//    }
+
+    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
+    public String describe(
+            @PathVariable Integer id) {
+        return dxApiProcessManager.JSONDescribe(id).toString();
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
