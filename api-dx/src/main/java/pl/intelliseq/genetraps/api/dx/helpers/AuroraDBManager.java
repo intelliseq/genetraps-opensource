@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.User;
 
@@ -48,25 +47,11 @@ public class AuroraDBManager {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public SqlRowSet checkJobsStatus() {
-        String sql = "SELECT JobId, SampleId, Output FROM Jobs WHERE JobStatus = 0";
+    public List<String> getJobsWithStatusNotYetSucceded() {
+        String sql = "SELECT JobID FROM Jobs WHERE JobStatus = 0";
         // columns like: 1, 2, 3, ...
         // so not so much programmer..
-        return jdbcTemplate.queryForRowSet(sql);
-    }
-
-    public void updateJobsStatus(List<String> toUpdate) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        jdbcTemplate.batchUpdate("UPDATE Jobs SET JobStatus = 1 WHERE JobID = ?", new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setString(1, toUpdate.get(i));
-            }
-            @Override
-            public int getBatchSize() {
-                return toUpdate.size();
-            }
-        });
+        return jdbcTemplate.queryForList(sql, String.class);
     }
 
     public Integer checkWdlId(String wdlName) {
@@ -78,7 +63,6 @@ public class AuroraDBManager {
         jdbcTemplate.update("INSERT INTO Wdls VALUES (?, ?)", 0, wdlName);
     }
 
-    //TODO or to put output json in wdl table?
     public void putJobToDB(String jobId, Integer userId, Integer wdlId, Integer jobStatus, Integer sampleId, JSONObject output) {
         jdbcTemplate.update("INSERT INTO Jobs VALUES (?, ?, ?, ?, ?, ?)", jobId, userId, wdlId, jobStatus, sampleId, output.toString());
     }

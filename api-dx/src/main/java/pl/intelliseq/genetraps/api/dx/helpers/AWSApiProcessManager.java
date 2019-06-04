@@ -62,7 +62,6 @@ public class AWSApiProcessManager {
         File file;
         try {
             file = new File(System.currentTimeMillis()+"fileupload");
-//            file = new File(mfile.getOriginalFilename());
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(mfile.getBytes());
             fos.close();
