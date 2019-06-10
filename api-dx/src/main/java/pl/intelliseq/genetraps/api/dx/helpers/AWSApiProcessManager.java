@@ -122,7 +122,7 @@ public class AWSApiProcessManager {
                 throw new InterruptedException(responseBody);
 
             auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), relevantOutput);
-            return responseBody;
+            return jobId;
 
         } catch (UnirestException e) {
             throw new InterruptedException(e.getMessage());

@@ -83,7 +83,7 @@ public class FilesController {
             if(requestedOutputs.length() == 0)
                 throw new Exception("No requested output set");
             Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
-            return awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs);
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs)).toString();
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
