@@ -1,7 +1,7 @@
 version: '2'
 services:
   api-dx:
-    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:6df60912c0496b2bdbbb50292b460643
+    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:aa61cb994062b1590e5754cc680b5dee
     ports:
       - "8086:8086"
     logging:
@@ -14,3 +14,6 @@ services:
       - AURORA_GENETRAPS_CLIENT_PASSWD
       - AURORA_GENETRAPS_CLIENT_LOGIN
       - DNANEXUS_TOKEN_TEST
+      - AWS_REGION
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY

@@ -84,7 +84,7 @@ fi
 
 LOG_APP="api-security: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
-API_SECURITY_CHECKSUM=`find api-security -type f -exec md5sum {} \; | sort -k 2 | grep -P "/src/|Readme" | md5sum | sed 's/  -//g'`
+API_SECURITY_CHECKSUM=`find api-security -type f -exec md5sum {} \; | sort -k 2 | grep -E "/src/|Readme" | md5sum | sed 's/  -//g'`
 API_SECURITY_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-security:"$API_SECURITY_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $API_SECURITY_TAG
 #docker pull $API_SECURITY_TAG
@@ -132,7 +132,7 @@ fi
 
 LOG_APP="api-dx: "
 echo $LOG_PREFIX $LOG_APP "setting tag"
-API_DX_CHECKSUM=`find api-dx -type f -exec md5sum {} \; | sort -k 2 | grep -P "/src/|Readme" | md5sum | sed 's/  -//g'`
+API_DX_CHECKSUM=`find api-dx -type f -exec md5sum {} \; | sort -k 2 | grep -E "/src/|Readme" | md5sum | sed 's/  -//g'`
 API_DX_TAG=$AWS_ACCOUNT_ID".dkr.ecr."$AWS_REGION".amazonaws.com/genetraps-api-dx:"$API_DX_CHECKSUM
 echo $LOG_PREFIX $LOG_APP $API_DX_TAG
 #docker pull $API_DX_TAG
@@ -141,11 +141,11 @@ if [ $API_DX_EXISTS -eq 1 ]; then
     echo $LOG_PREFIX"docker image already exists"
 else
     echo $LOG_PREFIX"building new image"
-    gradle build -q -p api-dx -x test
+    gradle build -p api-dx -x test
     cp `ls api-dx/build/libs/api-dx*` api-dx/build/libs/app.jar
-    docker build api-dx/ -t $API_DX_TAG -q
+    docker build api-dx/ -t $API_DX_TAG
     echo $LOG_PREFIX $LOG_APP "dx tag: " $API_DX_TAG
-    docker push $API_DX_TAG | cat
+    docker push $API_DX_TAG #| cat
     cat aws-conf/docker-compose-template.yml | \
         sed 's@appTag@'"api-dx"'@' | \
         sed 's@imageTag@'"$API_DX_TAG"'@' | \
