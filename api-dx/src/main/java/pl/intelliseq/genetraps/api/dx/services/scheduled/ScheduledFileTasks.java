@@ -47,18 +47,19 @@ public class ScheduledFileTasks {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void deleteAllObjectsWithPrefix(String prefix) {
+    public void deleteAllObjectsWithPrefix(String bucket, String prefix) {
         List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(env.getProperty("bucket-name"), prefix).getObjectSummaries();
         List<String> objects = new ArrayList<>();
         for (S3ObjectSummary object : objectSummaries) {
             objects.add(object.getKey());
         }
-        s3Client.deleteObjects(new DeleteObjectsRequest(env.getProperty("bucket-name")).withKeys(objects.toArray(new String[0])));
+        s3Client.deleteObjects(new DeleteObjectsRequest(bucket).withKeys(objects.toArray(new String[0])));
     }
 
+    // TODO: make cron delete given record and all its workflow output if e.g. number of failed tries reaches 3/5/...
     @Scheduled(cron = "0 */5 * * * *")
-    public synchronized void checkForOutput() {
-        log.info("||| checkForNewData");
+    private synchronized void checkForOutput() {
+        log.info("||| checkForOutput");
         String bucket = env.getProperty("bucket-name");
         if(s3Client.listObjectsV2(bucket, "cromwell-execution/").getKeyCount() > 0) {
 
@@ -73,7 +74,7 @@ public class ScheduledFileTasks {
                     pscf.setUpdatableResults(true);
 //                    pscf.setResultSetType(ResultSet.TYPE_FORWARD_ONLY);
 
-                    RowCallbackHandler rch = resultSet -> {
+                    RowCallbackHandler rowHandler = resultSet -> {
                         try {
                             // query to cromwell to get details about job with 'jobId' as a label
                             HttpResponse<JsonNode> response = Unirest
@@ -92,8 +93,6 @@ public class ScheduledFileTasks {
                             }
 
                             String cromwellId = jobDetails.getString("id");
-                            String sampleId = resultSet.getString("SampleID");
-                            JSONObject requestedOutputs = new JSONObject(resultSet.getString("Output"));
 
                             // get the outputs of the job's workflow
                             response = Unirest
@@ -102,27 +101,28 @@ public class ScheduledFileTasks {
                                     .asJson();
                             if (response.getStatus() / 100 != 2)
                                 throw new Exception(response.getStatusText());
-                            JSONObject availableOutputs = response.getBody().getObject().getJSONObject("outputs");
 
-                            Iterator<String> outputKeys = requestedOutputs.keys();
-                            String outputLink, outputKey;
+                            JSONObject availableOutputs = response.getBody().getObject().getJSONObject("outputs");
+                            JSONObject requestedOutputs = new JSONObject(resultSet.getString("Output"));
 
                             // move the requested outputs to sample directory of given sampleId
-                            // TODO make nested try-catch to take care of s3client errors while moving objects
-                            while (outputKeys.hasNext()) {
-                                outputLink = outputKeys.next();
-                                outputKey = availableOutputs.getString(outputLink).replaceFirst(".*/(cromwell-execution/.*)", "$1");
-                                s3Client.copyObject(bucket, outputKey, bucket, String.format("samples/%s/%s", sampleId, requestedOutputs.getString(outputLink)));
-                                s3Client.deleteObject(bucket, outputKey);
-                            }
+                            moveObjectsWithJSON(bucket, availableOutputs, requestedOutputs, "samples/" + resultSet.getString("SampleID"));
+
                             // delete remaining outputs of a workflow
-                            deleteAllObjectsWithPrefix(String.format("cromwell-execution/%s/%s/", jobDetails.getString("name"), cromwellId));
+                            deleteAllObjectsWithPrefix(bucket, String.format("cromwell-execution/%s/%s/", jobDetails.getString("name"), cromwellId));
 
                             log.info(resultSet.getInt("JobStatus"));
                             resultSet.updateInt("JobStatus", 1);
 
                         } catch (Exception e) {
                             log.info(e.getMessage());
+                            try {
+                                moveToDebug(bucket, "debug", e.getMessage(), resultSet.getString("JobID"));
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                            resultSet.updateInt("JobStatus", 2);
+
                         } finally {
                             resultSet.updateInt("SampleID", resultSet.getInt("SampleID"));  // mock update to make sure resultSet is always an updated one
                             resultSet.updateRow();
@@ -130,13 +130,64 @@ public class ScheduledFileTasks {
                     };
 
 //                    jdbcTemplate.setMaxRows(1);
-                    jdbcTemplate.query(pscf.newPreparedStatementCreator(new Object[]{jobId}), rch);
+                    jdbcTemplate.query(pscf.newPreparedStatementCreator(new Object[]{jobId}), rowHandler);
 
                 } catch (Exception e) {
                     log.info(e.getMessage());
                 }
         }
 
+    }
+
+    private void moveObjectsWithJSON(String bucket, JSONObject availableObjects, JSONObject requestedObjects, String destinationDirectory) {
+        Iterator<String> movedObjects = requestedObjects.keys();
+        String outputLink, outputKey;
+        // TODO make nested try-catch to take care of s3client errors while moving objects
+        while (movedObjects.hasNext()) {
+            outputLink = movedObjects.next();
+            outputKey = availableObjects.getString(outputLink).replaceFirst(".*/(cromwell-execution/.*)", "$1");
+            s3Client.copyObject(bucket, outputKey, bucket, String.format("%s/%s", destinationDirectory, requestedObjects.getString(outputLink)));
+            s3Client.deleteObject(bucket, outputKey);
+        }
+    }
+
+    private void moveToDebug(String sourceBucket, String debugDirectory, String errorMessage, String jobId) throws Exception {
+
+        HttpResponse<JsonNode> response = Unirest
+                .get(String.format("%s/query?label=jobId:%s", env.getProperty("ec2-cromwell-dns"), jobId))
+                .header("accept", "application/json")
+                .asJson();
+        if (response.getStatus() / 100 != 2)
+            throw new Exception(response.getStatusText());
+        JSONObject jobDetails = response.getBody().getObject().getJSONArray("results").getJSONObject(0);
+        String cromwellId = jobDetails.getString("id");
+        response = Unirest
+                .get(String.format("%s/%s/outputs", env.getProperty("ec2-cromwell-dns"), cromwellId))
+                .header("accept", "application/json")
+                .asJson();
+        if (response.getStatus() / 100 != 2)
+            throw new Exception(response.getStatusText());
+
+        JSONObject objectsToMove = response.getBody().getObject().getJSONObject("outputs");
+
+        Iterator<String> movedObjects = objectsToMove.keys();
+        String outputLink, outputKey;
+
+        while (movedObjects.hasNext()) {
+            outputLink = movedObjects.next();
+            outputKey = objectsToMove.getString(outputLink).replaceFirst(".*/(cromwell-execution/.*)", "$1");
+            log.info(outputKey);
+            //TODO: not all outputs are listed in Outputs of workflow details, need modification...
+            try {
+                s3Client.copyObject(sourceBucket, outputKey, sourceBucket, String.format("%s/%s", debugDirectory, outputKey));
+                s3Client.deleteObject(sourceBucket, outputKey);
+            } catch (Exception e) {
+                log.info("err");
+            }
+        }
+
+        // TODO: put to finally
+        s3Client.putObject(sourceBucket, jobId + "\n" + debugDirectory + "/log.err", errorMessage);
     }
 
 }
