@@ -37,11 +37,18 @@ JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl 
 -d "req-out={\"proper_name_of_desired_output_file\":\"new_name_for_the_output_file\"}" | jq -r ".id")
 ```
 (...-d "req-out={\"minimal_workflow.minimal.out\":\"new_name.out\"}" \...)
+if you want to leave the original name of output file, then leave the value in key:value of req-out empty
 
 **Status of the workflow:**
 ```bash
 curl -X GET "$AWS_ADDRESS/query?label=jobId:$JOBID" -H "accept: application/json" | jq -r ".results" | jq -r ".[].status"
 ```
+
+**To get URL link to your output file: (use the new name of output file if set)**
+```bash
+OUT=$(curl -X GET -H "Authorization: Bearer $TOKEN" localhost:8086/sample/$SAMPLEID/get/output/url?outputName=new_name.out) && echo $OUT
+```
+
 
 ## Additional
 
