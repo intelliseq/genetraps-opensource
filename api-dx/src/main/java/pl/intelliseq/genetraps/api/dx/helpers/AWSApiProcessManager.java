@@ -131,6 +131,14 @@ public class AWSApiProcessManager {
         }
     }
 
+    public String runGetOutputURL(Integer sampleId, String outputName) throws InterruptedException {
+
+        if(s3Client.doesObjectExist(env.getProperty("bucket-name"), String.format("samples/%s/%s", sampleId, outputName)))
+            return s3Client.getUrl(env.getProperty("bucket-name"), String.format("samples/%s/%s", sampleId, outputName)).toString();
+        else
+            throw new InterruptedException("There is no such an output file or your output is not ready yet");
+    }
+
     public List<String> runListObjects(String bucketName) {
 
         List<S3ObjectSummary> objectSummaries;

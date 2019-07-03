@@ -141,12 +141,13 @@ public class ScheduledFileTasks {
 
     private void moveObjectsWithJSON(String bucket, JSONObject availableObjects, JSONObject requestedObjects, String destinationDirectory) {
         Iterator<String> movedObjects = requestedObjects.keys();
-        String outputLink, outputKey;
+        String outputLink, outputKey, newName;
         // TODO make nested try-catch to take care of s3client errors while moving objects
         while (movedObjects.hasNext()) {
             outputLink = movedObjects.next();
             outputKey = availableObjects.getString(outputLink).replaceFirst(".*/(cromwell-execution/.*)", "$1");
-            s3Client.copyObject(bucket, outputKey, bucket, String.format("%s/%s", destinationDirectory, requestedObjects.getString(outputLink)));
+            newName = requestedObjects.getString(outputLink);
+            s3Client.copyObject(bucket, outputKey, bucket, String.format("%s/%s", destinationDirectory, newName.length() == 0 ? outputLink : newName));
             s3Client.deleteObject(bucket, outputKey);
         }
     }

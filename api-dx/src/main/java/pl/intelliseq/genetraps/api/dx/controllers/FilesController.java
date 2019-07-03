@@ -90,6 +90,21 @@ public class FilesController {
     }
 
     // AWS S3
+    // returns url of output file on aws s3
+    @RequestMapping(value = "/sample/{id}/get/output/url", method = RequestMethod.GET)
+    @ResponseBody
+    public String outputURL(
+            @PathVariable Integer id,
+            @RequestParam String outputName) {
+
+        try {
+            return awsApiProcessManager.runGetOutputURL(id, outputName);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    // AWS S3
     // list objects of default bucket (see app properties) if param bucket-name absent
     @RequestMapping(value = "/list/objects", method = RequestMethod.GET)
     @ResponseBody
