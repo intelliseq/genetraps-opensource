@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RestController
 public class HelloController {
+
+    final String timestamp = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String hello() {
@@ -21,7 +24,7 @@ public class HelloController {
 
     @RequestMapping(value = "/secure-hello", method = RequestMethod.GET)
     public String secureHello() {
-        return "{\"status\": \"ok\"}";
+        return "{\"status\":\"up\", \"timestamp\":\"" + timestamp + "\"}";
     }
 
     /* preflight */
