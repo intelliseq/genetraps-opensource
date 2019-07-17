@@ -28,6 +28,16 @@ WDL=
 ```
 (eg. https://gitlab.com/intelliseq/workflows/raw/dev/src/main/wdl/tasks/minimal-task/v1.0/minimal.wdl)
 
+**To upload an input file locally (absolute path required) to aws (returns relative path to the file):**
+Relative path can be recognized by '/' at the beginning (is followed by nr of sample, later dirs and name of file)
+```bash
+curl -H "Authorization: Bearer $TOKEN" -d abs-path=$(pwd)/file localhost:8086/sample/$SAMPLEID/upload/file
+```
+To set up another name for a file use `new-name` flag, to set up a tag - `tag` [tags can be multiple]
+```bash
+curl -H "Authorization: Bearer $TOKEN" -d abs-path=file -d new-name=dir/newfilename -d tag=newtag -d tag=othertag localhost:8086/sample/$SAMPLEID/upload/file
+```
+
 **Activating the desired pipeline with desired (requested) outputs (req-out [can be multiple]: json with key:value like proper_name_of_desired_output_file:new_name_for_the_output_file)**
 ```bash
 JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl -H "accept: application/json" \
