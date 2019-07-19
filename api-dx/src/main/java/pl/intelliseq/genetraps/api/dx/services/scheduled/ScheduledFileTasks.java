@@ -105,7 +105,7 @@ public class ScheduledFileTasks {
                             JSONObject availableOutputs = response.getBody().getObject().getJSONObject("outputs");
                             JSONObject requestedOutputs = new JSONObject(resultSet.getString("Output"));
 
-                            // move the requested outputs to sample directory of given sampleId
+                            // move the requested outputs to sample directory with given sampleId
                             moveObjectsWithJSON(bucket, availableOutputs, requestedOutputs, "samples/" + resultSet.getString("SampleID"));
 
                             // delete remaining outputs of a workflow
@@ -136,7 +136,6 @@ public class ScheduledFileTasks {
                     log.info(e.getMessage());
                 }
         }
-
     }
 
     private void moveObjectsWithJSON(String bucket, JSONObject availableObjects, JSONObject requestedObjects, String destinationDirectory) {
