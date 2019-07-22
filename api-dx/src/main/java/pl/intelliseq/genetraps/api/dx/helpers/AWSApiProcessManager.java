@@ -91,13 +91,14 @@ public class AWSApiProcessManager {
     public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject relevantOutput) throws InterruptedException {
 
         // extracts a name of wdl from workflow url, even the ones like "wdl-name.1"
-        String wdlName = workflowUrl.replaceFirst(".*/([\\w+\\.\\-]+)\\.wdl.*","$1");
+        String wdlName = workflowUrl;
         // gets id of wdl from db unless it's first time, otherwise adds new wdl id to db
         // TODO make wdl ids in db more universal
         Integer wdlId = auroraDBManager.checkWdlId(wdlName);
         if(wdlId == null) {
             try {
                 auroraDBManager.putWdlToDB(wdlName);
+                wdlId = auroraDBManager.checkWdlId(wdlName);
             } catch (DataIntegrityViolationException e) {
                 wdlId = auroraDBManager.checkWdlId(wdlName);
             }
