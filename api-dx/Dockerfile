@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y  gradle && \
     add-apt-repository ppa:linuxuprising/java -y && \
     apt-get update && \
-    apt-get install openjdk-12-jdk && \
+    apt-get install -y openjdk-11-jdk && \
     apt-get clean && \
     apt-get install -y python-pip python-dev build-essential && \
     apt-get install -y python-dev libffi-dev libssl-dev && \
