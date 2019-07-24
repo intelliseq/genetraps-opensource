@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
 import java.io.FileReader;
 import java.io.IOException;
 
-public enum TestUser {
+public enum UserTest {
     ADMIN(1), DEVIL(3), PSYDUCK(8);
 
     private JSONObject token;
@@ -18,7 +18,7 @@ public enum TestUser {
     @Getter
     private Integer id;
 
-    TestUser(Integer id){
+    UserTest(Integer id){
         this.id = id;
 
         Resource resource = new ClassPathResource(String.format("tokens/%s.json", toString().toLowerCase()));

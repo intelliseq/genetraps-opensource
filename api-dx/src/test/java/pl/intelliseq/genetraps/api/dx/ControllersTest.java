@@ -27,8 +27,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.testng.Assert.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
-import static pl.intelliseq.genetraps.api.dx.TestUser.ADMIN;
-import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
+import static pl.intelliseq.genetraps.api.dx.UserTest.ADMIN;
+import static pl.intelliseq.genetraps.api.dx.UserTest.PSYDUCK;
 
 
 //@RunWith(SpringRunner.class)
@@ -36,7 +36,7 @@ import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
 @AutoConfigureMockMvc
 @Log4j2
 //@ActiveProfiles("test")
-public class ControllersTests extends AbstractTestNGSpringContextTests {
+public class ControllersTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -51,7 +51,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
     private String sampleRight = "http://resources.intelliseq.pl/kamilant/test-data/fastq/capn3.2.fq.gz";
     private String interval = "chr15:42377802-42397802";
 
-    public ResponseEntity<JsonNode> getForResponseEnity(TestUser user, String url) {
+    public ResponseEntity<JsonNode> getForResponseEnity(UserTest user, String url) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + user.getAccessToken());
@@ -84,7 +84,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         }
     }
 
-    private DXJob.Describe upload(TestUser user, String sampleUrl, Integer sampleid, String... tags) {
+    private DXJob.Describe upload(UserTest user, String sampleUrl, Integer sampleid, String... tags) {
         HttpHeaders uploadHeaders = new HttpHeaders();
         uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
@@ -104,57 +104,57 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         return waitUntilJobIsDone(response.get("id").textValue());
     }
 
-    private DXJob.Describe fastqc(TestUser user, String fileId) {
-        HttpHeaders uploadHeaders = new HttpHeaders();
-        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
+//    private DXJob.Describe fastqc(UserTest user, String fileId) {
+//        HttpHeaders uploadHeaders = new HttpHeaders();
+//        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
+//
+//        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
+//        uploadValueMap.add("fileId", fileId);
+//
+//        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
+//
+//        JsonNode response = this.restTemplate.postForObject("/fastqc", uploadEntity, JsonNode.class);
+//        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
+//
+//        return waitUntilJobIsDone(response.get("id").textValue());
+//    }
 
-        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<String, String>();
-        uploadValueMap.add("fileId", fileId);
+//    private DXJob.Describe bwa(UserTest user, Integer sampleid) {
+//        HttpHeaders uploadHeaders = new HttpHeaders();
+//        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
+//
+//        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
+//        uploadValueMap.add("sampleId", sampleid.toString());
+//
+//        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
+//
+//        JsonNode response = this.restTemplate.postForObject("/bwa", uploadEntity, JsonNode.class);
+//        log.debug("R " + response);
+//        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
+//
+//        return waitUntilJobIsDone(response.get("id").textValue());
+//    }
 
-        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<MultiValueMap<String, String>>(uploadValueMap, uploadHeaders);
+//    private DXJob.Describe gatkhc(UserTest user, Integer sampleid, String interval) {
+//        HttpHeaders uploadHeaders = new HttpHeaders();
+//        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
+//
+//        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
+//        uploadValueMap.add("sampleId", sampleid.toString());
+//        uploadValueMap.add("interval", interval);
+//
+//        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
+//
+//        JsonNode response = this.restTemplate.postForObject("/gatkhc", uploadEntity, JsonNode.class);
+//        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
+//
+//        return waitUntilJobIsDone(response.get("id").textValue());
+//    }
 
-        JsonNode response = this.restTemplate.postForObject("/fastqc", uploadEntity, JsonNode.class);
-        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
-
-        return waitUntilJobIsDone(response.get("id").textValue());
-    }
-
-    private DXJob.Describe bwa(TestUser user, Integer sampleid) {
-        HttpHeaders uploadHeaders = new HttpHeaders();
-        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
-
-        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
-        uploadValueMap.add("sampleId", sampleid.toString());
-
-        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
-
-        JsonNode response = this.restTemplate.postForObject("/bwa", uploadEntity, JsonNode.class);
-        log.debug("R " + response);
-        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
-
-        return waitUntilJobIsDone(response.get("id").textValue());
-    }
-
-    private DXJob.Describe gatkhc(TestUser user, Integer sampleid, String interval) {
-        HttpHeaders uploadHeaders = new HttpHeaders();
-        uploadHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        uploadHeaders.set("Authorization", "Bearer " + user.getAccessToken());
-
-        MultiValueMap<String, String> uploadValueMap = new LinkedMultiValueMap<>();
-        uploadValueMap.add("sampleId", sampleid.toString());
-        uploadValueMap.add("interval", interval);
-
-        HttpEntity<MultiValueMap<String, String>> uploadEntity = new HttpEntity<>(uploadValueMap, uploadHeaders);
-
-        JsonNode response = this.restTemplate.postForObject("/gatkhc", uploadEntity, JsonNode.class);
-        assertThat(response.get("id").textValue(), Matchers.matchesPattern("job-\\w*"));
-
-        return waitUntilJobIsDone(response.get("id").textValue());
-    }
-
-    @Test
+//    @Test
     public void propertiesAndFileUploadTest() {
         Integer sampleId = mkDir();
         try {
@@ -244,7 +244,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
 
 //BUG mkDir can faint - no sync!!!! BUG
 
-    @Test
+//    @Test
     public void simpleUpload() {
         Integer sampleid = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleid, "left");
@@ -255,7 +255,7 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         log.debug("D: " + describe);
     }
 
-    @Test
+//    @Test
     public void upload() {
         Integer sampleId = mkDir();
         DXJob.Describe upload1 = upload(PSYDUCK, sampleLeft, sampleId, "left");
@@ -275,9 +275,9 @@ public class ControllersTests extends AbstractTestNGSpringContextTests {
         assertTrue(describe.getStatusCode().is2xxSuccessful());
         log.info(describe.getBody());
 
-        log.info(fastqc(PSYDUCK, file1Id));
-        log.info(bwa(PSYDUCK, sampleId));
-        log.info(gatkhc(PSYDUCK, sampleId, interval));
+//        log.info(fastqc(PSYDUCK, file1Id));
+//        log.info(bwa(PSYDUCK, sampleId));
+//        log.info(gatkhc(PSYDUCK, sampleId, interval));
 
     }
 
