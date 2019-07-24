@@ -34,8 +34,9 @@ public class AWSApiProcessManager {
     @Autowired
     private FilesManager filesManager;
 
+    //TODO: probably cant be final global because diffrent users
     final private AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
-    final private TransferManager s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();         // ok? or maybe local
+//    final private TransferManager s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();         // ok? or maybe local
 
     public void runCreateSample(Integer sampleId) {
 
@@ -46,7 +47,7 @@ public class AWSApiProcessManager {
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
 
         String bucketName = env.getProperty("bucket-name");
-        String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName;
+        String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName.charAt(newFileName.length() - 1) == '/' ? String.format("%s%s", newFileName, mfile.getOriginalFilename()) : newFileName;
         String fileKey = String.format("samples/%s/%s", sampleId, fileName);
 
         if(s3Client.doesObjectExist(bucketName, fileKey)) {
@@ -111,7 +112,9 @@ public class AWSApiProcessManager {
                 String value = workflowInputs.getString(key);
                 if (value.isEmpty()) continue;
                 if (value.charAt(0) == '/')
-                    workflowInputs.put(key, getAWSUrl(value));
+                    workflowInputs.put(key, getAWSUrl(value.substring(1)));
+                log.info(value);
+                log.info(getAWSUrl(value.substring(1)));
             }
         } catch (InterruptedException e) {
             throw new InterruptedException(String.format("%s - relative path to the file is not correct or the file is missing", e.getMessage()));
@@ -148,7 +151,7 @@ public class AWSApiProcessManager {
     public String getAWSUrl(String fileName) throws InterruptedException {
 
         try {
-            if(s3Client.doesObjectExist(env.getProperty("bucket-name"), fileName.substring(1)))
+            if(s3Client.doesObjectExist(env.getProperty("bucket-name"), fileName))
                 return s3Client.getUrl(env.getProperty("bucket-name"), fileName).toString();
             else
                 throw new InterruptedException(fileName);
