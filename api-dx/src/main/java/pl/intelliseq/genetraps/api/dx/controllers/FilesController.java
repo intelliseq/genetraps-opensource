@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
@@ -72,6 +73,7 @@ public class FilesController {
 
     // AWS S3
     @RequestMapping(value = "/wdl", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @ResponseBody
     public String wdl(
             @ApiIgnore OAuth2Authentication auth,
@@ -91,31 +93,16 @@ public class FilesController {
 
     // AWS S3
     // returns url of output file on aws s3
-    @RequestMapping(value = "/sample/{id}/get/output/url", method = RequestMethod.GET)
-    @ResponseBody
-    public String outputURL(
-            @PathVariable Integer id,
-            @RequestParam String outputName) {
-
-        try {
-            return awsApiProcessManager.runGetOutputURL(id, outputName);
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    // AWS S3
-    // list objects of default bucket (see app properties) if param bucket-name absent
-    @RequestMapping(value = "/list/objects", method = RequestMethod.GET)
-    @ResponseBody
-    public String listObjects(@RequestParam(value = "bucket-name", required = false) String bucketName) {
-        if(bucketName == null)
-            log.info("bucket: default");
-        else
-            log.info("bucket: " + bucketName);
-
-        return awsApiProcessManager.runListObjects(bucketName).toString();
-    }
+//    @RequestMapping(value = "/sample/get/file/url", method = RequestMethod.GET)
+//    @ResponseBody
+//    public String outputURL(@RequestParam(name = "file-name") String fileName) {
+//
+//        try {
+//            return awsApiProcessManager.getAWSUrl(fileName);
+//        } catch (Exception e) {
+//            return e.getMessage();
+//        }
+//    }
 
     // AWS S3
     @RequestMapping(value = "/sample/create", method = RequestMethod.GET)
@@ -136,8 +123,8 @@ public class FilesController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String upload(
             @ApiIgnore OAuth2Authentication auth,
-            @RequestParam String url,
             @PathVariable Integer id,
+            @RequestParam String url,
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
@@ -148,16 +135,16 @@ public class FilesController {
     }
 
     // AWS S3
-    @RequestMapping(value = "/sample/{id}/fileupload", method = RequestMethod.POST)
+    @RequestMapping(value = "/sample/{id}/file/upload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String uploadfile(
-            @RequestParam MultipartFile mfile,
             @PathVariable Integer id,
-            @RequestParam(value = "file-name", required = false) String fileName,
+            @RequestParam MultipartFile file,
+            @RequestParam(value = "new-name", required = false) String fileName,
             @RequestParam(required = false) List<String> tag) {
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(mfile, id, fileName, tag)).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(file, id, fileName, tag)).toString();
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -167,29 +154,23 @@ public class FilesController {
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
     public String sampleLs(
             @PathVariable Integer id,
-            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
-        return awsApiProcessManager.runSampleLs(id).toString();
+//            @RequestParam(required = false, defaultValue = "false") boolean byNames,
+            @RequestParam(required = false, defaultValue = "")  String dir) {
+        try {
+            return awsApiProcessManager.runSampleLs(id, dir).toString();
+        } catch (InterruptedException e) {
+            // if error, returns err message with key: /error
+            // normal keys doesn't start with '/' at the beginning
+            return String.format("{\"/error\":\"%s\"}", e.getMessage());
+        }
     }
 
-//    // DX
-//    @RequestMapping(value = "/sample/new", method = RequestMethod.GET)
-//    @ResponseBody
-//    public String mkDir(@ApiIgnore OAuth2Authentication auth) {
-//        log.debug("mkdir");
-//        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
-//
-//        Integer sampleId = filesManager.mkdir();
-//
-//        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
-//
-//        return String.format("{\"response\":%s}", sampleId);
+    //TODO: is there an equivalent in aws??
+//    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
+//    public String describe(
+//            @PathVariable Integer id) {
+//        return dxApiProcessManager.JSONDescribe(id).toString();
 //    }
-
-    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
-    public String describe(
-            @PathVariable Integer id) {
-        return dxApiProcessManager.JSONDescribe(id).toString();
-    }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)

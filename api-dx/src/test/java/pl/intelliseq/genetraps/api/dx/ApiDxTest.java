@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 //@RunWith(SpringRunner.class)
@@ -43,13 +44,15 @@ public class ApiDxTest extends AbstractTestNGSpringContextTests {
     DxApiProcessManager dxApiProcessManager;
 
     @Test
-    public void singleMkdirTest() {
-        Integer folder = filesManager.getLowestFreeIndex();
-        dxApiProcessManager.runMkDir(folder);
+    public void testSingleMkdir() {
+
+        Integer folder = filesManager.getLowestFreeIndex(filesManager.getNumericDirectories());
+//        dxApiProcessManager.runMkDir(folder);
+        assertTrue(folder != null);
     }
 
     //    @Test
-    public void descriptiontesting() {
+    public void testDescription() {
         var objectId = "job-FGP2j6Q0pqjbJZ7kKjJVJz8k";
         var out = DXJSON.safeTreeToValue(
                 new DXHTTPRequest(DXEnvironment.create()).request("/" + objectId + "/" + "describe",
@@ -65,8 +68,8 @@ public class ApiDxTest extends AbstractTestNGSpringContextTests {
         log.info(out);
     }
 
-    @Test
-    public void manyMkdirTest() throws InterruptedException {
+//    @Test
+    public void testManyMkdir() throws InterruptedException {
         class MkDirRunnable implements Runnable {
             private int id;
 
