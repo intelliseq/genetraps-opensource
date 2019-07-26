@@ -14,25 +14,22 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.*;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static pl.intelliseq.genetraps.api.dx.TestUser.DEVIL;
-import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
+import static pl.intelliseq.genetraps.api.dx.UserTest.DEVIL;
+import static pl.intelliseq.genetraps.api.dx.UserTest.PSYDUCK;
 
 
 //@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
 //@ActiveProfiles("test")
-public class CoreTests extends AbstractTestNGSpringContextTests {
+public class CoreTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private TestRestTemplate restTemplate;

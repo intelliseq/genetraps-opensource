@@ -15,7 +15,7 @@ import java.io.FileReader;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static pl.intelliseq.genetraps.api.dx.TestUser.PSYDUCK;
+import static pl.intelliseq.genetraps.api.dx.UserTest.PSYDUCK;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
