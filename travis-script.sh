@@ -225,7 +225,7 @@ fi
 REFRESH_TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded"  --data "grant_type=password&username=$STAGING_USERNAME&password=$STAGING_PASSWORD" | jq -r ".refresh_token")
 TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded" --data "grant_type=refresh_token&refresh_token=$REFRESH_TOKEN" | jq -r ".access_token")
 STATUS=$(curl -H "Authorization: Bearer $TOKEN" http://genetraps.intelliseq.pl:8086/secure-hello | jq -r ".status")
-if [[ "$STATUS" = "ok" ]]; then
+if [[ "$STATUS" = "up" ]]; then
   echo "auth token - ok"
 else
   echo "auth token - failure"

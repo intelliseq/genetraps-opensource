@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
