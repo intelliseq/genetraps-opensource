@@ -24,22 +24,26 @@ public class WDLParserManager {
 
     @Value("${fileTree-prefix}")
     String pathPrefix;
+
     @Value("${fileTree-path}")
     String commonPath;
+
     @Value("${fileTree-ref}")
     String pathSuffix;
+
     @Value("${fileGet-prefix}")
     String filePathPrefix;
+
     @Value("${fileGet-ref}")
     String filePathRef;
 
     private JsonNode data;
 
-    public JsonNode GetData(){
+    public JsonNode getData(){
         return data;
     }
 
-    public JsonNode GetData(String name){
+    public JsonNode getData(String name){
         if (data.has(name)) {
             ObjectNode requestedData = new ObjectMapper().createObjectNode();
             requestedData.set(name, data.get(name));
@@ -50,8 +54,7 @@ public class WDLParserManager {
         }
     }
 
-    private JsonNode ParserWDLToJSON(String path){
-
+    private JsonNode parserWDLToJSON(String path){
         String resourcePath = path;
         StringBuilder trueYaml = new StringBuilder();
 
@@ -93,7 +96,7 @@ public class WDLParserManager {
                 // looking for /# @Input()/ lines
                 if (descriptionPattern.matcher(line).matches()) {
 
-                    variableLine = reader.readLine().strip();
+                    variableLine = reader.readLine().trim();
 
                     // cutting variable line and parsing it to YAML
                     if (variablePatternQM.matcher(variableLine).matches()){
@@ -169,26 +172,26 @@ public class WDLParserManager {
     }
 
     @PostConstruct
-    public void CollectData(){
+    public void collectData(){
         Pattern isWdlFile = Pattern.compile(".*\\.wdl");
         StringBuilder path;
         ObjectNode node = new ObjectMapper().createObjectNode();
 
-        ArrayNode wdlDirectories = GetListOfFiles((new StringBuilder(pathPrefix)).append(commonPath).append(pathSuffix).toString());
+        ArrayNode wdlDirectories = getListOfFiles((new StringBuilder(pathPrefix)).append(commonPath).append(pathSuffix).toString());
 
         // iterating through directories
         for (JsonNode fileNode: wdlDirectories)
         {
-            String filePath = Remover(fileNode.get("path").toString());
+            String filePath = remover(fileNode.get("path").toString());
             path = (new StringBuilder(pathPrefix)).append(filePath).append(pathSuffix);
 
-            ArrayNode wdlVersions = GetListOfFiles(path.toString());
+            ArrayNode wdlVersions = getListOfFiles(path.toString());
 
             // finding latest version in directory
             double highestVersion=0.0;
             for (JsonNode versionNode: wdlVersions){
-                String versionPath = Remover(versionNode.get("path").toString());
-                double versionNumber = Double.parseDouble(Remover(versionNode.get("name").toString()).substring(1));
+                String versionPath = remover(versionNode.get("path").toString());
+                double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
                 if (versionNumber>highestVersion) {
                     filePath = versionPath;
                     highestVersion=versionNumber;
@@ -197,32 +200,32 @@ public class WDLParserManager {
 
             path = (new StringBuilder(pathPrefix)).append(filePath).append(pathSuffix);
 
-            ArrayNode filesInVersionDirectory = GetListOfFiles(path.toString());
+            ArrayNode filesInVersionDirectory = getListOfFiles(path.toString());
 
             // finding and adding wdl file to node
             for (JsonNode file: filesInVersionDirectory){
-                if (isWdlFile.matcher(Remover(file.get("name").toString())).matches()){
+                if (isWdlFile.matcher(remover(file.get("name").toString())).matches()){
                     String wdlPath;
                     try {
-                        wdlPath = URLEncoder.encode(Remover(file.get("path").toString()), StandardCharsets.UTF_8.toString());
+                        wdlPath = URLEncoder.encode(remover(file.get("path").toString()), StandardCharsets.UTF_8.toString());
                     } catch (UnsupportedEncodingException e) {
                         throw new RuntimeException(e);
                     }
                     StringBuilder apiPath = (new StringBuilder(filePathPrefix))
                             .append(wdlPath)
                             .append(filePathRef);
-                    node.set(Remover(file.get("name").toString()).substring(0,Remover(file.get("name").toString()).length()-4), ParserWDLToJSON(apiPath.toString()));
+                    node.set(remover(file.get("name").toString()).substring(0, remover(file.get("name").toString()).length()-4), parserWDLToJSON(apiPath.toString()));
                 }
             }
         }
         data = node;
     }
 
-    private String Remover(String oldString){
+    private String remover(String oldString){
         return oldString.substring(1, oldString.length()-1);
     }
 
-    private ArrayNode GetListOfFiles(String path) {
+    private ArrayNode getListOfFiles(String path) {
         // Downloading JSON with WDL files data
         HttpResponse<String> response;
         try {
