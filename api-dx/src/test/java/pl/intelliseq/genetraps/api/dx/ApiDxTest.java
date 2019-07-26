@@ -42,11 +42,11 @@ public class ApiDxTest extends AbstractTestNGSpringContextTests {
     @Autowired
     DxApiProcessManager dxApiProcessManager;
 
-    @Test
-    public void singleMkdirTest() {
-        Integer folder = filesManager.getLowestFreeIndex();
-        dxApiProcessManager.runMkDir(folder);
-    }
+//    @Test
+//    public void singleMkdirTest() {
+//        Integer folder = filesManager.getLowestFreeIndex();
+//        dxApiProcessManager.runMkDir(folder);
+//    }
 
     //    @Test
     public void descriptiontesting() {
