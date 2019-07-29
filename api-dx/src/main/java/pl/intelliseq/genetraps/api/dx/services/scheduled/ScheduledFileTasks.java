@@ -14,6 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
@@ -49,7 +50,7 @@ public class ScheduledFileTasks {
     }
 
     // TODO: make cron delete given record and all its workflow output if e.g. number of failed tries reaches 3/5/...
-//    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     private synchronized void checkForOutput() {
 
         log.info("||| checkForOutput");
