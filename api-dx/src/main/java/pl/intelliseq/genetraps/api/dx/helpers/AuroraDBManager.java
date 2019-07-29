@@ -4,21 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.log4j.Log4j2;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.User;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +58,7 @@ public class AuroraDBManager {
         jdbcTemplate.update("INSERT INTO Wdls VALUES (?, ?)", 0, wdlName);
     }
 
-    public void putJobToDB(String jobId, Integer userId, Integer wdlId, Integer jobStatus, Integer sampleId, JSONObject output) {
+    public void putJobToDB(String jobId, Integer userId, Integer wdlId, Integer jobStatus, Integer sampleId, JsonNode output) {
         jdbcTemplate.update("INSERT INTO Jobs VALUES (?, ?, ?, ?, ?, ?)", jobId, userId, wdlId, jobStatus, sampleId, output.toString());
     }
 

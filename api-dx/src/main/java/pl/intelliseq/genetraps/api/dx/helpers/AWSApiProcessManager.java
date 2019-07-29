@@ -9,13 +9,15 @@ import com.amazonaws.services.s3.model.Tag;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,6 +29,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 public class AWSApiProcessManager {
@@ -95,7 +98,7 @@ public class AWSApiProcessManager {
         return String.format("/samples/%s/%s", sampleId, fileName);
     }
 
-    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject relevantOutput) throws InterruptedException {
+    public String runWdl(Integer userId, String workflowUrl, ObjectNode workflowInputs, ObjectNode labels, ObjectNode relevantOutput) throws InterruptedException {
 
         // extracts a name of wdl from workflow url, even the ones like "wdl-name.1"
         String wdlName = workflowUrl;
@@ -113,22 +116,24 @@ public class AWSApiProcessManager {
 
         // creates correct url links if a string value in workflowInputs begins with "/"
         try {
-            for (Iterator<String> it = workflowInputs.keys(); it.hasNext(); ) {
-                String key = it.next();
+            for (Iterator<Map.Entry<String, JsonNode>> it = workflowInputs.fields(); it.hasNext(); ) {
+                String key = it.next().getKey();
                 String value;
-                if(workflowInputs.get(key).getClass().equals(JSONArray.class)) {
-                    JSONArray values = workflowInputs.getJSONArray(key);
-                    for (int i = 0; i < values.length(); i++) {
-                        value = values.getString(i);
-                        if (value.isEmpty()) continue;
-                        if (value.charAt(0) == '/') {
-                            values.put(i, getAWSUrl(value.substring(1)));
+                if(workflowInputs.get(key).isArray()) {
+                    ArrayNode values = (ArrayNode) workflowInputs.get(key);
+                    ArrayNode newValues = new ObjectMapper().createArrayNode();
+                    for (JsonNode node : values) {
+                        value = node.toString();
+                        if (value.isEmpty()){
+                            newValues.add(value);
+                        } else if (value.charAt(0) == '/') {
+                            newValues.add(getAWSUrl(value.substring(1)));
                         }
                     }
-                    workflowInputs.put(key, values);
+                    workflowInputs.set(key, newValues);
                 }
                 else {
-                    value = workflowInputs.getString(key);
+                    value = workflowInputs.get(key).toString();
                     if (value.isEmpty()) continue;
                     if (value.charAt(0) == '/') {
                         workflowInputs.put(key, getAWSUrl(value.substring(1)));
@@ -157,7 +162,7 @@ public class AWSApiProcessManager {
             if (response.getStatus() / 100 != 2)
                 throw new InterruptedException(responseBody);
 
-            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), relevantOutput);
+            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, Integer.parseInt(labels.get("sampleid").toString()), relevantOutput);
             return jobId;
 
         } catch (UnirestException e) {
@@ -179,7 +184,7 @@ public class AWSApiProcessManager {
         }
     }
 
-    public JSONObject runSampleLs(Integer sampleId, String dir) throws InterruptedException {
+    public ObjectNode runSampleLs(Integer sampleId, String dir) throws InterruptedException {
 
         String bucket = env.getProperty("bucket-name");
         try {
@@ -191,7 +196,7 @@ public class AWSApiProcessManager {
             List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(bucket,
                     dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir)).getObjectSummaries();
 //            log.info(dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir));
-            JSONObject objects = new JSONObject();
+            ObjectNode objects = new ObjectMapper().createObjectNode();
             String objectKey;
             for (S3ObjectSummary object : objectSummaries) {
                 objectKey = object.getKey();

@@ -1,19 +1,19 @@
 package pl.intelliseq.genetraps.api.dx;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
 public enum UserTest {
     ADMIN(1), DEVIL(3), PSYDUCK(8);
 
-    private JSONObject token;
+    private JsonNode token;
 
     @Getter
     private Integer id;
@@ -22,17 +22,17 @@ public enum UserTest {
         this.id = id;
 
         Resource resource = new ClassPathResource(String.format("tokens/%s.json", toString().toLowerCase()));
-
-        JSONParser parser = new JSONParser();
         try {
-            token = (JSONObject) parser.parse(new FileReader(resource.getFile()));
-        } catch (IOException | ParseException e) {
+            BufferedReader fileReader = new BufferedReader(new FileReader(resource.getFile()));
+            ObjectMapper mapper = new ObjectMapper();
+            token = mapper.readValue(fileReader, JsonNode.class);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public String getAccessToken(){
-        return (String) token.get("access_token");
+        return token.get("access_token").toString();
     }
 
     public String getUsername(){

@@ -4,11 +4,11 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import lombok.extern.log4j.Log4j2;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -86,13 +86,13 @@ public class ScheduledFileTasks {
 
                             // extract job details from the response
                             // id, name, status
-                            JSONObject jobDetails = response.getBody().getObject().getJSONArray("results").getJSONObject(0);
+                            ObjectNode jobDetails = response.getBody().getObject().get("results").get(0);
 
-                            if (!jobDetails.getString("status").equals("Succeeded")) {     // Check whether is successful
+                            if (!jobDetails.get("status").toString().equals("Succeeded")) {     // Check whether is successful
                                 return;
                             }
 
-                            String cromwellId = jobDetails.getString("id");
+                            String cromwellId = jobDetails.get("id").toString();
 
                             // get the outputs of the job's workflow
                             response = Unirest
