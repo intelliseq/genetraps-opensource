@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Log4j2
 public class WDLParserManager {
 
     @Value("${fileTree-prefix}")
@@ -93,7 +95,7 @@ public class WDLParserManager {
                 // looking for /# @Input()/ lines
                 if (descriptionPattern.matcher(line).matches()) {
 
-                    variableLine = reader.readLine().strip();
+                    variableLine = reader.readLine().trim();
 
                     // cutting variable line and parsing it to YAML
                     if (variablePatternQM.matcher(variableLine).matches()){
@@ -211,7 +213,12 @@ public class WDLParserManager {
                     StringBuilder apiPath = (new StringBuilder(filePathPrefix))
                             .append(wdlPath)
                             .append(filePathRef);
-                    node.set(Remover(file.get("name").toString()).substring(0,Remover(file.get("name").toString()).length()-4), ParserWDLToJSON(apiPath.toString()));
+                    String filename = Remover(file.get("name").toString()).substring(0, Remover(file.get("name").toString()).length() - 4);
+                    try {
+                        node.set(filename, ParserWDLToJSON(apiPath.toString()));
+                    }catch(RuntimeException e){
+                        log.error("Error parsing task named \"" + filename + "\"\n");
+                    }
                 }
             }
         }
