@@ -36,11 +36,11 @@ function request(params) {
     headers: headers
   })
   .then(response => {
-    callback(response.data)
     store.commit('setWaitingVisibility', false)
+    callback(response.data)
   })
   .catch(error => {
-    errorCallback(error)
     store.commit('setWaitingVisibility', false)
+    errorCallback(error)
   })
 }
