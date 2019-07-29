@@ -2,10 +2,7 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.dnanexus.DXContainer;
-import com.dnanexus.exceptions.ResourceNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -44,7 +41,7 @@ public class FilesManager {
 
     // AWS
     public List<Integer> getNumericDirectories() {
-        String bucketName = env.getProperty("bucket-name");
+        String bucketName = env.getProperty("default-bucket");
         var listObjectsV2Result = s3Client.listObjectsV2(bucketName, "samples/");
         List<S3ObjectSummary> sampleSummaries = listObjectsV2Result.getObjectSummaries();
         if(sampleSummaries.size() == 1) {

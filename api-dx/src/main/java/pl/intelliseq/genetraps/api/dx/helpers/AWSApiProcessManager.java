@@ -46,13 +46,13 @@ public class AWSApiProcessManager {
 
     public void runCreateSample(Integer sampleId) {
 
-        String bucketName = env.getProperty("bucket-name");
+        String bucketName = env.getProperty("default-bucket");
         s3Client.putObject(bucketName, String.format("samples/%s/", sampleId), "");
     }
 
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
 
-        String bucketName = env.getProperty("bucket-name");
+        String bucketName = env.getProperty("default-bucket");
         String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName.charAt(newFileName.length() - 1) == '/' ? String.format("%s%s", newFileName, mfile.getOriginalFilename()) : newFileName;
         String fileKey = String.format("samples/%s/%s", sampleId, fileName);
 
@@ -170,8 +170,8 @@ public class AWSApiProcessManager {
     public String getAWSUrl(String fileName) throws InterruptedException {
 
         try {
-            if(s3Client.doesObjectExist(env.getProperty("bucket-name"), fileName))
-                return s3Client.getUrl(env.getProperty("bucket-name"), fileName).toString();
+            if(s3Client.doesObjectExist(env.getProperty("default-bucket"), fileName))
+                return s3Client.getUrl(env.getProperty("default-bucket"), fileName).toString();
             else
                 throw new InterruptedException(fileName);
         } catch (Exception e) {
@@ -181,7 +181,7 @@ public class AWSApiProcessManager {
 
     public JSONObject runSampleLs(Integer sampleId, String dir) throws InterruptedException {
 
-        String bucket = env.getProperty("bucket-name");
+        String bucket = env.getProperty("default-bucket");
         try {
             if(!s3Client.doesObjectExist(bucket, String.format("samples/%s/", sampleId)))
                 throw new InterruptedException(String.format("Sample: %s does not exist", sampleId));
