@@ -117,7 +117,7 @@ public class ScheduledFileTasks {
                             try {
                                 moveToDebug(bucket, env.getProperty("debug-folder"), String.format("JOB ID: %s\nSAMPLE ID: %s\nERROR MESSAGE:\n%s", jobId, resultSet.getString("SampleID"), e.getMessage()), resultSet.getString("JobID"));
                             } catch (Exception eDebug) {
-                                moveToDebugSimple(bucket, jobId, env.getProperty("debug-folder"), String.format("JOB ID: %s\nMOVING TO DEBUG ERROR:\n%sERROR MESSAGE:\n%s", jobId, eDebug.getMessage(), e.getMessage());
+                                moveToDebugSimple(bucket, jobId, env.getProperty("debug-folder"), String.format("JOB ID: %s\nMOVING TO DEBUG ERROR:\n%sERROR MESSAGE:\n%s", jobId, eDebug.getMessage(), e.getMessage()));
                             }
                             resultSet.updateInt("JobStatus", 2);
 
@@ -211,7 +211,7 @@ public class ScheduledFileTasks {
 
     private void moveToDebug(String sourceBucket, String debugFolder, String errorMessage, String jobId) throws Exception {
 
-        HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", jobId)
+        HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", jobId);
         JSONObject jobDetails = getJobDetails(response);
         String cromwellJobId = getCromwellJobId(jobDetails);
         response = getCromwellJobOutputs(cromwellJobId);

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Log4j2
 public class WDLParserManager {
 
     @Value("${fileTree-prefix}")
@@ -214,7 +216,12 @@ public class WDLParserManager {
                     StringBuilder apiPath = (new StringBuilder(filePathPrefix))
                             .append(wdlPath)
                             .append(filePathRef);
-                    node.set(remover(file.get("name").toString()).substring(0, remover(file.get("name").toString()).length()-4), parserWDLToJSON(apiPath.toString()));
+                    String filename = remover(file.get("name").toString()).substring(0, remover(file.get("name").toString()).length() - 4);
+                    try {
+                        node.set(filename, parserWDLToJSON(apiPath.toString()));
+                    }catch(RuntimeException e){
+                        log.error("Error parsing task named \"" + filename + "\"\n");
+                    }
                 }
             }
         }
