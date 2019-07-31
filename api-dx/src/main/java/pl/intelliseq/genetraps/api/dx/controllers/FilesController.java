@@ -80,10 +80,10 @@ public class FilesController {
             @RequestParam String workflowUrl,
             @RequestParam JSONObject workflowInputs,
             @RequestParam JSONObject labels,
-            @RequestParam(name = "req-out") JSONObject requestedOutputs) {
+            @RequestParam(name = "req-out", required = false, defaultValue = "{}") JSONObject requestedOutputs) {
         try {
-            if(requestedOutputs.length() == 0)
-                throw new Exception("No requested output set");
+//            if(requestedOutputs.length() == 0)
+//                throw new Exception("No requested output set");
             Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
             return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs)).toString();
         } catch (Exception e) {
