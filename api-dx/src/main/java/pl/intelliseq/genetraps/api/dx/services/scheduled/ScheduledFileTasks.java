@@ -14,6 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
@@ -49,7 +50,7 @@ public class ScheduledFileTasks {
     }
 
     // TODO: make cron delete given record and all its workflow output if e.g. number of failed tries reaches 3/5/...
-//    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     private synchronized void checkForOutput() {
 
         log.info("||| checkForOutput");
@@ -116,7 +117,7 @@ public class ScheduledFileTasks {
                             try {
                                 moveToDebug(bucket, env.getProperty("debug-folder"), String.format("JOB ID: %s\nSAMPLE ID: %s\nERROR MESSAGE:\n%s", jobId, resultSet.getString("SampleID"), e.getMessage()), resultSet.getString("JobID"));
                             } catch (Exception eDebug) {
-                                moveToDebugSimple(bucket, jobId, env.getProperty("debug-folder"), String.format("JOB ID: %s\nMOVING TO DEBUG ERROR:\n%sERROR MESSAGE:\n%s", jobId, eDebug.getMessage(), e.getMessage());
+                                moveToDebugSimple(bucket, jobId, env.getProperty("debug-folder"), String.format("JOB ID: %s\nMOVING TO DEBUG ERROR:\n%sERROR MESSAGE:\n%s", jobId, eDebug.getMessage(), e.getMessage()));
                             }
                             resultSet.updateInt("JobStatus", 2);
 
@@ -210,7 +211,7 @@ public class ScheduledFileTasks {
 
     private void moveToDebug(String sourceBucket, String debugFolder, String errorMessage, String jobId) throws Exception {
 
-        HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", jobId)
+        HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", jobId);
         JSONObject jobDetails = getJobDetails(response);
         String cromwellJobId = getCromwellJobId(jobDetails);
         response = getCromwellJobOutputs(cromwellJobId);

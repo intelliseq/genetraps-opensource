@@ -1,7 +1,7 @@
 const store = new Vuex.Store({
     state: {
         waitingVisibility: false,
-        toolbarVisibility: true,
+        toolbarVisibility: false,
         buttonColor: 'teal lighten-2',
         buttonColors: {
           'samples':'teal lighten-2',
@@ -22,11 +22,16 @@ const store = new Vuex.Store({
       },
       setWaitingText(state, waitingText) {
         state.waitingText = waitingText
-      }
+      },
+      setToolbarVisibility(state, toolbarVisibility) {
+        state.toolbarVisibility = toolbarVisibility
+        logger.debug("setToolbarVisibility")
+      },
     },
     modules: {
     	user: userModule,
       security: securityModule,
-      sample: sampleModule
+      sample: sampleModule,
+      samples: samplesModule,
     },
 })

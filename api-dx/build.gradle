@@ -93,6 +93,6 @@ docker {
     buildArgs(['JAR_FILE': "${jar.archiveName}"])
 }
 
-task wrapper(type: Wrapper) {
+wrapper() {
     gradleVersion = '4.7'
 }

@@ -4,6 +4,7 @@ const router = new VueRouter({
     { path: '/', component: welcomeComponent },
     { path: '/login', component: loginComponent },
     { path: '/cookies', component: cookiesComponent },
+    { path: '/sample', component: sampleComponent },
     { path: '/samples', component: samplesComponent }
   ]
 })

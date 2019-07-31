@@ -4,8 +4,9 @@ const loginComponent = {
           <v-flex>
             <v-dialog v-model="loginDialogVisibility" persistent max-width="500px">
             <v-card class="elevation-6">
-              <v-toolbar dark color="primary">
-                <v-toolbar-title>Sign in</v-toolbar-title>
+              <v-toolbar card dark color="primary">
+                <v-toolbar-title class="pl-3">Sign in</v-toolbar-title>
+                <v-spacer></v-spacer>
               </v-toolbar>
               <v-card-text>
                 <v-form>

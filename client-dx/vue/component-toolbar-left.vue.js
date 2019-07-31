@@ -1,7 +1,7 @@
 const leftToolbarComponent = {
   template:
 `
-<v-flex v-if="false" d-flex xs12 sm2 md2>
+<v-flex v-if="toolbarVisibility" d-flex xs12 sm2 md2>
 <v-card color="teal lighten-3" >
   <v-layout column px-2 py-0>
 
@@ -19,6 +19,7 @@ components: {
 'toolbar-button-component' :toolbarButtonComponent,
 },
     computed: {
+      ...Vuex.mapState(['toolbarVisibility'])
     },
     //  Vuex.mapState('user', ['userEmail'])
     //}
