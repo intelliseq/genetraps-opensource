@@ -95,48 +95,48 @@ public class AWSApiProcessManager {
         return String.format("/samples/%s/%s", sampleId, fileName);
     }
 
-    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject relevantOutput) throws InterruptedException {
+    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject requestedOutputs) throws InterruptedException {
 
         // extracts a name of wdl from workflow url, even the ones like "wdl-name.1"
-        String wdlName = workflowUrl;
         // gets id of wdl from db unless it's first time, otherwise adds new wdl id to db
         // TODO make wdl ids in db more universal
-        Integer wdlId = auroraDBManager.checkWdlId(wdlName);
+        Integer wdlId = auroraDBManager.checkWdlId(workflowUrl);
         if(wdlId == null) {
             try {
-                auroraDBManager.putWdlToDB(wdlName);
-                wdlId = auroraDBManager.checkWdlId(wdlName);
+                auroraDBManager.putWdlToDB(workflowUrl);
+                wdlId = auroraDBManager.checkWdlId(workflowUrl);
             } catch (DataIntegrityViolationException e) {
-                wdlId = auroraDBManager.checkWdlId(wdlName);
+                wdlId = auroraDBManager.checkWdlId(workflowUrl);
             }
         }
 
         // creates correct url links if a string value in workflowInputs begins with "/"
-        try {
-            for (Iterator<String> it = workflowInputs.keys(); it.hasNext(); ) {
-                String key = it.next();
-                String value;
-                if(workflowInputs.get(key).getClass().equals(JSONArray.class)) {
-                    JSONArray values = workflowInputs.getJSONArray(key);
-                    for (int i = 0; i < values.length(); i++) {
-                        value = values.getString(i);
+        if(requestedOutputs.length() != 0) {
+            try {
+                for (Iterator<String> it = workflowInputs.keys(); it.hasNext(); ) {
+                    String key = it.next();
+                    String value;
+                    if (workflowInputs.get(key).getClass().equals(JSONArray.class)) {
+                        JSONArray values = workflowInputs.getJSONArray(key);
+                        for (int i = 0; i < values.length(); i++) {
+                            value = values.getString(i);
+                            if (value.isEmpty()) continue;
+                            if (value.charAt(0) == '/') {
+                                values.put(i, getAWSUrl(value.substring(1)));
+                            }
+                        }
+                        workflowInputs.put(key, values);
+                    } else {
+                        value = workflowInputs.getString(key);
                         if (value.isEmpty()) continue;
                         if (value.charAt(0) == '/') {
-                            values.put(i, getAWSUrl(value.substring(1)));
+                            workflowInputs.put(key, getAWSUrl(value.substring(1)));
                         }
                     }
-                    workflowInputs.put(key, values);
                 }
-                else {
-                    value = workflowInputs.getString(key);
-                    if (value.isEmpty()) continue;
-                    if (value.charAt(0) == '/') {
-                        workflowInputs.put(key, getAWSUrl(value.substring(1)));
-                    }
-                }
+            } catch (InterruptedException e) {
+                throw new InterruptedException(String.format("%s - relative path to the file is not correct or the file is missing", e.getMessage()));
             }
-        } catch (InterruptedException e) {
-            throw new InterruptedException(String.format("%s - relative path to the file is not correct or the file is missing", e.getMessage()));
         }
 
         try {
@@ -157,7 +157,7 @@ public class AWSApiProcessManager {
             if (response.getStatus() / 100 != 2)
                 throw new InterruptedException(responseBody);
 
-            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), relevantOutput);
+            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), requestedOutputs);
             return jobId;
 
         } catch (UnirestException e) {

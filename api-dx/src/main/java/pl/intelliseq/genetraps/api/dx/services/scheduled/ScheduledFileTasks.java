@@ -103,7 +103,12 @@ public class ScheduledFileTasks {
                             JSONObject requestedOutputs = getRequestedOutputsForJob(resultSet);
 
                             // move the requested outputs to sample directory with given sampleId
-                            moveObjectsWithJSON(bucket, availableOutputs, requestedOutputs, resultSet.getString("SampleID"));
+                            if(requestedOutputs.length() == 0) {
+                                moveAllObjects(bucket, availableOutputs, resultSet.getString("SampleID"));
+                            }
+                            else {
+                                moveObjectsWithJSON(bucket, availableOutputs, requestedOutputs, resultSet.getString("SampleID"));
+                            }
 
                             // delete remaining outputs of a workflow
                             deleteAllObjectsWithPrefix(bucket, String.format("%s/%s/%s/", env.getProperty("cromwell-execution-folder"), jobDetails.getString("name"), cromwellJobId));
@@ -134,6 +139,18 @@ public class ScheduledFileTasks {
                 } catch (Exception e) {
                     log.info(e.getMessage());
                 }
+        }
+    }
+
+    private void moveAllObjects(String bucket, JSONObject availableObjects, String destinationSampleId) {
+
+        Iterator<String> allObjectsIt = availableObjects.keys();
+        String object, objectKey;
+        while (allObjectsIt.hasNext()) {
+            object = allObjectsIt.next();
+            objectKey = availableObjects.getString(object).replaceFirst(".*/(cromwell-execution/.*)", "$1");
+            s3Client.copyObject(bucket, objectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples-folder"), destinationSampleId, object));
+            s3Client.deleteObject(bucket, objectKey);
         }
     }
 
