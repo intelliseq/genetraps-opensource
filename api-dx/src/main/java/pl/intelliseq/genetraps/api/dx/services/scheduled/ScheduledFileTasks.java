@@ -50,7 +50,7 @@ public class ScheduledFileTasks {
     }
 
     // TODO: make cron delete given record and all its workflow output if e.g. number of failed tries reaches 3/5/...
-    @Scheduled(cron = "0 */5 * * * *")
+//    @Scheduled(cron = "0 */5 * * * *")
     private synchronized void checkForOutput() {
 
         log.info("||| checkForOutput");
