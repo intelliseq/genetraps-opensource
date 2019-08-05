@@ -49,7 +49,6 @@ public class ScheduledFileTasks {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // TODO: make cron delete given record and all its workflow output if e.g. number of failed tries reaches 3/5/...
 //    @Scheduled(cron = "0 */5 * * * *")
     private synchronized void checkForOutput() {
 
@@ -97,9 +96,9 @@ public class ScheduledFileTasks {
                             String cromwellJobId = getCromwellJobId(jobDetails);
 
                             // get the outputs of the job's workflow
-                            response = getCromwellJobOutputs(cromwellJobId);
+//                            response = getCromwellJobOutputs(cromwellJobId);
 
-                            JSONObject availableOutputs = getAvailableOuputsForJob(response);
+                            JSONObject availableOutputs = getAvailableOuputsForJob(env.getProperty("default-bucket"), env.getProperty("cromwell-execution-folder"), getWorkflowName(jobDetails), cromwellJobId);
                             JSONObject requestedOutputs = getRequestedOutputsForJob(resultSet);
 
                             // move the requested outputs to sample directory with given sampleId
@@ -119,12 +118,12 @@ public class ScheduledFileTasks {
 
                         } catch (Exception e) {
 //                            log.info(e.getMessage());
-                            try {
-                                moveToDebug(bucket, env.getProperty("debug-folder"), String.format("JOB ID: %s\nSAMPLE ID: %s\nERROR MESSAGE:\n%s", jobId, resultSet.getString("SampleID"), e.getMessage()), resultSet.getString("JobID"));
-                            } catch (Exception eDebug) {
-                                moveToDebugSimple(bucket, jobId, env.getProperty("debug-folder"), String.format("JOB ID: %s\nMOVING TO DEBUG ERROR:\n%sERROR MESSAGE:\n%s", jobId, eDebug.getMessage(), e.getMessage()));
-                            }
-                            resultSet.updateInt("JobStatus", 2);
+//                            try {
+//                                moveToDebug(bucket, env.getProperty("debug-folder"), String.format("JOB ID: %s\nSAMPLE ID: %s\nERROR MESSAGE:\n%s", jobId, resultSet.getString("SampleID"), e.getMessage()), resultSet.getString("JobID"));
+//                            } catch (Exception eDebug) {
+//                                moveToDebugSimple(bucket, jobId, env.getProperty("debug-folder"), String.format("JOB ID: %s\nMOVING TO DEBUG ERROR:\n%sERROR MESSAGE:\n%s", jobId, eDebug.getMessage(), e.getMessage()));
+//                            }
+//                            resultSet.updateInt("JobStatus", 2);
 
                         } finally {
                             resultSet.updateInt("SampleID", resultSet.getInt("SampleID"));  // mock update to make sure resultSet is always an updated one, otherwise the lock won't be removed (I know, so effed)
@@ -154,8 +153,6 @@ public class ScheduledFileTasks {
         }
     }
 
-//    private void moveToDebugWhenJobFailed()
-
     private HttpResponse<JsonNode> getCromwellJobWithLabel(String label, String key) throws Exception {
 
         HttpResponse<JsonNode> response = Unirest
@@ -182,6 +179,11 @@ public class ScheduledFileTasks {
         return jobDetails.getString("id");
     }
 
+    private String getWorkflowName(JSONObject jobDetails) {
+
+        return jobDetails.getString("name");
+    }
+
     private HttpResponse<JsonNode> getCromwellJobOutputs(String cromwellJobId) throws Exception {
 
         HttpResponse<JsonNode> response = Unirest
@@ -193,9 +195,19 @@ public class ScheduledFileTasks {
         return response;
     }
 
-    private JSONObject getAvailableOuputsForJob(HttpResponse<JsonNode> response) {
+    private JSONObject getAvailableOuputsForJob(String bucket, String cromwellExecutionFolder, String workflowName, String jobId) {
 
-        return response.getBody().getObject().getJSONObject("outputs");
+        List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(bucket, String.format("%s/%s/%s/", cromwellExecutionFolder, workflowName, jobId)).getObjectSummaries();
+//            log.info(dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir));
+        JSONObject objects = new JSONObject();
+        String objectKey;
+        for (S3ObjectSummary object : objectSummaries) {
+            objectKey = object.getKey();
+            if(objectKey.matches(".*/"))    continue;       // omits id of directories
+            objects.put(objectKey.substring(objectKey.lastIndexOf("/") + 1), String.format("/%s", objectKey));
+        }
+
+        return objects;
     }
 
     private JSONObject getRequestedOutputsForJob(ResultSet resultSet) throws SQLException {

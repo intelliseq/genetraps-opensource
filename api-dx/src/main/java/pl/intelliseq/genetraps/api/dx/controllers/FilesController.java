@@ -72,6 +72,20 @@ public class FilesController {
 //    }
 
     // AWS S3
+    @RequestMapping(value = "/sample/create", method = RequestMethod.GET)
+    @ResponseBody
+    public String createFolder(@ApiIgnore OAuth2Authentication auth) {
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+
+        Integer sampleId = filesManager.mkdir();
+
+        //TO DO make creating samples synchronized with DB i.e. setUserPrivilegesToSample and removing it
+//        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
+
+        return String.format("{\"response\":\"%s\"}", sampleId);
+    }
+
+    // AWS S3
     @RequestMapping(value = "/wdl", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @ResponseBody
@@ -89,34 +103,6 @@ public class FilesController {
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
-    }
-
-    // AWS S3
-    // returns url of output file on aws s3
-//    @RequestMapping(value = "/sample/get/file/url", method = RequestMethod.GET)
-//    @ResponseBody
-//    public String outputURL(@RequestParam(name = "file-name") String fileName) {
-//
-//        try {
-//            return awsApiProcessManager.getAWSUrl(fileName);
-//        } catch (Exception e) {
-//            return e.getMessage();
-//        }
-//    }
-
-    // AWS S3
-    @RequestMapping(value = "/sample/create", method = RequestMethod.GET)
-    @ResponseBody
-    public String createFolder(@ApiIgnore OAuth2Authentication auth) {
-        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
-//        Integer sampleId = awsApiProcessManager.runCreateSample();
-
-        Integer sampleId = filesManager.mkdir();
-
-        //TO DO make creating samples synchronized with DB i.e. setUserPrivilegesToSample and removing it
-//        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
-
-        return String.format("{\"response\":\"%s\"}", sampleId);
     }
 
     @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
