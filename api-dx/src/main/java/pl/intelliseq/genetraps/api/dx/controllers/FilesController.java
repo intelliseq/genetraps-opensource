@@ -137,6 +137,19 @@ public class FilesController {
     }
 
     // AWS S3
+    @RequestMapping(value = "sample/{id}/file/delete", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String deleteFile(
+            @PathVariable Integer id,
+            @RequestParam(name = "file-path") String fileRelPath) {
+        try {
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runDeleteFile(id, fileRelPath)).toString();
+        } catch (Exception e) {
+            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
+        }
+    }
+
+    // AWS S3
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
     public String sampleLs(
             @PathVariable Integer id,

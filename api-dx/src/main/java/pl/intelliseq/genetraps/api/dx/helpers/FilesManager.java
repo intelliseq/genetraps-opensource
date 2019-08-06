@@ -41,8 +41,8 @@ public class FilesManager {
 
     // AWS
     public List<Integer> getNumericDirectories() {
-        String bucketName = env.getProperty("default-bucket");
-        var listObjectsV2Result = s3Client.listObjectsV2(bucketName, String.format("%s/", env.getProperty("samples-folder")));
+        String bucketName = env.getProperty("bucket.default");
+        var listObjectsV2Result = s3Client.listObjectsV2(bucketName, String.format("%s/", env.getProperty("samples.folder")));
         List<S3ObjectSummary> sampleSummaries = listObjectsV2Result.getObjectSummaries();
         if(sampleSummaries.size() == 1) {
             return new LinkedList<>();

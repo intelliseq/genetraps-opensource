@@ -14,7 +14,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
@@ -53,8 +52,8 @@ public class ScheduledFileTasks {
     private synchronized void checkForOutput() {
 
         log.info("||| checkForOutput");
-        String bucket = env.getProperty("default-bucket");
-        String debugDir = env.getProperty("debug-folder");
+        String bucket = env.getProperty("bucket.default");
+        String debugDir = env.getProperty("debug.folder");
 
         List<String> jobsToCheck = auroraDBManager.getJobsWithStatusNotYetSucceded();
 
@@ -98,7 +97,7 @@ public class ScheduledFileTasks {
                             // get the outputs of the job's workflow
 //                            response = getCromwellJobOutputs(cromwellJobId);
 
-                            JSONObject availableOutputs = getAvailableOuputsForJob(env.getProperty("default-bucket"), env.getProperty("cromwell-execution-folder"), getWorkflowName(jobDetails), cromwellJobId);
+                            JSONObject availableOutputs = getAvailableOuputsForJob(env.getProperty("bucket.default"), env.getProperty("cromwell.execution.folder"), getWorkflowName(jobDetails), cromwellJobId);
                             JSONObject requestedOutputs = getRequestedOutputsForJob(resultSet);
 
                             // move the requested outputs to sample directory with given sampleId
@@ -110,7 +109,7 @@ public class ScheduledFileTasks {
                             }
 
                             // delete remaining outputs of a workflow
-                            deleteAllObjectsWithPrefix(bucket, String.format("%s/%s/%s/", env.getProperty("cromwell-execution-folder"), jobDetails.getString("name"), cromwellJobId));
+                            deleteAllObjectsWithPrefix(bucket, String.format("%s/%s/%s/", env.getProperty("cromwell.execution.folder"), jobDetails.getString("name"), cromwellJobId));
 
                             log.info(resultSet.getInt("JobStatus"));
                             // update job status in db to successful (1)
@@ -148,7 +147,7 @@ public class ScheduledFileTasks {
         while (allObjectsIt.hasNext()) {
             object = allObjectsIt.next();
             objectKey = availableObjects.getString(object).replaceFirst(".*/(cromwell-execution/.*)", "$1");
-            s3Client.copyObject(bucket, objectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples-folder"), destinationSampleId, object));
+            s3Client.copyObject(bucket, objectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, object));
             s3Client.deleteObject(bucket, objectKey);
         }
     }
@@ -223,14 +222,14 @@ public class ScheduledFileTasks {
             requestedObject = reqObjectsIt.next();
             reqObjectKey = availableObjects.getString(requestedObject).replaceFirst(".*/(cromwell-execution/.*)", "$1");
             newName = requestedObjects.getString(requestedObject);  // newName is a value of pair where requestedObject is key
-            s3Client.copyObject(bucket, reqObjectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples-folder"), destinationSampleId, newName.isEmpty() ? requestedObject : newName));
+            s3Client.copyObject(bucket, reqObjectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, newName.isEmpty() ? requestedObject : newName));
             s3Client.deleteObject(bucket, reqObjectKey);
         }
     }
 
     public void deleteAllObjectsWithPrefix(String bucket, String prefix) {
 
-        List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(env.getProperty("default-bucket"), prefix).getObjectSummaries();
+        List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(env.getProperty("bucket.default"), prefix).getObjectSummaries();
         List<String> objects = new ArrayList<>();
         for (S3ObjectSummary object : objectSummaries) {
             objects.add(object.getKey());
