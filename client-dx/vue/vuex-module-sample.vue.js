@@ -1,7 +1,7 @@
 const sampleModule = {
 	namespaced: true,
 	state: {
-		sampleId: ''
+		sample: {properties: {"key1": "value1","key2": "value2"}}
   },
 	mutations: {
 	},
@@ -10,7 +10,7 @@ const sampleModule = {
 			logger.debug("vue.vuex.sample.createSample")
 			request({
 				waitingText: "Creating sample",
-				endpoint: "mkdir",
+				endpoint: "sample/new",
 				callback: function(data){console.log(data)}
 			})
 		},
@@ -21,6 +21,10 @@ const sampleModule = {
 				endpoint: "user/privileges",
 				callback: function(data){console.log(data)}
 			})
+		},
+		showSamples({commit}) {
+			logger.debug("vue.vuex.sample.showSamples")
+			store.dispatch("sample/getSamples")
 		},
 	}
 }

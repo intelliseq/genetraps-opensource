@@ -14,18 +14,18 @@ public class WDLParserController {
     WDLParserManager WDLParserManager;
 
     @RequestMapping(value = "/wdl/{name}/info", method = RequestMethod.GET)
-    public String GetSpecificWDL(
+    public String getSpecificWDL(
             @PathVariable String name) {
-        return WDLParserManager.GetData(name).toString();
+        return WDLParserManager.getData(name).toString();
     }
 
     @RequestMapping(value = "/wdl/info", method = RequestMethod.GET)
-    public String GetAllWDLs() {
-        return WDLParserManager.GetData().toString();
+    public String getAllWDLs() {
+        return WDLParserManager.getData().toString();
     }
 
     @RequestMapping(value = "/wdl/update", method = RequestMethod.GET)
-    public void UpdateWDLData() {
-        WDLParserManager.CollectData();
+    public void updateWDLData() {
+        WDLParserManager.collectData();
     }
 }

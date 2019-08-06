@@ -46,15 +46,15 @@ public class AWSApiProcessManager {
 
     public void runCreateSample(Integer sampleId) {
 
-        String bucketName = env.getProperty("bucket-name");
-        s3Client.putObject(bucketName, String.format("samples/%s/", sampleId), "");
+        String bucketName = env.getProperty("default-bucket");
+        s3Client.putObject(bucketName, String.format("%s/%s/", env.getProperty("samples-folder"), sampleId), "");
     }
 
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
 
-        String bucketName = env.getProperty("bucket-name");
+        String bucketName = env.getProperty("default-bucket");
         String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName.charAt(newFileName.length() - 1) == '/' ? String.format("%s%s", newFileName, mfile.getOriginalFilename()) : newFileName;
-        String fileKey = String.format("samples/%s/%s", sampleId, fileName);
+        String fileKey = String.format("%s/%s/%s", env.getProperty("samples-folder"), sampleId, fileName);
 
         if(s3Client.doesObjectExist(bucketName, fileKey)) {
             throw new InterruptedException("A file with given name (key) already exists");
@@ -92,22 +92,21 @@ public class AWSApiProcessManager {
             s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
         }
 
-        return String.format("/samples/%s/%s", sampleId, fileName);
+        return String.format("/%s/%s/%s", env.getProperty("samples-folder"), sampleId, fileName);
     }
 
-    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject relevantOutput) throws InterruptedException {
+    public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject requestedOutputs) throws InterruptedException {
 
         // extracts a name of wdl from workflow url, even the ones like "wdl-name.1"
-        String wdlName = workflowUrl;
         // gets id of wdl from db unless it's first time, otherwise adds new wdl id to db
         // TODO make wdl ids in db more universal
-        Integer wdlId = auroraDBManager.checkWdlId(wdlName);
+        Integer wdlId = auroraDBManager.checkWdlId(workflowUrl);
         if(wdlId == null) {
             try {
-                auroraDBManager.putWdlToDB(wdlName);
-                wdlId = auroraDBManager.checkWdlId(wdlName);
+                auroraDBManager.putWdlToDB(workflowUrl);
+                wdlId = auroraDBManager.checkWdlId(workflowUrl);
             } catch (DataIntegrityViolationException e) {
-                wdlId = auroraDBManager.checkWdlId(wdlName);
+                wdlId = auroraDBManager.checkWdlId(workflowUrl);
             }
         }
 
@@ -116,7 +115,7 @@ public class AWSApiProcessManager {
             for (Iterator<String> it = workflowInputs.keys(); it.hasNext(); ) {
                 String key = it.next();
                 String value;
-                if(workflowInputs.get(key).getClass().equals(JSONArray.class)) {
+                if (workflowInputs.get(key).getClass().equals(JSONArray.class)) {
                     JSONArray values = workflowInputs.getJSONArray(key);
                     for (int i = 0; i < values.length(); i++) {
                         value = values.getString(i);
@@ -126,8 +125,7 @@ public class AWSApiProcessManager {
                         }
                     }
                     workflowInputs.put(key, values);
-                }
-                else {
+                } else {
                     value = workflowInputs.getString(key);
                     if (value.isEmpty()) continue;
                     if (value.charAt(0) == '/') {
@@ -139,39 +137,42 @@ public class AWSApiProcessManager {
             throw new InterruptedException(String.format("%s - relative path to the file is not correct or the file is missing", e.getMessage()));
         }
 
-        try {
-            // creates unique 32-char id for a job, using hash
-            String responseBody;
-            String toHash = String.format("%s%d", auroraDBManager.getUserDetails(userId).getUserName(), System.currentTimeMillis());
-            String jobId = DigestUtils.md5Hex(toHash);
-            labels.put("jobId", jobId);
+        log.info(workflowInputs.toString());
 
-            HttpResponse<String> response = Unirest.post(env.getProperty("ec2-cromwell-dns"))
-                    .header("accept", "application/json")
-                    .field("workflowUrl", workflowUrl)
-                    .field("workflowInputs", workflowInputs)
-                    .field("workflowType", new ByteArrayInputStream("WDL".getBytes()), "workflowtype")
-                    .field("labels", labels)
-                    .asString();
-            responseBody = response.getBody();
-            if (response.getStatus() / 100 != 2)
-                throw new InterruptedException(responseBody);
-
-            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), relevantOutput);
-            return jobId;
-
-        } catch (UnirestException e) {
-            throw new InterruptedException(e.getMessage());
-        } catch (Exception e) {
-            throw new InterruptedException(e.getMessage());
-        }
+//        try {
+//            // creates unique 32-char id for a job, using hash
+//            String responseBody;
+//            String toHash = String.format("%s%d", auroraDBManager.getUserDetails(userId).getUserName(), System.currentTimeMillis());
+//            String jobId = DigestUtils.md5Hex(toHash);
+//            labels.put("jobId", jobId);
+//
+//            HttpResponse<String> response = Unirest.post(env.getProperty("ec2-cromwell-dns"))
+//                    .header("accept", "application/json")
+//                    .field("workflowUrl", workflowUrl)
+//                    .field("workflowInputs", workflowInputs)
+//                    .field("workflowType", new ByteArrayInputStream("WDL".getBytes()), "workflowtype")
+//                    .field("labels", labels)
+//                    .asString();
+//            responseBody = response.getBody();
+//            if (response.getStatus() / 100 != 2)
+//                throw new InterruptedException(responseBody);
+//
+//            auroraDBManager.putJobToDB(jobId, userId, wdlId, 0, labels.getInt("sampleid"), requestedOutputs);
+//            return jobId;
+//
+//        } catch (UnirestException e) {
+//            throw new InterruptedException(e.getMessage());
+//        } catch (Exception e) {
+//            throw new InterruptedException(e.getMessage());
+//        }
+        return workflowInputs.toString();
     }
 
     public String getAWSUrl(String fileName) throws InterruptedException {
 
         try {
-            if(s3Client.doesObjectExist(env.getProperty("bucket-name"), fileName))
-                return s3Client.getUrl(env.getProperty("bucket-name"), fileName).toString();
+            if(s3Client.doesObjectExist(env.getProperty("default-bucket"), fileName))
+                return s3Client.getUrl(env.getProperty("default-bucket"), fileName).toString();
             else
                 throw new InterruptedException(fileName);
         } catch (Exception e) {
@@ -181,15 +182,15 @@ public class AWSApiProcessManager {
 
     public JSONObject runSampleLs(Integer sampleId, String dir) throws InterruptedException {
 
-        String bucket = env.getProperty("bucket-name");
+        String bucket = env.getProperty("default-bucket");
         try {
-            if(!s3Client.doesObjectExist(bucket, String.format("samples/%s/", sampleId)))
+            if(!s3Client.doesObjectExist(bucket, String.format("%s/%s/", env.getProperty("samples-folder"), sampleId)))
                 throw new InterruptedException(String.format("Sample: %s does not exist", sampleId));
 //            else if(!dir.isEmpty() && !s3Client.doesObjectExist(bucket, String.format("samples/%s/%s/", sampleId, dir)))
 //                throw new InterruptedException(String.format("Directory: %s does not exist in sample: %s", dir, sampleId));
 
             List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(bucket,
-                    dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir)).getObjectSummaries();
+                    dir.isEmpty() ? String.format("%s/%s/", env.getProperty("samples-folder"), sampleId) : String.format("%s/%s/%s/", env.getProperty("samples-folder"), sampleId, dir)).getObjectSummaries();
 //            log.info(dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir));
             JSONObject objects = new JSONObject();
             String objectKey;
