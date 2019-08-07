@@ -38,7 +38,7 @@ public class BeansConfiguration {
     }
 
     @Bean
-    WDLParserManager WDLparser(){
+    WDLParserManager wdlParserManager(){
   		return new WDLParserManager();
   	}
 

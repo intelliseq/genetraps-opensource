@@ -223,10 +223,14 @@ public class WDLParserManager {
             double highestVersion=0.0;
             for (JsonNode versionNode: wdlVersions){
                 String versionPath = remover(versionNode.get("path").toString());
-                double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
-                if (versionNumber>highestVersion) {
-                    filePath = versionPath;
-                    highestVersion=versionNumber;
+                try{
+                    double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
+                    if (versionNumber>highestVersion) {
+                        filePath = versionPath;
+                        highestVersion=versionNumber;
+                    }
+                } catch(NumberFormatException e){
+                    log.error(String.format("Error when parsing version of file: %s", filePath));
                 }
             }
 
