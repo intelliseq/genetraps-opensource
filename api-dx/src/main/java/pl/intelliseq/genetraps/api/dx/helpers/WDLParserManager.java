@@ -51,9 +51,7 @@ public class WDLParserManager {
             requestedData.set(name, data.get(name));
             return requestedData;
         }
-        else{
-            return null;
-        }
+        return null;
     }
 
     private JsonNode parserWDLToJSON(String path){
@@ -63,11 +61,6 @@ public class WDLParserManager {
         // Parsing file to clean YAML
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(resourcePath).openStream()));
-
-            // Omitting header
-            for (int i=0;i<4;i++){
-                reader.readLine();
-            }
 
             // Parsing description to YAMLFactory
             String line;
@@ -87,16 +80,20 @@ public class WDLParserManager {
             }
 
             String variableLine;
-            Pattern descriptionPattern = Pattern.compile("#\\s*@Input.*");
-            Pattern soloDescriptionPattern = Pattern.compile("((\\w*)\\s?=\\s?)((\\\".*?\\\")|(\\[.*\\])|(\\d*\\.?\\d?))");
+            Pattern inputDescriptionPattern = Pattern.compile("\\s*#\\s*@Input.*");
+            Pattern outputsStartingPattern = Pattern.compile("\\s*output\\s*\\{.*");
+            Pattern outputDescriptionPattern = Pattern.compile("\\s*#\\s*@Output.*");
+            Pattern soloInputDescriptionPattern = Pattern.compile("((\\w*)\\s?=\\s?)((\\\".*?\\\")|(\\[.*\\])|(\\d*\\.?\\d?))");
+            Pattern soloOutputDescriptionPattern = Pattern.compile("((\\w*)\\s?=\\s?)((\\\".*?\\\")|(true)|(false))");
             Pattern variablePatternQM = Pattern.compile(".*\\?.*");
             Pattern variablePatternEq = Pattern.compile("(.*?)\\s(.*)\\s*=\\s*(.*)");
 
-            trueYaml.append("Inputs:\n");
-            while((line = reader.readLine()) != null){
+            // reading inputs
+            trueYaml.append("inputs:\n");
+            while((line = reader.readLine()) != null && !outputsStartingPattern.matcher(line).matches()){
 
                 // looking for /# @Input()/ lines
-                if (descriptionPattern.matcher(line).matches()) {
+                if (inputDescriptionPattern.matcher(line).matches()) {
 
                     variableLine = reader.readLine().trim();
 
@@ -104,28 +101,28 @@ public class WDLParserManager {
                     if (variablePatternQM.matcher(variableLine).matches()){
                         String[] parts = variableLine.split("\\? *");
                         trueYaml.append("  ").append(parts[1]).append(":\n");
-                        trueYaml.append("    Type: ").append(parts[0]).append("\n");
-                        trueYaml.append("    Optional: true\n");
+                        trueYaml.append("    type: ").append(parts[0]).append("\n");
+                        trueYaml.append("    required: true\n");
                     }
                     else if (variablePatternEq.matcher(variableLine).matches()){
                         Matcher eq = variablePatternEq.matcher(variableLine);
                         eq.find();
                         trueYaml.append("  ").append(eq.group(2)).append(":\n");
-                        trueYaml.append("    Type: ").append(eq.group(1)).append("\n");
-                        trueYaml.append("    Default_Value: ").append(eq.group(3)).append("\n");
-                        trueYaml.append("    Optional: false\n");
+                        trueYaml.append("    type: ").append(eq.group(1)).append("\n");
+                        trueYaml.append("    default_Value: ").append(eq.group(3)).append("\n");
+                        trueYaml.append("    required: false\n");
                     }
                     else
                     {
                         String[] parts = variableLine.split("\\s+");
                         trueYaml.append("  ").append(parts[1]).append(":\n");
-                        trueYaml.append("    Type: ").append(parts[0]).append("\n");
-                        trueYaml.append("    Optional: false\n");
+                        trueYaml.append("    type: ").append(parts[0]).append("\n");
+                        trueYaml.append("    required: false\n");
                     }
 
                     // cutting found description line and parsing it to YAML
                     List<String> allMatches = new ArrayList<String>();
-                    Matcher descriptionMatcher = soloDescriptionPattern.matcher(line);
+                    Matcher descriptionMatcher = soloInputDescriptionPattern.matcher(line);
                     while (descriptionMatcher.find())
                     {
                         allMatches.add(descriptionMatcher.group(2));
@@ -150,6 +147,39 @@ public class WDLParserManager {
                         else {
                             trueYaml.append(allMatches.get(i)).append('\n');
                         }
+                    }
+                }
+            }
+
+            // reading outputs
+            trueYaml.append("outputs:\n");
+            while((line = reader.readLine()) != null) {
+
+                // looking for /# @Output()/ lines
+                if (outputDescriptionPattern.matcher(line).matches()) {
+
+                    variableLine = reader.readLine().trim();
+
+                    Matcher eq = variablePatternEq.matcher(variableLine);
+                    eq.find();
+                    trueYaml.append("  ").append(eq.group(2)).append(":\n");
+                    trueYaml.append("    type: ").append(eq.group(1)).append("\n");
+
+                    // cutting found description line and parsing it to YAML
+                    List<String> allMatches = new ArrayList<String>();
+                    Matcher descriptionMatcher = soloOutputDescriptionPattern.matcher(line);
+                    while (descriptionMatcher.find())
+                    {
+                        allMatches.add(descriptionMatcher.group(2));
+                        int i=6;
+                        while(descriptionMatcher.group(i) == null) i--;
+                        allMatches.add(descriptionMatcher.group(i));
+                    }
+                    for (int i=0;i<allMatches.size();i++)
+                    {
+                        trueYaml.append("    ").append(allMatches.get(i)).append(": ");
+                        i++;
+                        trueYaml.append(allMatches.get(i)).append('\n');
                     }
                 }
             }
@@ -193,10 +223,14 @@ public class WDLParserManager {
             double highestVersion=0.0;
             for (JsonNode versionNode: wdlVersions){
                 String versionPath = remover(versionNode.get("path").toString());
-                double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
-                if (versionNumber>highestVersion) {
-                    filePath = versionPath;
-                    highestVersion=versionNumber;
+                try{
+                    double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
+                    if (versionNumber>highestVersion) {
+                        filePath = versionPath;
+                        highestVersion=versionNumber;
+                    }
+                } catch(NumberFormatException e){
+                    log.error(String.format("Error when parsing version of file: %s", filePath));
                 }
             }
 
