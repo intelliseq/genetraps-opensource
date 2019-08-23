@@ -1,0 +1,847 @@
+swagger: '2.0'
+info:
+  description: Api Documentation
+  version: '1.0'
+  title: Api Documentation
+  termsOfService: 'urn:tos'
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+host: 'localhost:8086'
+basePath: /
+tags:
+  - name: files-controller
+    description: Files Controller
+  - name: groups-controller
+    description: Groups Controller
+  - name: hello-controller
+    description: Hello Controller
+  - name: pipeline-controller
+    description: Pipeline Controller
+  - name: privileges-controller
+    description: Privileges Controller
+  - name: users-controller
+    description: Users Controller
+paths:
+  /bwa:
+    post:
+      tags:
+        - pipeline-controller
+      summary: bwa
+      operationId: bwaUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: sampleId
+          in: query
+          description: sampleId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /fastqc:
+    post:
+      tags:
+        - pipeline-controller
+      summary: fastqc
+      operationId: fastqcUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: fileId
+          in: query
+          description: fileId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /gatkhc:
+    post:
+      tags:
+        - pipeline-controller
+      summary: gatkhc
+      operationId: gatkhcUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: interval
+          in: query
+          description: interval
+          required: false
+          type: string
+        - name: sampleId
+          in: query
+          description: sampleId
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/group/{id}':
+    get:
+      tags:
+        - groups-controller
+      summary: getGroupInfo
+      operationId: getGroupInfoUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/groupId'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /groups:
+    get:
+      tags:
+        - groups-controller
+      summary: getGroups
+      operationId: getGroupsUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+    post:
+      tags:
+        - groups-controller
+      summary: createGroup
+      operationId: createGroupUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /hello:
+    get:
+      tags:
+        - hello-controller
+      summary: hello
+      operationId: helloUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /sample/new:
+    get:
+      tags:
+        - files-controller
+      summary: mkDir
+      operationId: mkDirUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sample/{id}/describe':
+    get:
+      tags:
+        - files-controller
+      summary: describe
+      operationId: describeUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/sampleId'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sample/{id}/ls':
+    get:
+      tags:
+        - files-controller
+      summary: sampleLs
+      operationId: sampleLsUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - name: byNames
+          in: query
+          description: byNames
+          required: false
+          type: boolean
+          default: false
+        - $ref: '#/parameters/sampleId'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sample/{id}/properties':
+    get:
+      tags:
+        - files-controller
+      summary: samplePropertiesGet
+      operationId: samplePropertiesGetUsingGET
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/sampleId'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+    post:
+      tags:
+        - files-controller
+      summary: samplePropertiesPost
+      operationId: samplePropertiesPostUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: properties
+          description: properties
+          required: true
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+    put:
+      tags:
+        - files-controller
+      summary: samplePropertiesPut
+      operationId: samplePropertiesPutUsingPUT
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: properties
+          description: properties
+          required: true
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+    delete:
+      tags:
+        - files-controller
+      summary: samplePropertiesDelete
+      operationId: samplePropertiesDeleteUsingDELETE
+      produces:
+        - '*/*'
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: properties
+          description: properties
+          required: true
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      deprecated: false
+  /status:
+    get:
+      tags:
+        - hello-controller
+      summary: getBadge
+      operationId: getBadgeUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Resource'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sample/{id}/urlupload':
+    post:
+      tags:
+        - files-controller
+      summary: upload
+      operationId: uploadUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/sampleId'
+        - name: tag
+          in: query
+          description: tag
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: url
+          in: query
+          description: url
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sample/{id}/fileupload':
+    post:
+      tags:
+        - files-controller
+      summary: uploadfile
+      operationId: uploadfileUsingPOST
+      consumes:
+        - multipart/form-data
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/sampleId'
+        - name: file
+          in: formData
+          description: file
+          required: true
+          type: file
+        - name: newfilename
+          in: query
+          description: newfilename
+          required: false
+          type: string
+        - name: tag
+          in: query
+          description: tag
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  '/sample/{id}/grandprivileges':
+    post:
+      tags:
+        - files-controller
+        - privileges-controller
+      summary: giveUserPriviliges
+      operationId: giveUserPriviligesUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/sampleId'
+        - name: role
+          in: query
+          description: role
+          required: true
+          type: string
+          enum:
+            - READER
+            - WRITER
+            - ADMIN
+        - name: targetUserId
+          in: query
+          description: targetUserId
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /user:
+    get:
+      tags:
+        - users-controller
+      summary: user
+      operationId: userUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /user/groups:
+    get:
+      tags:
+        - users-controller
+      summary: getUsersGroups
+      operationId: getUsersGroupsUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+  /user/privileges:
+    get:
+      tags:
+        - privileges-controller
+        - user-controller
+      summary: getUserPrivileges
+      operationId: getUserPrivilegesUsingGET
+      produces:
+        - '*/*'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+definitions:
+  File:
+    type: object
+    properties:
+      absolute:
+        type: boolean
+      absoluteFile:
+        $ref: '#/definitions/File'
+      absolutePath:
+        type: string
+      canonicalFile:
+        $ref: '#/definitions/File'
+      canonicalPath:
+        type: string
+      directory:
+        type: boolean
+      file:
+        type: boolean
+      freeSpace:
+        type: integer
+        format: int64
+      hidden:
+        type: boolean
+      name:
+        type: string
+      parent:
+        type: string
+      parentFile:
+        $ref: '#/definitions/File'
+      path:
+        type: string
+      totalSpace:
+        type: integer
+        format: int64
+      usableSpace:
+        type: integer
+        format: int64
+    title: File
+  InputStream:
+    type: object
+    title: InputStream
+  ModelAndView:
+    type: object
+    properties:
+      empty:
+        type: boolean
+      model:
+        type: object
+      modelMap:
+        type: object
+        additionalProperties:
+          type: object
+      reference:
+        type: boolean
+      status:
+        type: string
+        enum:
+          - '100'
+          - '101'
+          - '102'
+          - '103'
+          - '200'
+          - '201'
+          - '202'
+          - '203'
+          - '204'
+          - '205'
+          - '206'
+          - '207'
+          - '208'
+          - '226'
+          - '300'
+          - '301'
+          - '302'
+          - '303'
+          - '304'
+          - '305'
+          - '307'
+          - '308'
+          - '400'
+          - '401'
+          - '402'
+          - '403'
+          - '404'
+          - '405'
+          - '406'
+          - '407'
+          - '408'
+          - '409'
+          - '410'
+          - '411'
+          - '412'
+          - '413'
+          - '414'
+          - '415'
+          - '416'
+          - '417'
+          - '418'
+          - '419'
+          - '420'
+          - '421'
+          - '422'
+          - '423'
+          - '424'
+          - '426'
+          - '428'
+          - '429'
+          - '431'
+          - '451'
+          - '500'
+          - '501'
+          - '502'
+          - '503'
+          - '504'
+          - '505'
+          - '506'
+          - '507'
+          - '508'
+          - '509'
+          - '510'
+          - '511'
+      view:
+        $ref: '#/definitions/View'
+      viewName:
+        type: string
+    title: ModelAndView
+  Resource:
+    type: object
+    properties:
+      description:
+        type: string
+      file:
+        $ref: '#/definitions/File'
+      filename:
+        type: string
+      inputStream:
+        $ref: '#/definitions/InputStream'
+      open:
+        type: boolean
+      readable:
+        type: boolean
+      uri:
+        $ref: '#/definitions/URI'
+      url:
+        $ref: '#/definitions/URL'
+    title: Resource
+  URI:
+    type: object
+    properties:
+      absolute:
+        type: boolean
+      authority:
+        type: string
+      fragment:
+        type: string
+      host:
+        type: string
+      opaque:
+        type: boolean
+      path:
+        type: string
+      port:
+        type: integer
+        format: int32
+      query:
+        type: string
+      rawAuthority:
+        type: string
+      rawFragment:
+        type: string
+      rawPath:
+        type: string
+      rawQuery:
+        type: string
+      rawSchemeSpecificPart:
+        type: string
+      rawUserInfo:
+        type: string
+      scheme:
+        type: string
+      schemeSpecificPart:
+        type: string
+      userInfo:
+        type: string
+    title: URI
+  URL:
+    type: object
+    properties:
+      authority:
+        type: string
+      content:
+        type: object
+      defaultPort:
+        type: integer
+        format: int32
+      file:
+        type: string
+      host:
+        type: string
+      path:
+        type: string
+      port:
+        type: integer
+        format: int32
+      protocol:
+        type: string
+      query:
+        type: string
+      ref:
+        type: string
+      userInfo:
+        type: string
+    title: URL
+  View:
+    type: object
+    properties:
+      contentType:
+        type: string
+    title: View
+parameters:
+  groupId:
+    name: id
+    description: Group ID
+    required: true
+    type: integer
+    in: path
+  sampleId:
+    name: id
+    description: Sample ID
+    required: true
+    type: integer
+    in: path

@@ -1,5 +1,7 @@
 package pl.intelliseq.genetraps.api.dx;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -8,13 +10,17 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.util.FileCopyUtils;
-import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
-import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
-import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
+import pl.intelliseq.genetraps.api.dx.helpers.*;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -23,6 +29,8 @@ import java.io.IOException;
  * Created by intelliseq on 07/12/2017.
  */
 @Configuration
+@EnableScheduling
+@EnableSwagger2
 public class BeansConfiguration {
     @Bean
     FilesManager filesManager() {
@@ -30,12 +38,20 @@ public class BeansConfiguration {
     }
 
     @Bean
+    WDLParserManager wdlParserManager(){
+  		return new WDLParserManager();
+  	}
+
+    @Bean
     DxApiProcessManager dxApiProcessManager() {
         return new DxApiProcessManager();
     }
 
     @Bean
-    AuroraDBManager auroraDBManager(){
+    AWSApiProcessManager awsApiProcessManager() { return new AWSApiProcessManager(); }
+
+    @Bean
+    AuroraDBManager auroraDBManager() {
         return new AuroraDBManager();
     }
 
@@ -64,7 +80,7 @@ public class BeansConfiguration {
 
     @Bean
     protected JwtAccessTokenConverter jwtTokenEnhancer() {
-        JwtAccessTokenConverter converter =  new JwtAccessTokenConverter();
+        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
         Resource resource = new ClassPathResource("public.cert");
         String publicKey = null;
         try {
@@ -74,5 +90,18 @@ public class BeansConfiguration {
         }
         converter.setVerifierKey(publicKey);
         return converter;
+    }
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(paths())
+                .build();
+    }
+
+    private Predicate<String> paths() {
+        return Predicates.not(PathSelectors.regex("/(basic-)?error(-controller)?.*"));
     }
 }

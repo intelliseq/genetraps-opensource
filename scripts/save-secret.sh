@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # how to use
-# ./save-secret.sh KEY VALUE bucket
+# source save-secret.sh KEY
 KEY=$1
 VALUE=${!KEY}
 BUCKET=param-store

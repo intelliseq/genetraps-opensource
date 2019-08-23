@@ -35,16 +35,16 @@ public class AuroraDBManager {
     private Logger logger = LoggerFactory.getLogger(AuroraDBManager.class);
 
     @PostConstruct
-    private void postConstruct(){
+    private void postConstruct() {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public User getUser(String username){
+    public User getUser(String username) {
         return jdbcTemplate.query(
                 String.format("SELECT S.* FROM " +
                         "Security AS S " +
-                        "JOIN Users AS U ON S.UserID=U.USerID " +
-                        "WHERE S.Username = \"%s\" OR U.Email = \"%s\";", username, username),
-                (rs, rowNum) -> new User(username, rs.getString("Password"), Collections.singletonList(new SimpleGrantedAuthority("user")))).get(0);
+                        "JOIN Users AS U ON S.UserID=U.UserID " +
+                        "WHERE S.UserID = \"%s\" OR S.Username = \"%s\" OR U.Email = \"%s\";", username, username, username),
+                (rs, rowNum) -> new User(rs.getString("UserID"), rs.getString("Password"), Collections.singletonList(new SimpleGrantedAuthority("user")))).get(0);
     }
 }

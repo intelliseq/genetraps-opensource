@@ -1,24 +1,41 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
+import pl.intelliseq.genetraps.api.dx.helpers.AWSApiProcessManager;
+import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @RestController
 @Log4j2
 public class FilesController {
 
     @Autowired
-    private DxApiProcessManager processManager;
+    private DxApiProcessManager dxApiProcessManager;
+
+    @Autowired
+    private AWSApiProcessManager awsApiProcessManager;
 
     @Autowired
     private FilesManager filesManager;
+
+    @Autowired
+    private AuroraDBManager auroraDBManager;
 
 //TODO: For future features
 //    private String matchFileAndGetName(String filename, String regex) {
@@ -45,8 +62,8 @@ public class FilesController {
 //        String rightName = matchFileAndGetName(right, rightRegex);
 //
 //        if (leftName != null && leftName.equals(rightName)) {
-//            DXJob leftId = processManager.runUrlFetch(left, sampleNumber, tag);
-//            DXJob rightId = processManager.runUrlFetch(right, sampleNumber, tag);
+//            DXJob leftId = dxApiProcessManager.runUrlFetch(left, sampleNumber, tag);
+//            DXJob rightId = dxApiProcessManager.runUrlFetch(right, sampleNumber, tag);
 //
 //            return String.format("[\"%s\",\"%s\"]", leftId.getId(), rightId.getId());
 //        } else {
@@ -54,57 +71,153 @@ public class FilesController {
 //        }
 //    }
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    // AWS S3
+    @RequestMapping(value = "/sample/create", method = RequestMethod.GET)
+    @ResponseBody
+    public String createFolder(@ApiIgnore OAuth2Authentication auth) {
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+
+        Integer sampleId = filesManager.mkdir();
+
+        //TO DO make creating samples synchronized with DB i.e. setUserPrivilegesToSample and removing it
+//        auroraDBManager.setUserPrivilegesToSample(userId, sampleId, Roles.ADMIN);
+
+        return String.format("{\"response\":\"%s\"}", sampleId);
+    }
+
+    // AWS S3
+    @RequestMapping(value = "/wdl", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseBody
+    public String wdl(
+            @ApiIgnore OAuth2Authentication auth,
+            @RequestParam String workflowUrl,
+            @RequestParam JSONObject workflowInputs,
+            @RequestParam JSONObject labels,
+            @RequestParam(name = "req-out", required = false, defaultValue = "{}") JSONObject requestedOutputs) {
+        try {
+//            if(requestedOutputs.length() == 0)
+//                throw new Exception("No requested output set");
+            Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs)).toString();
+        } catch (Exception e) {
+            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
+        }
+    }
+
+    @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public String upload(
-            OAuth2Authentication auth,
+            @ApiIgnore OAuth2Authentication auth,
+            @PathVariable Integer id,
             @RequestParam String url,
-            @RequestParam String sampleid,
             @RequestParam String... tag) {
         log.info("upload");
         log.debug(Arrays.toString(tag));
-//        log.debug(auth.getUserAuthentication().getPrincipal().toString());
+        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
+        log.debug(userId);
 
-        return new ObjectMapper().createObjectNode().put("id", processManager.runUrlFetch(url, sampleid, tag).getId()).toString();
+        return new ObjectMapper().createObjectNode().put("id", dxApiProcessManager.runUrlFetch(url, id, tag).getId()).toString();
     }
 
-    @RequestMapping(value = "/describe/{id}", method = RequestMethod.GET)
-    public String describe(
-            @PathVariable String id) {
-        return processManager.JSONDescribe(id).toString();
+    // AWS S3
+    @RequestMapping(value = "/sample/{id}/file/upload", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String uploadfile(
+            @PathVariable Integer id,
+            @RequestParam MultipartFile file,
+            @RequestParam(value = "new-name", required = false) String fileName,
+            @RequestParam(required = false) List<String> tag) {
+
+        try {
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(file, id, fileName, tag)).toString();
+        } catch (Exception e) {
+            return new ObjectMapper().createObjectNode().put("id", e.toString()).toString();
+        }
     }
 
-    @RequestMapping(value = "/fastqc", method = RequestMethod.POST)
-    public String fastqc(@RequestParam String fileId) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runFastqc(fileId).getId()).toString();
+    // AWS S3
+    @RequestMapping(value = "sample/{id}/file/delete", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String deleteFile(
+            @PathVariable Integer id,
+            @RequestParam(name = "file-path") String fileRelPath) {
+        try {
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runDeleteFile(id, fileRelPath)).toString();
+        } catch (Exception e) {
+            return new ObjectMapper().createObjectNode().put("id", e.toString()).toString();
+        }
     }
 
-//    test me not in use
-//    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"fastq_file_1", "fastq_file_2"})
-//    public String bwa(@RequestParam String fastq_file_1, @RequestParam String fastq_file_2) {
-//        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(fastq_file_1, fastq_file_2).getId()).toString();
+    // AWS S3
+    @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
+    public String sampleLs(
+            @PathVariable Integer id,
+//            @RequestParam(required = false, defaultValue = "false") boolean byNames,
+            @RequestParam(required = false, defaultValue = "")  String dir) {
+        try {
+            return awsApiProcessManager.runSampleLs(id, dir).toString();
+        } catch (InterruptedException e) {
+            // if error, returns err message with key: /error
+            // normal keys doesn't start with '/' at the beginning
+            return String.format("{\"/error\":\"%s\"}", e.toString());
+        }
+    }
+
+    //TODO: is there an equivalent in aws??
+//    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
+//    public String describe(
+//            @PathVariable Integer id) {
+//        return dxApiProcessManager.JSONDescribe(id).toString();
 //    }
 
-    @RequestMapping(value = "/bwa", method = RequestMethod.POST, params = {"sampleid"})
-    public String bwa(@RequestParam int sampleid) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runBwa(sampleid).getId()).toString();
+    // creates and/or adds properties a specified sample folder
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public String samplePropertiesPost(
+            @PathVariable Integer id,
+            @RequestBody JsonNode properties,
+            @RequestParam boolean persist) {
+        try {
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesPost(id, properties, persist).toString()).toString();
+        } catch (PropertiesException e) {
+//            return new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString()).toString();
+        }
     }
 
-    @RequestMapping(value = "/gatkhc", method = RequestMethod.POST)
-    public String gatkhc(@RequestParam int sampleid,
-                         @RequestParam(required = false) String interval) {
-        return new ObjectMapper().createObjectNode().put("id", processManager.runGatkHC(sampleid, interval).getId()).toString();
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.GET)
+    public String samplePropertiesGet(
+            @PathVariable Integer id) {
+        try {
+            return awsApiProcessManager.propertiesGet(id).toString();
+        } catch (PropertiesException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
+        }
     }
 
-    @RequestMapping(value = "/mkdir", method = RequestMethod.GET)
-    @ResponseBody
-    public String mkDir() {
-        return String.format("{\"response\":%s}", filesManager.mkdir());
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.PUT)
+    public String samplePropertiesPut(
+            @PathVariable Integer id,
+            @RequestBody JsonNode properties,
+            @RequestParam boolean persist) {
+        try {
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesPut(id, properties, persist).toString()).toString();
+        } catch (PropertiesException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString()).toString();
+        }
     }
 
-    @RequestMapping(value = "/sample/{no}/ls", method = RequestMethod.GET)
-    public String samplels(@PathVariable("no") int sampleid,
-                            @RequestParam(required = false, defaultValue = "false") boolean byNames) {
-        return processManager.sampleLs(sampleid, byNames);
+    @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.DELETE)
+    public String samplePropertiesDelete(
+            @PathVariable Integer id,
+            @RequestBody JsonNode properties,
+            @RequestParam boolean persist) {
+        try {
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesDelete(id, properties, persist).toString()).toString();
+        } catch (PropertiesException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString()).toString();
+        }
     }
 
 }

@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/java,gradle,eclipse,intellij
 
+### MACOS ###
+.DS_Store
+
 ### Eclipse ###
 
 .metadata
@@ -190,3 +193,13 @@ gradle-app.setting
 
 
 # End of https://www.gitignore.io/api/java,gradle,eclipse,intellij
+
+# keys
+*.jks
+*.cert
+
+# Decrypted
+secret-data/decrypted
+
+
+api-dx/src/main/resources/for-reference/

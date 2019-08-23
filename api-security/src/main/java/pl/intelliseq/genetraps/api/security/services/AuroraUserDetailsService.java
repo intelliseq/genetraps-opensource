@@ -14,7 +14,7 @@ public class AuroraUserDetailsService implements UserDetailsService{
     private AuroraDBManager auroraDBManager;
     @Override
     public UserDetails loadUserByUsername(String username) {
-        log.info("Getting user details for "+username);
+//        log.info("Getting user details for "+username);
         return auroraDBManager.getUser(username);
     }
 }

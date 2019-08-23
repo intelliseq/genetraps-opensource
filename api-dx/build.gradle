@@ -45,7 +45,7 @@ repositories {
 
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.testng', name: 'testng', version: '7.0.0-beta1'
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
     testCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.3.RELEASE'
@@ -53,13 +53,14 @@ dependencies {
 
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version:'2.7.4'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+//    compile group: 'com.google.guava', name: 'guava', version: '18.0'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.3.RELEASE'
     compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.3.RELEASE'
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
@@ -74,6 +75,14 @@ dependencies {
     compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.390'
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.9.RELEASE'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+
+    compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
+    // aws
+    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.492'
 
 
 }
@@ -84,6 +93,6 @@ docker {
     buildArgs(['JAR_FILE': "${jar.archiveName}"])
 }
 
-task wrapper(type: Wrapper) {
+wrapper() {
     gradleVersion = '4.7'
 }

@@ -7,14 +7,13 @@ import com.dnanexus.DXJSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
@@ -23,14 +22,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Log4j2
 @ActiveProfiles("test")
-public class ApiDxTest {
+public class ApiDxTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     FilesManager filesManager;
@@ -43,13 +43,15 @@ public class ApiDxTest {
     DxApiProcessManager dxApiProcessManager;
 
     @Test
-    public void singleMkdirTest() {
-        Integer folder = filesManager.getLowestFreeIndex();
-        dxApiProcessManager.runMkDir(folder);
+    public void testSingleMkdir() {
+
+        Integer folder = filesManager.getLowestFreeIndex(filesManager.getNumericDirectories());
+//        dxApiProcessManager.runMkDir(folder);
+        assertTrue(folder != null);
     }
 
     //    @Test
-    public void descriptiontesting() {
+    public void testDescription() {
         var objectId = "job-FGP2j6Q0pqjbJZ7kKjJVJz8k";
         var out = DXJSON.safeTreeToValue(
                 new DXHTTPRequest(DXEnvironment.create()).request("/" + objectId + "/" + "describe",
@@ -65,8 +67,8 @@ public class ApiDxTest {
         log.info(out);
     }
 
-    @Test
-    public void manyMkdirTest() throws InterruptedException {
+//    @Test
+    public void testManyMkdir() throws InterruptedException {
         class MkDirRunnable implements Runnable {
             private int id;
 
@@ -98,7 +100,9 @@ public class ApiDxTest {
 
         Integer folderToDelete = filesManager.getNumericDirectories().size() / 2;
 
-        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/" + folderToDelete);
+        log.debug("Folder to delete: "+folderToDelete);
+
+        DXContainer.getInstance(env.getProperty("dx-project")).removeFolder("/samples/" + folderToDelete, true);
 
         assertEquals(filesManager.mkdir(), folderToDelete);
 
