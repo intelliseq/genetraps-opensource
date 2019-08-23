@@ -132,7 +132,7 @@ public class FilesController {
         try {
             return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(file, id, fileName, tag)).toString();
         } catch (Exception e) {
-            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
+            return new ObjectMapper().createObjectNode().put("id", e.toString()).toString();
         }
     }
 
@@ -145,7 +145,7 @@ public class FilesController {
         try {
             return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runDeleteFile(id, fileRelPath)).toString();
         } catch (Exception e) {
-            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
+            return new ObjectMapper().createObjectNode().put("id", e.toString()).toString();
         }
     }
 
@@ -160,7 +160,7 @@ public class FilesController {
         } catch (InterruptedException e) {
             // if error, returns err message with key: /error
             // normal keys doesn't start with '/' at the beginning
-            return String.format("{\"/error\":\"%s\"}", e.getMessage());
+            return String.format("{\"/error\":\"%s\"}", e.toString());
         }
     }
 
@@ -171,15 +171,18 @@ public class FilesController {
 //        return dxApiProcessManager.JSONDescribe(id).toString();
 //    }
 
+    // creates and/or adds properties a specified sample folder
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public String samplePropertiesPost(
             @PathVariable Integer id,
-            @RequestBody LinkedHashMap<String, String> properties) {
+            @RequestBody JsonNode properties,
+            @RequestParam boolean persist) {
         try {
-            return dxApiProcessManager.propertiesPost(id, properties).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesPost(id, properties, persist).toString()).toString();
         } catch (PropertiesException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
+//            return new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString()).toString();
         }
     }
 
@@ -187,7 +190,7 @@ public class FilesController {
     public String samplePropertiesGet(
             @PathVariable Integer id) {
         try {
-            return dxApiProcessManager.propertiesGet(id).toString();
+            return awsApiProcessManager.propertiesGet(id).toString();
         } catch (PropertiesException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
         }
@@ -196,22 +199,24 @@ public class FilesController {
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.PUT)
     public String samplePropertiesPut(
             @PathVariable Integer id,
-            @RequestBody LinkedHashMap<String, String> properties) {
+            @RequestBody JsonNode properties,
+            @RequestParam boolean persist) {
         try {
-            return dxApiProcessManager.propertiesPut(id, properties).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesPut(id, properties, persist).toString()).toString();
         } catch (PropertiesException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString()).toString();
         }
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.DELETE)
     public String samplePropertiesDelete(
             @PathVariable Integer id,
-            @RequestBody LinkedHashMap<String, String> properties) {
+            @RequestBody JsonNode properties,
+            @RequestParam boolean persist) {
         try {
-            return dxApiProcessManager.propertiesDelete(id, properties).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesDelete(id, properties, persist).toString()).toString();
         } catch (PropertiesException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString()).toString();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.toString()).toString()).toString();
         }
     }
 

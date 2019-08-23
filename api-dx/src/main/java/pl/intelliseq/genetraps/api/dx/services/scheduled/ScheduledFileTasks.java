@@ -155,7 +155,7 @@ public class ScheduledFileTasks {
     private HttpResponse<JsonNode> getCromwellJobWithLabel(String label, String key) throws Exception {
 
         HttpResponse<JsonNode> response = Unirest
-                .get(String.format("%s/query?label=%s:%s", env.getProperty("ec2-cromwell-dns"), label, key))
+                .get(String.format("%s/query?label=%s:%s", env.getProperty("cromwell.server"), label, key))
                 .header("accept", "application/json")
                 .asJson();
         if (response.getStatus() / 100 != 2)
@@ -186,7 +186,7 @@ public class ScheduledFileTasks {
     private HttpResponse<JsonNode> getCromwellJobOutputs(String cromwellJobId) throws Exception {
 
         HttpResponse<JsonNode> response = Unirest
-                .get(String.format("%s/%s/outputs", env.getProperty("ec2-cromwell-dns"), cromwellJobId))
+                .get(String.format("%s/%s/outputs", env.getProperty("cromwell.server"), cromwellJobId))
                 .header("accept", "application/json")
                 .asJson();
         if (response.getStatus() / 100 != 2)
