@@ -5,7 +5,6 @@ branches:
   - develop
   - travis
   - feature-travis-api-dx-build
-  - feature-tests
 sudo: required
 language: java
 jdk:

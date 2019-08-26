@@ -1,7 +1,7 @@
 version: '2'
 services:
   api-dx:
-    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:73ab79fe5216e3935edd313057ecc7f6
+    image: 958510462668.dkr.ecr.us-east-1.amazonaws.com/genetraps-api-dx:132411e6940f39a8568afe347f09bbbf
     ports:
       - "8086:8086"
     logging:
