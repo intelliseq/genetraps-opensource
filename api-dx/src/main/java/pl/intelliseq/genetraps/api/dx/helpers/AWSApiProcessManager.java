@@ -185,6 +185,26 @@ public class AWSApiProcessManager {
         }
     }
 
+    public JSONObject runGetJobStatus(String jobId) throws InterruptedException {
+
+        //TODO: change from mashape json to jackson json
+        HttpResponse<com.mashape.unirest.http.JsonNode> response;
+        try {
+            response = Unirest
+                    .get(String.format("%s/query", env.getProperty("cromwell.server")))
+                    .header("accept", "application/json")
+                    .queryString("label", String.format("jobId:%s", jobId))
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new InterruptedException(e.toString());
+        }
+        JSONObject responseBody = response.getBody().getObject().getJSONArray("results").getJSONObject(0);
+        if (response.getStatus() / 100 != 2)
+            throw new InterruptedException(responseBody.toString());
+
+        return responseBody;
+    }
+
     private String getAWSUrl(String fileName) throws InterruptedException {
 
         try {
