@@ -17,11 +17,6 @@ or
 SAMPLEID=
 ```
 
-**EC2 cromwell dns - obligatory:**
-```bash
-AWS_ADDRESS=http://ec2-100-25-40-253.compute-1.amazonaws.com/api/workflows/v1
-```
-
 **Link to your pipeline - obligatory:**
 ```bash
 WDL=
@@ -51,7 +46,7 @@ if you want to leave the original name of output file, then leave the value in k
 
 **Status of the workflow:**
 ```bash
-curl -X GET "$AWS_ADDRESS/query?label=jobId:$JOBID" -H "accept: application/json" | jq -r ".results" | jq -r ".[].status"
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/status?jobId=$JOBID" | jq -r ".status"
 ```
 
 
@@ -59,12 +54,7 @@ curl -X GET "$AWS_ADDRESS/query?label=jobId:$JOBID" -H "accept: application/json
 
 **Job's properties:**
 ```bash
-curl -X GET "$AWS_ADDRESS/query?label=jobId:$JOBID" -H "accept: application/json"
-```
-
-**Id of the workflow (one of jobs's properties):**
-```bash
-WORKFLOWID=$(curl -X GET "$AWS_ADDRESS/query?label=jobId:$JOBID" -H "accept: application/json" | jq -r ".results" | jq -r ".[].id")
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/status?jobId=$JOBID"
 ```
 
 
