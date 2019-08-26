@@ -4,7 +4,6 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y  software-properties-common && \
     apt-get install -y  gradle && \
-    apt-get install -y wget && \
     add-apt-repository ppa:linuxuprising/java -y && \
     apt-get update && \
     apt-get install -y openjdk-11-jdk
@@ -18,7 +17,7 @@ ADD "http://resouces.intelliseq.pl/public/intelliseqngs/workflows/cromwell/aws.c
 RUN sed -i "s+BUCKET_TAG+${BUCKET_TAG}+" aws.cfg
 RUN sed -i "s+QUEUE_TAG+${QUEUE_TAG}+" aws.cfg
 
-RUN echo "echo starting cromwell server" >> start.sh
+RUN echo "echo starting cromwell server" > start.sh
 RUN echo "java -Dconfig.file=aws.cfg -jar cromwell.jar server &" >> start.sh
 RUN echo "echo starting app" >> start.sh
 RUN echo "java -jar app.jar" >> start.sh
