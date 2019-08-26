@@ -105,6 +105,18 @@ public class FilesController {
         }
     }
 
+    @RequestMapping(value = "/job/status", method = RequestMethod.GET)
+    public String getStatus(
+            @RequestParam String jobId) {
+        log.info("get job status");
+        log.info(jobId);
+        try {
+            return awsApiProcessManager.runGetJobStatus(jobId).toString();
+        } catch (InterruptedException e) {
+            return new ObjectMapper().createObjectNode().put("id", e.toString()).toString();
+        }
+    }
+
     @RequestMapping(value = "/sample/{id}/urlupload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String upload(
