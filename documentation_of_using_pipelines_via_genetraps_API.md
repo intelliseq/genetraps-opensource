@@ -21,7 +21,7 @@ SAMPLEID=
 ```bash
 WDL=
 ```
-(eg. https://gitlab.com/intelliseq/workflows/raw/dev/src/main/wdl/tasks/minimal-task/v1.0/minimal.wdl)
+(eg. https://gitlab.com/intelliseq/workflows/raw/master/src/main/wdl/tasks/minimal-task/v1.0/minimal.wdl)
 
 **To upload an input file from your machine to aws (returns relative path to the file):**
 Relative path can be recognized by '/' at the beginning (is followed by nr of sample, later dirs, ending with name of file)
@@ -126,6 +126,7 @@ FILEPATH=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/s
 
 ```bash
 JSONINPUT="{\"minimal_workflow.minimal_file.strs\":[\"minimal\"], \"minimal_workflow.minimal_file.files\":[\"$FILEPATH\"]}"
+```
 
 ```bash
 JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl -H "accept: application/json" \
