@@ -2,10 +2,7 @@ package pl.intelliseq.genetraps.api.dx.helpers;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ObjectTagging;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.amazonaws.services.s3.model.SetObjectTaggingRequest;
-import com.amazonaws.services.s3.model.Tag;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -13,12 +10,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mashape.unirest.http.HttpResponse;
-
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,11 +23,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 public class AWSApiProcessManager {
@@ -63,43 +63,39 @@ public class AWSApiProcessManager {
         return sampleId;
     }
 
-    public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
+    public String runUrlFetch(String url, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
 
         String bucketName = env.getProperty("bucket.default");
-        String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName.charAt(newFileName.length() - 1) == '/' ? String.format("%s%s", newFileName, mfile.getOriginalFilename()) : newFileName;
+        String fileName = newFileName == null ? url.substring(url.lastIndexOf("/") + 1) : newFileName.charAt(newFileName.length() - 1) == '/' ? String.format("%s%s", newFileName, url.substring(url.lastIndexOf("/") + 1)) : newFileName;
+        log.info(url.substring(url.lastIndexOf("/") + 1));
         String fileKey = String.format("%s/%s/%s", env.getProperty("samples.folder"), sampleId, fileName);
 
         if(s3Client.doesObjectExist(bucketName, fileKey)) {
             throw new InterruptedException("A file with given name (key) already exists");
         }
 
-        // should rather be final global?
-        TransferManager tm = TransferManagerBuilder.standard()
-                .withS3Client(s3Client)
-                .build();
+        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream())) {
 
-        Upload upload;
-        File file = null;
-        try {
-            file = new File(System.currentTimeMillis()+"fileupload");
-            //TODO to test which is faster (relatively)
-//            FileOutputStream fos = new FileOutputStream(file);
-//            fos.write(mfile.getBytes());
-//            fos.close();
-            FileUtils.writeByteArrayToFile(file, mfile.getBytes());
-            upload = tm.upload(bucketName, fileKey, file);
-        } catch (Exception e) {
-            if(file != null)
-                file.delete();
-            throw new InterruptedException(String.format("File: %s failed to upload #1", fileKey));
-        }
+            TransferManager tm = TransferManagerBuilder.standard()
+                    .withS3Client(s3Client)
+                    .build();
 
-        try {
-            upload.waitForCompletion();
-        } catch (InterruptedException e) {
-            throw new InterruptedException("File failed to upload #2");
+            Upload upload;
+            try {
+                upload = tm.upload(bucketName, fileKey, in, new ObjectMetadata());
+            } catch (Exception e) {
+                throw new InterruptedException(String.format("File: %s failed to upload #1: %s", fileKey, e.getMessage()));
+            }
+
+            try {
+                upload.waitForCompletion();
+            } catch (InterruptedException e) {
+                throw new InterruptedException(String.format("File: %s failed to upload #2: %s", fileKey, e.getMessage()));
+            }
+
+        } catch (IOException e) {
+            throw new InterruptedException(e.getMessage());
         }
-        file.delete();
 
         if(tags != null) {
 //            GetObjectTaggingResult getTaggingResult = s3Client.getObjectTagging(new GetObjectTaggingRequest(bucketName, fileKey));
@@ -110,7 +106,46 @@ public class AWSApiProcessManager {
             s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
         }
 
-        return String.format("/%s/%s/%s", env.getProperty("samples.folder"), sampleId, fileName);
+        return fileKey;
+    }
+
+    public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
+
+        String bucketName = env.getProperty("bucket.default");
+        String fileName = newFileName == null ? mfile.getOriginalFilename() : newFileName.charAt(newFileName.length() - 1) == '/' ? String.format("%s%s", newFileName, mfile.getOriginalFilename()) : newFileName;
+        String fileKey = String.format("%s/%s/%s", env.getProperty("samples.folder"), sampleId, fileName);
+
+        if(s3Client.doesObjectExist(bucketName, fileKey)) {
+            throw new InterruptedException("A file with given name (key) already exists");
+        }
+
+        TransferManager tm = TransferManagerBuilder.standard()
+                .withS3Client(s3Client)
+                .build();
+
+        Upload upload;
+        try {
+            upload = tm.upload(bucketName, fileKey, mfile.getInputStream(), new ObjectMetadata());
+        } catch (Exception e) {
+            throw new InterruptedException(String.format("File: %s failed to upload #1: %s", fileKey, e.getMessage()));
+        }
+
+        try {
+            upload.waitForCompletion();
+        } catch (InterruptedException e) {
+            throw new InterruptedException(String.format("File: %s failed to upload #2: %s", fileKey, e.getMessage()));
+        }
+
+        if(tags != null) {
+//            GetObjectTaggingResult getTaggingResult = s3Client.getObjectTagging(new GetObjectTaggingRequest(bucketName, fileKey));
+            List<Tag> fileTags = new ArrayList<>();
+            for (String tag : tags) {
+                fileTags.add(new Tag(tag, ""));
+            }
+            s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
+        }
+
+        return fileKey;
     }
 
     public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject requestedOutputs) throws InterruptedException {
@@ -196,7 +231,7 @@ public class AWSApiProcessManager {
                     .queryString("label", String.format("jobId:%s", jobId))
                     .asJson();
         } catch (UnirestException e) {
-            throw new InterruptedException(e.toString());
+            throw new InterruptedException(e.getMessage());
         }
         JSONObject responseBody = response.getBody().getObject().getJSONArray("results").getJSONObject(0);
         if (response.getStatus() / 100 != 2)
@@ -275,8 +310,8 @@ public class AWSApiProcessManager {
             }
         } catch (PropertiesException e) {
             if(bePersistent)
-                throw new PropertiesException(String.format("Adding new properties finished.%sFollowing properties couldn't be added: %s", System.lineSeparator(), e.toString()));
-            throw new PropertiesException(String.format("Adding properties interrupted.%sThe following property couldn't be added: %s", System.lineSeparator(), e.toString()));
+                throw new PropertiesException(String.format("Adding new properties finished.%sFollowing properties couldn't be added: %s", System.lineSeparator(), e.getMessage()));
+            throw new PropertiesException(String.format("Adding properties interrupted.%sThe following property couldn't be added: %s", System.lineSeparator(), e.getMessage()));
         } catch (Exception e) {
             throw new PropertiesException(e.getMessage());
         }
@@ -329,8 +364,8 @@ public class AWSApiProcessManager {
             }
         } catch (PropertiesException e) {
             if(bePersistent)
-                throw new PropertiesException(String.format("Updating properties finished.%sFollowing properties couldn't be updated: %s", System.lineSeparator(), e.toString()));
-            throw new PropertiesException(String.format("Updating properties interrupted.%sThe following property couldn't be updated: %s", System.lineSeparator(), e.toString()));
+                throw new PropertiesException(String.format("Updating properties finished.%sFollowing properties couldn't be updated: %s", System.lineSeparator(), e.getMessage()));
+            throw new PropertiesException(String.format("Updating properties interrupted.%sThe following property couldn't be updated: %s", System.lineSeparator(), e.getMessage()));
         } catch (Exception e) {
             throw new PropertiesException(e.getMessage());
         }
@@ -359,8 +394,8 @@ public class AWSApiProcessManager {
             }
         } catch (PropertiesException e) {
             if(bePersistent)
-                throw new PropertiesException(String.format("Deleting properties finished.%sFollowing properties couldn't be deleted: %s", System.lineSeparator(), e.toString()));
-            throw new PropertiesException(String.format("Deleting properties interrupted.%sThe following property couldn't be deleted: %s", System.lineSeparator(), e.toString()));
+                throw new PropertiesException(String.format("Deleting properties finished.%sFollowing properties couldn't be deleted: %s", System.lineSeparator(), e.getMessage()));
+            throw new PropertiesException(String.format("Deleting properties interrupted.%sThe following property couldn't be deleted: %s", System.lineSeparator(), e.getMessage()));
         } catch (Exception e) {
             throw new PropertiesException(e.getMessage());
         }

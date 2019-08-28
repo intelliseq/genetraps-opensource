@@ -12,12 +12,12 @@ echo $LOG_PREFIX `python --version | head -1`
 echo $LOG_PREFIX "JAVA VERSION: " `javac -version`
 echo $LOG_PREFIX"Starting travis script"
 if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
-echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
-dx login --token $DNANEXUS_TOKEN_TEST --noprojects
-dx select genetraps-test
-
-echo $LOG_PREFIX"Cleaning DNANEXUS test space"
-dx rm -r -a /samples/
+# echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
+# dx login --token $DNANEXUS_TOKEN_TEST --noprojects
+# dx select genetraps-test
+#
+# echo $LOG_PREFIX"Cleaning DNANEXUS test space"
+# dx rm -r -a /samples/
 #ls dx-apps/ | xargs -I {} bash -c "dx build dx-apps/{}"
 #echo `dx ls`
 
