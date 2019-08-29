@@ -197,6 +197,7 @@ public class AWSApiProcessManager {
             String responseBody;
             String toHash = String.format("%s%d", auroraDBManager.getUserDetails(userId).getUserName(), System.currentTimeMillis());
             String jobId = DigestUtils.md5Hex(toHash);
+            // used to get job status and date
             labels.put("jobId", jobId);
 
             HttpResponse<String> response = Unirest.post(env.getProperty("cromwell.server"))
@@ -220,26 +221,6 @@ public class AWSApiProcessManager {
         }
     }
 
-    public JSONObject runGetJobStatus(String jobId) throws InterruptedException {
-
-        //TODO: change from mashape json to jackson json
-        HttpResponse<com.mashape.unirest.http.JsonNode> response;
-        try {
-            response = Unirest
-                    .get(String.format("%s/query", env.getProperty("cromwell.server")))
-                    .header("accept", "application/json")
-                    .queryString("label", String.format("jobId:%s", jobId))
-                    .asJson();
-        } catch (UnirestException e) {
-            throw new InterruptedException(e.getMessage());
-        }
-        JSONObject responseBody = response.getBody().getObject().getJSONArray("results").getJSONObject(0);
-        if (response.getStatus() / 100 != 2)
-            throw new InterruptedException(responseBody.toString());
-
-        return responseBody;
-    }
-
     private String getAWSUrl(String fileName) throws InterruptedException {
 
         try {
@@ -248,6 +229,55 @@ public class AWSApiProcessManager {
             else
                 throw new InterruptedException(fileName);
         } catch (Exception e) {
+            throw new InterruptedException(e.getMessage());
+        }
+    }
+
+    public JsonNode runGetJobStatus(String jobId) throws InterruptedException {
+
+
+        
+        JsonNode response = getJobWithLabelJobId(jobId);
+        if(response.get("totalResultsCount").asInt() == 0)
+            return new ObjectMapper().createObjectNode().put("id", "No job was found");
+        ObjectNode jobsExtractedFromBigJson = (ObjectNode) response.get("results").get(0);
+        return jobsExtractedFromBigJson.put("id", jobId);
+    }
+
+    public JsonNode runGetJobsForSample(String sampleId) throws InterruptedException {
+
+        ObjectNode jobs = new ObjectMapper().createObjectNode();
+        JsonNode response;
+
+        List<String> jobsFromDB = auroraDBManager.getJobsWithSampleID(sampleId);
+        int jobCount = 0;
+        for(String jobId : jobsFromDB) {
+
+            log.info(jobId);
+            response = getJobWithLabelJobId(jobId);
+            if(response.get("totalResultsCount").asInt() == 0)
+                continue;
+            jobCount += response.get("totalResultsCount").asInt();
+            jobs.set(jobId, ((ObjectNode) getJobWithLabelJobId(jobId).get("results").get(0)).without("id"));
+        }
+        jobs.put("count", jobCount);
+
+        return jobs;
+    }
+
+    private JsonNode getJobWithLabelJobId(String jobId) throws InterruptedException {
+
+        try {
+            HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                    .get(String.format("%s/query", env.getProperty("cromwell.server")))
+                    .header("accept", "application/json")
+                    .queryString("label", String.format("jobId:%s", jobId))
+                    .asJson();
+            JsonNode response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
+            if (responseUnirest.getStatus() / 100 != 2)
+                throw new InterruptedException(response.toString());
+            return response;
+        } catch (UnirestException | IOException e) {
             throw new InterruptedException(e.getMessage());
         }
     }

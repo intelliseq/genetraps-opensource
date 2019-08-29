@@ -113,10 +113,24 @@ public class FilesController {
         try {
             return awsApiProcessManager.runGetJobStatus(jobId).toString();
         } catch (InterruptedException e) {
-            return new ObjectMapper().createObjectNode().put("id", e.toString()).toString();
+            return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job status").put("err", e.getMessage()).toString();
         }
     }
 
+    // AWS S3
+    @RequestMapping(value = "/sample/{id}/jobs", method = RequestMethod.GET)
+    @ResponseBody
+    public String getJobs(
+            @PathVariable String id) {
+        log.info("get sample jobs");
+        try {
+            return awsApiProcessManager.runGetJobsForSample(id).toString();
+        } catch (InterruptedException e) {
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).toString();
+        }
+    }
+
+    // AWS S3
     @RequestMapping(value = "/sample/{id}/url/upload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String upload(

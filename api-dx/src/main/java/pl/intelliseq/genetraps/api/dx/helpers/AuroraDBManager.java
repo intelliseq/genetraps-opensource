@@ -7,18 +7,14 @@ import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import pl.intelliseq.genetraps.api.dx.Roles;
 import pl.intelliseq.genetraps.api.dx.User;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
@@ -47,10 +43,20 @@ public class AuroraDBManager {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public List<String> getJobsWithStatusNotYetSucceded() {
-        String sql = "SELECT JobID FROM Jobs WHERE JobStatus = 0";
+    public List<String> getJobs(boolean withStatusNotYetSucceeded) {
+        String sql;
+        if(withStatusNotYetSucceeded)
+            sql = "SELECT JobID FROM Jobs WHERE JobStatus = 0";
+        else
+            sql = "SELECT JobID FROM Jobs";
         // columns like: 1, 2, 3, ...
         // so not so much programmer..
+        return jdbcTemplate.queryForList(sql, String.class);
+    }
+
+    public List<String> getJobsWithSampleID(String sampleId) {
+        //TODO: add quotation marks around %s when sampleid changed to hash (string)
+        String sql = String.format("SELECT JobID FROM Jobs WHERE SampleID = %s", sampleId);
         return jdbcTemplate.queryForList(sql, String.class);
     }
 
