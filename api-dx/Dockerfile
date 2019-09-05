@@ -34,6 +34,7 @@ RUN sed -i "s+QUEUE_TAG+${QUEUE_TAG}+" aws.cfg
 
 RUN echo "echo starting mysql" > start.sh
 RUN echo "/sbin/runmysql.sh" >> start.sh
+#RUN echo "free -m" > start.sh
 RUN echo "echo starting cromwell server" >> start.sh
 RUN echo "java -Dconfig.file=aws.cfg -jar cromwell.jar server &" >> start.sh
 RUN echo "echo starting app" >> start.sh
