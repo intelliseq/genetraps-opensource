@@ -17,7 +17,8 @@ ADD "http://resouces.intelliseq.pl/public/intelliseqngs/workflows/cromwell/aws.c
 RUN sed -i "s+BUCKET_TAG+${BUCKET_TAG}+" aws.cfg
 RUN sed -i "s+QUEUE_TAG+${QUEUE_TAG}+" aws.cfg
 
-RUN echo "echo starting cromwell server" > start.sh
+RUN echo "free -m" > start.sh
+RUN echo "echo starting cromwell server" >> start.sh
 RUN echo "java -Dconfig.file=aws.cfg -jar cromwell.jar server &" >> start.sh
 RUN echo "echo starting app" >> start.sh
 RUN echo "java -jar app.jar" >> start.sh

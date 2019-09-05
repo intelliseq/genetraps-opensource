@@ -1,5 +1,6 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
@@ -9,6 +10,7 @@ import com.amazonaws.services.s3.transfer.Upload;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.io.FileBackedOutputStream;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -23,16 +25,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 public class AWSApiProcessManager {
@@ -74,7 +73,33 @@ public class AWSApiProcessManager {
             throw new InterruptedException("A file with given name (key) already exists");
         }
 
+        long streamContentLength = 0;
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream())) {
+
+            byte[] buffer = new byte[8 * 1024];
+            int bytesRead;
+            while((bytesRead = in.read(buffer)) != -1) {
+                streamContentLength += bytesRead;
+
+            }
+            log.info(streamContentLength);
+        } catch (IOException e) {
+            throw new InterruptedException(e.getMessage());
+        }
+
+        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream())) {
+//            URL urll = new URL(url);
+//            log.info(url);
+//            HttpsURLConnection conn = (HttpsURLConnection) urll.openConnection();
+////            if(conn instanceof HttpURLConnection)
+//                conn.setRequestMethod("GET");
+//                log.info(conn.getContentLengthLong());
+//            BufferedInputStream in = new BufferedInputStream(conn.getInputStream());
+//            File file = new File(System.currentTimeMillis() + "urlupload");
+//            try (OutputStream outputStream = new FileOutputStream(file)) {
+//                IOUtils.copy(in, outputStream);
+//            }
+//            log.info(file.length());
 
             TransferManager tm = TransferManagerBuilder.standard()
                     .withS3Client(s3Client)
@@ -82,7 +107,9 @@ public class AWSApiProcessManager {
 
             Upload upload;
             try {
-                upload = tm.upload(bucketName, fileKey, in, new ObjectMetadata());
+                ObjectMetadata fileMetadata = new ObjectMetadata();
+                fileMetadata.setContentLength(streamContentLength);
+                upload = tm.upload(bucketName, fileKey, in, fileMetadata);
             } catch (Exception e) {
                 throw new InterruptedException(String.format("File: %s failed to upload #1: %s", fileKey, e.getMessage()));
             }
@@ -106,7 +133,7 @@ public class AWSApiProcessManager {
             s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
         }
 
-        return fileKey;
+        return String.format("/%s", fileKey);
     }
 
     public String runFileUpload(MultipartFile mfile, Integer sampleId, String newFileName, List<String> tags) throws InterruptedException {
@@ -125,7 +152,9 @@ public class AWSApiProcessManager {
 
         Upload upload;
         try {
-            upload = tm.upload(bucketName, fileKey, mfile.getInputStream(), new ObjectMetadata());
+            ObjectMetadata fileMetadata = new ObjectMetadata();
+            fileMetadata.setContentLength(mfile.getSize());
+            upload = tm.upload(bucketName, fileKey, mfile.getInputStream(), fileMetadata);
         } catch (Exception e) {
             throw new InterruptedException(String.format("File: %s failed to upload #1: %s", fileKey, e.getMessage()));
         }
@@ -145,7 +174,7 @@ public class AWSApiProcessManager {
             s3Client.setObjectTagging(new SetObjectTaggingRequest(bucketName, fileKey, new ObjectTagging(fileTags)));
         }
 
-        return fileKey;
+        return String.format("/%s", fileKey);
     }
 
     public String runWdl(Integer userId, String workflowUrl, JSONObject workflowInputs, JSONObject labels, JSONObject requestedOutputs) throws InterruptedException {
@@ -225,7 +254,8 @@ public class AWSApiProcessManager {
 
         try {
             if(s3Client.doesObjectExist(env.getProperty("bucket.default"), fileName))
-                return s3Client.getUrl(env.getProperty("bucket.default"), fileName).toString();
+//                return s3Client.getUrl(env.getProperty("bucket.default"), fileName).toString();
+                return String.format("s3://%s/%s", env.getProperty("bucket.default"), fileName);
             else
                 throw new InterruptedException(fileName);
         } catch (Exception e) {
@@ -235,13 +265,87 @@ public class AWSApiProcessManager {
 
     public JsonNode runGetJobStatus(String jobId) throws InterruptedException {
 
-
-        
         JsonNode response = getJobWithLabelJobId(jobId);
         if(response.get("totalResultsCount").asInt() == 0)
             return new ObjectMapper().createObjectNode().put("id", "No job was found");
         ObjectNode jobsExtractedFromBigJson = (ObjectNode) response.get("results").get(0);
         return jobsExtractedFromBigJson.put("id", jobId);
+    }
+
+    public JsonNode runGetJobOutputs(String jobId) throws InterruptedException {
+
+        ObjectNode response = (ObjectNode) getJobWithLabelJobId(jobId);
+        if(response.get("totalResultsCount").asInt() == 0)
+            return new ObjectMapper().createObjectNode().put("id", "No job was found");
+        String jobCromwellId = response.get("results").get(0).get("id").asText();
+
+        try {
+            HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                    .get(String.format("%s/%s/outputs", env.getProperty("cromwell.server"), jobCromwellId))
+                    .header("accept", "application/json")
+                    .asJson();
+            response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
+            if (responseUnirest.getStatus() / 100 != 2)
+                throw new InterruptedException(response.toString());
+        } catch (UnirestException | IOException e) {
+            throw new InterruptedException(e.getMessage());
+        }
+
+        response = (ObjectNode) response.get("outputs");
+        for (Iterator<Map.Entry<String, JsonNode>> it = response.fields(); it.hasNext(); ) {
+            String outputKey = it.next().getKey();
+            String outputLink = response.get(outputKey).asText();
+            response.put(outputKey, outputLink.substring(outputLink.lastIndexOf('/') + 1));
+        }
+
+        return response;
+    }
+
+    public JsonNode runGetJobOutputsDownloadLinks(String jobId, String sub) throws InterruptedException {
+
+        ObjectNode response = (ObjectNode) getJobWithLabelJobId(jobId);
+        if(response.get("totalResultsCount").asInt() == 0)
+            return new ObjectMapper().createObjectNode().put("id", "No job was found");
+        String jobCromwellId = response.get("results").get(0).get("id").asText();
+
+        try {
+            HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                    .get(String.format("%s/%s/outputs", env.getProperty("cromwell.server"), jobCromwellId))
+                    .header("accept", "application/json")
+                    .asJson();
+            response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
+            if (responseUnirest.getStatus() / 100 != 2)
+                throw new InterruptedException(response.toString());
+        } catch (UnirestException | IOException e) {
+            throw new InterruptedException(e.getMessage());
+        }
+
+        String bucketName = env.getProperty("bucket.default");
+
+        java.util.Date expiration = new java.util.Date();
+        // an hour
+        long expTimeMillis = 1000 * 60 * 60;
+
+        response = (ObjectNode) response.get("outputs");
+        LinkedList<String> outputsNotWithSubstring = new LinkedList<>();
+        for (Iterator<Map.Entry<String, JsonNode>> it = response.fields(); it.hasNext(); ) {
+            String outputKey = it.next().getKey();
+            if(!outputKey.contains(sub)) {
+                outputsNotWithSubstring.add(outputKey);
+                continue;
+            }
+            String outputLink = response.get(outputKey).asText();
+            outputLink = outputLink.substring(outputLink.indexOf(bucketName) + 5);
+            expiration.setTime(expiration.getTime() + expTimeMillis);
+            GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                    new GeneratePresignedUrlRequest(bucketName, outputLink)
+                            .withMethod(HttpMethod.GET)
+                            .withExpiration(expiration);
+            response.put(outputKey, s3Client.generatePresignedUrl(generatePresignedUrlRequest).toString().replaceAll("%2F", "/"));
+        }
+        if(outputsNotWithSubstring.isEmpty())
+            return response;
+        return response.without(outputsNotWithSubstring);
     }
 
     public JsonNode runGetJobsForSample(String sampleId) throws InterruptedException {
@@ -276,6 +380,7 @@ public class AWSApiProcessManager {
             JsonNode response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
             if (responseUnirest.getStatus() / 100 != 2)
                 throw new InterruptedException(response.toString());
+
             return response;
         } catch (UnirestException | IOException e) {
             throw new InterruptedException(e.getMessage());
@@ -301,6 +406,7 @@ public class AWSApiProcessManager {
                 if(objectKey.matches(".*/"))    continue;       // omits id of directories
                 objects.put(objectKey.substring(objectKey.lastIndexOf("/") + 1), String.format("/%s", objectKey));
             }
+
             return objects;
         } catch (Exception e) {
             throw new InterruptedException(e.getMessage());

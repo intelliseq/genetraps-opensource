@@ -118,6 +118,35 @@ public class FilesController {
     }
 
     // AWS S3
+    @RequestMapping(value = "/job/output", method = RequestMethod.GET)
+    @ResponseBody
+    public String getJobOuput(
+            @RequestParam String jobId) {
+        log.info("get job output download");
+        log.info(jobId);
+        try {
+            return awsApiProcessManager.runGetJobOutputs(jobId).toString();
+        } catch (InterruptedException e) {
+            return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job output").put("err", e.getMessage()).toString();
+        }
+    }
+
+    // AWS S3
+    @RequestMapping(value = "/job/output/download/links", method = RequestMethod.GET)
+    @ResponseBody
+    public String getJobOuputDownloadLinks(
+            @RequestParam String jobId,
+            @RequestParam(required = false) String sub) {
+        log.info("get job output download links");
+        log.info(jobId);
+        try {
+            return awsApiProcessManager.runGetJobOutputsDownloadLinks(jobId, sub).toString();
+        } catch (InterruptedException e) {
+            return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job output").put("err", e.getMessage()).toString();
+        }
+    }
+
+    // AWS S3
     @RequestMapping(value = "/sample/{id}/jobs", method = RequestMethod.GET)
     @ResponseBody
     public String getJobs(
@@ -137,7 +166,7 @@ public class FilesController {
 //            @ApiIgnore OAuth2Authentication auth,
             @PathVariable Integer id,
             @RequestParam String url,
-            @RequestParam(value = "new-name", required = false) String fileName,
+            @RequestParam(value = "name", required = false) String fileName,
             @RequestParam(required = false) List<String> tag) {
 
         log.info("url upload");
@@ -155,10 +184,10 @@ public class FilesController {
     // AWS S3
     @RequestMapping(value = "/sample/{id}/file/upload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String uploadfile(
+    public String uploadFile(
             @PathVariable Integer id,
             @RequestParam MultipartFile file,
-            @RequestParam(value = "new-name", required = false) String fileName,
+            @RequestParam(value = "name", required = false) String fileName,
             @RequestParam(required = false) List<String> tag) {
 
         log.info("file upload");
