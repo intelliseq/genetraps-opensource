@@ -3,9 +3,9 @@ set -e
 
 [[ $DEBUG == true ]] && set -x
 
-DB_NAME="cromwell"#${DB_NAME:-}
-DB_USER="user"#${DB_USER:-}
-DB_PASS="pass"#${DB_PASS:-}
+DB_NAME="cromwell"
+DB_USER="user"
+DB_PASS="pass"
 
 DB_REMOTE_ROOT_NAME=${DB_REMOTE_ROOT_NAME:-"user"}
 DB_REMOTE_ROOT_PASS=${DB_REMOTE_ROOT_PASS:-"pass"}
@@ -129,7 +129,7 @@ create_users_and_databases() {
           if [ -n "${DB_USER}" ]; then
             echo "Granting access to database \"$db\" for user \"${DB_USER}\"..."
             mysql --defaults-file=/etc/mysql/debian.cnf \
-            -e "GRANT ALL PRIVILEGES ON \`$db\`.* TO '${DB_USER}' IDENTIFIED BY '${DB_PASS}';"
+            -e "GRANT ALL PRIVILEGES ON \`$db\`.* TO '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
           fi
         done
     fi
