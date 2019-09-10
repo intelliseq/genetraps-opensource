@@ -8,7 +8,7 @@ TOKEN=$(curl -XPOST "web_app:secret@genetraps.intelliseq.pl:8088/oauth/token" -d
 
 **You can generate the lowest available sample id (number) using the following command:**
 ```bash
-SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/create | jq -r ".response")
+SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/create" | jq -r ".response")
 ```
 or
 **Using any given number:**
@@ -23,29 +23,39 @@ WDL=
 ```
 (eg. https://gitlab.com/intelliseq/workflows/raw/master/src/main/wdl/tasks/minimal-task/v1.0/minimal.wdl)
 
-**To upload an input file from your machine to aws (returns special path to the file):**
-Special path can be recognized by '/' at the beginning (is followed by nr of sample, later dirs, ending with name of file)
+**To upload an input file from your machine to aws (returns special aws path to the file):**
+Special aws path can be recognized by '/' at the beginning (is followed by nr of sample, later dirs, ending with name of file)
 ```bash
-curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload -F file=@path_to_file
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload" -F file=@path_to_file
 ```
 To set up another name for a file use `name` flag, to set up a tag - `tag` flag [tags may be multiple]
 ```bash
-curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload -F file=@path_to_file -F name=dir/new_filename -F tag=newtag -F tag=anothertag 
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload" -F file=@path_to_file -F name=dir/new_filename -F tag=newtag -F tag=anothertag 
 ```
 
-**To upload a file from url to aws (returns special path to the file):**
-Special path can be recognized by '/' at the beginning (is followed by nr of sample, later optional dirs, ending with name of the file)
+**To upload a file from url to aws (returns special aws path to the file):**
+Special aws path can be recognized by '/' at the beginning (is followed by nr of sample, later optional dirs, ending with name of the file)
 ```bash
-curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/$SAMPLEID/url/upload -d url='your_url'
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/url/upload" -d url='your_url'
 ```
 To give another name, use `name` flag, to set up a tag - `tag` flag [tags may be multiple]  
 ```bash
-curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/$SAMPLEID/url/upload -d url='your_url' -d name=dir/new_filename -F tag=newtag -F tag=anothertag 
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/url/upload" -d url='your_url' -d name=dir/new_filename -F tag=newtag -F tag=anothertag 
+```
+
+**To list out content of a sample**
+```bash
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/ls"
+```
+
+**To delete a file in a sample**
+```bash
+curl -X DELETE -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/delete?path=aws_file_path"
 ```
 
 **Activating the desired pipeline with desired (requested) outputs**
 ```bash
-JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl -H "accept: application/json" \
+JOBID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/wdl" -H "accept: application/json" \
 -d "workflowUrl=$WDL" \
 -d "workflowInputs={\"minimal_workflow.minimal.str\":\"testing string\"}" \
 -d "labels={\"sampleid\":\"$SAMPLEID\"}" \
@@ -93,7 +103,7 @@ TOKEN=$(curl -XPOST "web_app:secret@genetraps.intelliseq.pl:8088/oauth/token" -d
 ```
 
 ```bash
-SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/create | jq -r ".response")
+SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/create" | jq -r ".response")
 ```
 
 ```bash
@@ -101,7 +111,7 @@ WDL=https://gitlab.com/intelliseq/workflows/raw/dev/src/main/wdl/tasks/minimal-t
 ```
 
 ```bash
-JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl -H "accept: application/json" \
+JOBID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/wdl" -H "accept: application/json" \
 -d "workflowUrl=$WDL" \
 -d "workflowInputs={\"minimal_workflow.minimal.str\":\"testing string\"}" \
 -d "labels={\"sampleid\":\"$SAMPLEID\"}" | jq -r ".id")
@@ -114,7 +124,7 @@ TOKEN=$(curl -XPOST "web_app:secret@genetraps.intelliseq.pl:8088/oauth/token" -d
 ```
 
 ```bash
-SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/create | jq -r ".response")
+SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/create" | jq -r ".response")
 ```
 
 ```bash
@@ -122,11 +132,11 @@ WDL=https://gitlab.com/intelliseq/workflows/blob/dev/src/main/wdl/tasks/minimal-
 ```
 
 ```bash
-FILEPATH=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload -F file=@minimal.txt | jq -r ".id")
+FILEPATH=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload" -F file=@minimal.txt | jq -r ".id")
 ```
 
 ```bash
-JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl -H "accept: application/json" \
+JOBID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/wdl" -H "accept: application/json" \
 -d "workflowUrl=$WDL" \
 -d "workflowInputs={\"minimal_workflow.minimal_.str\":\"$FILEPATH\"}" \
 -d "labels={\"sampleid\":\"$SAMPLEID\"}" | jq -r ".id")
@@ -139,7 +149,7 @@ TOKEN=$(curl -XPOST "web_app:secret@genetraps.intelliseq.pl:8088/oauth/token" -d
 ```
 
 ```bash
-SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/create | jq -r ".response")
+SAMPLEID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/create" | jq -r ".response")
 ```
 
 ```bash
@@ -147,7 +157,7 @@ WDL=https://gitlab.com/intelliseq/workflows/blob/dev/src/main/wdl/tasks/minimal-
 ```
 
 ```bash
-FILEPATH=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload -F file=@minimal.txt | jq -r ".id")
+FILEPATH=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/sample/$SAMPLEID/file/upload" -F file=@minimal.txt | jq -r ".id")
 ```
 
 ```bash
@@ -155,7 +165,7 @@ JSONINPUT="{\"minimal_workflow.minimal_file.strs\":[\"minimal\"], \"minimal_work
 ```
 
 ```bash
-JOBID=$(curl -H "Authorization: Bearer $TOKEN" genetraps.intelliseq.pl:8086/wdl -H "accept: application/json" \
+JOBID=$(curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/wdl" -H "accept: application/json" \
 -d "workflowUrl=$WDL" \
 -d "workflowInputs=$JSONINPUT" \
 -d "labels={\"sampleid\":\"$SAMPLEID\"}" | jq -r ".id")
