@@ -10,7 +10,6 @@ import com.amazonaws.services.s3.transfer.Upload;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.io.FileBackedOutputStream;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -25,11 +24,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
-import java.net.HttpURLConnection;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -191,6 +190,7 @@ public class AWSApiProcessManager {
                 wdlId = auroraDBManager.checkWdlId(workflowUrl);
             }
         }
+        log.info(wdlId);
 
         // creates correct url links if a string value in workflowInputs begins with "/"
         try {
@@ -225,8 +225,9 @@ public class AWSApiProcessManager {
             // creates unique 32-char id for a job, using hash
             String responseBody;
             String toHash = String.format("%s%d", auroraDBManager.getUserDetails(userId).getUserName(), System.currentTimeMillis());
-            String jobId = DigestUtils.md5Hex(toHash);
             // used to get job status and date
+            String jobId = DigestUtils.md5Hex(toHash);
+            log.info(jobId);
             labels.put("jobId", jobId);
 
             HttpResponse<String> response = Unirest.post(env.getProperty("cromwell.server"))
@@ -416,8 +417,10 @@ public class AWSApiProcessManager {
     public String runDeleteFile(Integer sampleId, String fileRelPath) throws InterruptedException {
 
         String bucket = env.getProperty("bucket.default");
+        if(!fileRelPath.matches(String.format("/samples/%s/.*", sampleId)))
+            throw new InterruptedException("There is a problem with your path or sample id");
         try {
-            s3Client.deleteObject(bucket, fileRelPath);
+            s3Client.deleteObject(bucket, fileRelPath.substring(1));
         } catch (Exception e) {
             throw new InterruptedException("Deletion of file failed: " + e.getMessage());
         }

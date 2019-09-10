@@ -94,8 +94,6 @@ public class FilesController {
             @RequestParam JSONObject labels,
             @RequestParam(name = "req-out", required = false, defaultValue = "{}") JSONObject requestedOutputs) {
         try {
-//            if(requestedOutputs.length() == 0)
-//                throw new Exception("No requested output set");
             Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
             return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs)).toString();
         } catch (Exception e) {
@@ -155,7 +153,7 @@ public class FilesController {
         try {
             return awsApiProcessManager.runGetJobsForSample(id).toString();
         } catch (InterruptedException e) {
-            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).toString();
+            return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
     }
 
@@ -204,7 +202,7 @@ public class FilesController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String deleteFile(
             @PathVariable Integer id,
-            @RequestParam(name = "file-path") String fileRelPath) {
+            @RequestParam(name = "path") String fileRelPath) {
         try {
             return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runDeleteFile(id, fileRelPath)).toString();
         } catch (Exception e) {
@@ -223,7 +221,7 @@ public class FilesController {
         } catch (InterruptedException e) {
             // if error, returns err message with key: /error
             // normal keys doesn't start with '/' at the beginning
-            return String.format("{\"/error\":\"%s\"}", e.getMessage());
+            return String.format("{\"id\":\"%s\"}", e.getMessage());
         }
     }
 
