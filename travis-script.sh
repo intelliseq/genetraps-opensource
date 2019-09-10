@@ -12,12 +12,12 @@ echo $LOG_PREFIX `python --version | head -1`
 echo $LOG_PREFIX "JAVA VERSION: " `javac -version`
 echo $LOG_PREFIX"Starting travis script"
 if [ -z "$HELLO" ]; then source scripts/get-secrets.sh; fi
-echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
-dx login --token $DNANEXUS_TOKEN_TEST --noprojects
-dx select genetraps-test
-
-echo $LOG_PREFIX"Cleaning DNANEXUS test space"
-dx rm -r -a /samples/
+# echo $LOG_PREFIX"Checking first five letters of token: "`echo $DNANEXUS_TOKEN_TEST | cut -c1-5`
+# dx login --token $DNANEXUS_TOKEN_TEST --noprojects
+# dx select genetraps-test
+#
+# echo $LOG_PREFIX"Cleaning DNANEXUS test space"
+# dx rm -r -a /samples/
 #ls dx-apps/ | xargs -I {} bash -c "dx build dx-apps/{}"
 #echo `dx ls`
 
@@ -143,7 +143,7 @@ else
     echo $LOG_PREFIX"building new image"
     gradle build -p api-dx -x test
     cp `ls api-dx/build/libs/api-dx*` api-dx/build/libs/app.jar
-    docker build api-dx/ -t $API_DX_TAG
+    docker build api-dx/ -t $API_DX_TAG --build-arg BUCKET_TAG=$BUCKET_TAG --build-arg QUEUE_TAG=$QUEUE_TAG
     echo $LOG_PREFIX $LOG_APP "dx tag: " $API_DX_TAG
     docker push $API_DX_TAG #| cat
     cat aws-conf/docker-compose-template.yml | \
@@ -224,7 +224,7 @@ fi
 
 REFRESH_TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded"  --data "grant_type=password&username=$STAGING_USERNAME&password=$STAGING_PASSWORD" | jq -r ".refresh_token")
 TOKEN=$(curl --request POST --url http://genetraps.intelliseq.pl:8088/oauth/token --header "Authorization: Basic $STAGING_HASH" --header "content-type: application/x-www-form-urlencoded" --data "grant_type=refresh_token&refresh_token=$REFRESH_TOKEN" | jq -r ".access_token")
-STATUS=$(curl -H "Authorization: Bearer $TOKEN" http://genetraps.intelliseq.pl:8086/secure-hello | jq -r ".status")
+STATUS=$(curl -H "Authorization: Bearer $TOKEN" http://genetraps.intelliseq.pl:8086/hello/secure | jq -r ".status")
 if [[ "$STATUS" = "up" ]]; then
   echo "auth token - ok"
 else

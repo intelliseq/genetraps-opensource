@@ -470,7 +470,7 @@ paths:
     post:
       tags:
         - files-controller
-      summary: uploadfile
+      summary: uploadFile
       operationId: uploadfileUsingPOST
       consumes:
         - multipart/form-data

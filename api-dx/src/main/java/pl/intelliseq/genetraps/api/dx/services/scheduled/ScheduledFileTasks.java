@@ -55,7 +55,7 @@ public class ScheduledFileTasks {
         String bucket = env.getProperty("bucket.default");
         String debugDir = env.getProperty("debug.folder");
 
-        List<String> jobsToCheck = auroraDBManager.getJobsWithStatusNotYetSucceded();
+        List<String> jobsToCheck = auroraDBManager.getJobs(true);
 
         if(!jobsToCheck.isEmpty()) {
 

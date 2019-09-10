@@ -22,7 +22,7 @@ public class HelloController {
         return "{\"status\": \"up\"}";
     }
 
-    @RequestMapping(value = "/secure-hello", method = RequestMethod.GET)
+    @RequestMapping(value = "/hello/secure", method = RequestMethod.GET)
     public String secureHello() {
         return "{\"status\":\"up\", \"timestamp\":\"" + timestamp + "\"}";
     }

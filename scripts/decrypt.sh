@@ -14,5 +14,5 @@ if [ ! -d "$DIR/$DESTINATION" ]; then
   mkdir -p $DIR/$DESTINATION
 fi
 
-unzip $DECARCHIVE -d $DIR/$DESTINATION
+yes | unzip $DECARCHIVE -d $DIR/$DESTINATION
 rm $DECARCHIVE
