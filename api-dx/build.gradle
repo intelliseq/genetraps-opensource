@@ -97,4 +97,25 @@ wrapper() {
     gradleVersion = '4.7'
 }
 
-apply from: rootProject.file('profiles.gradle');
+def prodProfiles='prod'
+def devProfiles='dev'
+def testProfiles='test'
+def propertyDrivenProfiles;
+
+if (project.hasProperty('prod')) {
+    propertyDrivenProfiles = prodProfiles
+    apply from: rootProject.file('gradle/profile_prod.gradle');
+} else if (project.hasProperty('dev')) {
+    propertyDrivenProfiles = devProfiles
+    apply from: rootProject.file('gradle/profile_dev.gradle');
+} else {
+    propertyDrivenProfiles = testProfiles
+    apply from: rootProject.file('gradle/profile_test.gradle');
+}
+println 'Using profile: "' + propertyDrivenProfiles + '" for ' + project.getName()
+
+bootRun {
+    systemProperties = [
+            'spring.profiles.active': propertyDrivenProfiles
+    ]
+}

@@ -207,7 +207,7 @@ public class WDLParserManager {
     }
 
     @PostConstruct
-    public void collectData(Boolean checkLatest){
+    public void collectData(){
         Pattern isWdlFile = Pattern.compile(".*\\.wdl");
         Pattern latestPattern = Pattern.compile(".*latest");
         StringBuilder path;
@@ -229,7 +229,7 @@ public class WDLParserManager {
             String latestPath = null;
             for (JsonNode versionNode: wdlVersions){
                 String versionPath = remover(versionNode.get("path").toString());
-                if(checkLatest && latestPattern.matcher(versionPath).matches()){
+                if(activeProfile == "" && latestPattern.matcher(versionPath).matches()){
                     latestPath=versionPath;
                     hasLatest=true;
                     break;
