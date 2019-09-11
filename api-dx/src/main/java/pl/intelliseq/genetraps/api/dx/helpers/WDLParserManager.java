@@ -10,6 +10,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import pl.intelliseq.genetraps.api.dx.Profiles;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -229,7 +230,7 @@ public class WDLParserManager {
             String latestPath = null;
             for (JsonNode versionNode: wdlVersions){
                 String versionPath = remover(versionNode.get("path").toString());
-                if(activeProfile == "" && latestPattern.matcher(versionPath).matches()){
+                if(activeProfile != Profiles.PROD && latestPattern.matcher(versionPath).matches()){
                     latestPath=versionPath;
                     hasLatest=true;
                     break;
