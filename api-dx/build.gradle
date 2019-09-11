@@ -96,3 +96,5 @@ docker {
 wrapper() {
     gradleVersion = '4.7'
 }
+
+apply from: rootProject.file('profiles.gradle');

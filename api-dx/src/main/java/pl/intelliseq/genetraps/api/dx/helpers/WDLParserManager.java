@@ -39,6 +39,9 @@ public class WDLParserManager {
     @Value("${fileGet-ref}")
     String filePathRef;
 
+    @Value("${spring.profiles.active}")
+    String activeProfile;
+
     private JsonNode data;
 
     public JsonNode getData(){
@@ -204,8 +207,9 @@ public class WDLParserManager {
     }
 
     @PostConstruct
-    public void collectData(){
+    public void collectData(Boolean checkLatest){
         Pattern isWdlFile = Pattern.compile(".*\\.wdl");
+        Pattern latestPattern = Pattern.compile(".*latest");
         StringBuilder path;
         ObjectNode node = new ObjectMapper().createObjectNode();
 
@@ -221,14 +225,24 @@ public class WDLParserManager {
 
             // finding latest version in directory
             double highestVersion=0.0;
+            Boolean hasLatest = false;
+            String latestPath = null;
             for (JsonNode versionNode: wdlVersions){
                 String versionPath = remover(versionNode.get("path").toString());
-                double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
-                if (versionNumber>highestVersion) {
-                    filePath = versionPath;
-                    highestVersion=versionNumber;
+                if(checkLatest && latestPattern.matcher(versionPath).matches()){
+                    latestPath=versionPath;
+                    hasLatest=true;
+                    break;
+                }
+                else {
+                    double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
+                    if (versionNumber > highestVersion) {
+                        filePath = versionPath;
+                        highestVersion = versionNumber;
+                    }
                 }
             }
+            if(hasLatest) filePath=latestPath;
 
             path = (new StringBuilder(pathPrefix)).append(filePath).append(pathSuffix);
 

@@ -26,6 +26,6 @@ public class WDLParserController {
 
     @RequestMapping(value = "/wdl/update", method = RequestMethod.GET)
     public void updateWDLData() {
-        WDLParserManager.collectData();
+        WDLParserManager.getData();
     }
 }
