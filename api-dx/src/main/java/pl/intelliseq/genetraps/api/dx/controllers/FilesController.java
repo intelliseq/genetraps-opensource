@@ -154,7 +154,8 @@ public class FilesController {
         }
     }
 
-    @RequestMapping(value = "/job/{id}/logs/download/links")
+    @RequestMapping(value = "/job/{id}/logs/download/links", method = RequestMethod.GET)
+    @ResponseBody
     public String jobLogs(
             @PathVariable String id) {
         log.info("get job logs download");
