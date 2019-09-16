@@ -78,6 +78,7 @@ curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/
 curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/status"
 ```
 
+**To abort a running workflow**
 ```bash
 curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/abort"
 ```
@@ -94,8 +95,8 @@ With `sub` flag you can limit the resulting links to those which correspond with
 curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/output/download/links?sub="
 ```
 
-**Logs
-Generate temporary links to download**  
+**Logs**
+Generate temporary links to download err and out logs files  
 ```bash
 curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/logs/download/links"
 ```
