@@ -67,7 +67,7 @@ If you want to leave the original name of output file, then leave the value in k
 
 **Status of the workflow:**
 ```bash
-curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/status?jobId=$JOBID" | jq -r ".status"
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/status" | jq -r ".status"
 ```
 
 
@@ -75,19 +75,25 @@ curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/status?
 
 **Job's properties:**
 ```bash
-curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/status?jobId=$JOBID"
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/status"
 ```
 
 **Job's outputs**
 ```bash
-curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/output?jobId=$JOBID"
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/output"
 ```
 
 **Generate temporary links to download output**
 Return json with pairs output_key:link  
 With `sub` flag you can limit the resulting links to those which correspond with keys containing the specified substring
 ```bash
-curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/output/download/links?jobId=$JOBID&sub="
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/output/download/links?sub="
+```
+
+**Logs
+Generate temporary links to download**  
+```bash
+curl -H "Authorization: Bearer $TOKEN" "localhost:8086/job/$JOBID/logs/download/links"
 ```
 
 **List all jobs associated with a sample**
