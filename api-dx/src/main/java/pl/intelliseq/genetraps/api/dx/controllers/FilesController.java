@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,7 +70,6 @@ public class FilesController {
 //        }
 //    }
 
-    // AWS S3
     @RequestMapping(value = "/sample/create", method = RequestMethod.GET)
     @ResponseBody
     public String createFolder(@ApiIgnore OAuth2Authentication auth) {
@@ -83,7 +83,6 @@ public class FilesController {
         return String.format("{\"response\":\"%s\"}", sampleId);
     }
 
-    // AWS S3
     @RequestMapping(value = "/wdl", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @ResponseBody
@@ -101,50 +100,72 @@ public class FilesController {
         }
     }
 
-    // AWS S3
-    @RequestMapping(value = "/job/status", method = RequestMethod.GET)
+    @RequestMapping(value = "/job/{id}/status", method = RequestMethod.GET)
     @ResponseBody
     public String getStatus(
-            @RequestParam String jobId) {
+            @PathVariable String id) {
         log.info("get job status");
-        log.info(jobId);
+        log.info(id);
         try {
-            return awsApiProcessManager.runGetJobStatus(jobId).toString();
+            return awsApiProcessManager.runGetJobStatus(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job status").put("err", e.getMessage()).toString();
         }
     }
 
-    // AWS S3
-    @RequestMapping(value = "/job/output", method = RequestMethod.GET)
+    @RequestMapping(value = "/job/{id}/abort", method = RequestMethod.GET)
+    @ResponseBody
+    public String abortJob(
+            @PathVariable String id) {
+        log.info("abort job");
+        log.info(id);
+        try {
+            return awsApiProcessManager.runAbortJob(id).toString();
+        } catch (InterruptedException e) {
+            return new ObjectMapper().createObjectNode().put("id", "Error while trying to abort the job").put("err", e.getMessage()).toString();
+        }
+    }
+
+    @RequestMapping(value = "/job/{id}/output", method = RequestMethod.GET)
     @ResponseBody
     public String getJobOuput(
-            @RequestParam String jobId) {
+            @PathVariable String id) {
         log.info("get job output download");
-        log.info(jobId);
+        log.info(id);
         try {
-            return awsApiProcessManager.runGetJobOutputs(jobId).toString();
+            return awsApiProcessManager.runGetJobOutputs(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job output").put("err", e.getMessage()).toString();
         }
     }
 
     // AWS S3
-    @RequestMapping(value = "/job/output/download/links", method = RequestMethod.GET)
+    @RequestMapping(value = "/job/{id}/output/download/links", method = RequestMethod.GET)
     @ResponseBody
     public String getJobOuputDownloadLinks(
-            @RequestParam String jobId,
+            @PathVariable String id,
             @RequestParam(required = false) String sub) {
         log.info("get job output download links");
-        log.info(jobId);
+        log.info(id);
         try {
-            return awsApiProcessManager.runGetJobOutputsDownloadLinks(jobId, sub).toString();
+            return awsApiProcessManager.runGetJobOutputsDownloadLinks(id, sub).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job output").put("err", e.getMessage()).toString();
         }
     }
 
-    // AWS S3
+    @RequestMapping(value = "/job/{id}/logs/download/links")
+    public String jobLogs(
+            @PathVariable String id) {
+        log.info("get job logs download");
+        log.info(id);
+        try {
+            return awsApiProcessManager.runGetJobLogs(id).toString();
+        } catch (InterruptedException e) {
+            return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job logs").put("err", e.getMessage()).toString();
+        }
+    }
+
     @RequestMapping(value = "/sample/{id}/jobs", method = RequestMethod.GET)
     @ResponseBody
     public String getJobs(
@@ -157,7 +178,6 @@ public class FilesController {
         }
     }
 
-    // AWS S3
     @RequestMapping(value = "/sample/{id}/url/upload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String upload(
@@ -166,7 +186,6 @@ public class FilesController {
             @RequestParam String url,
             @RequestParam(value = "name", required = false) String fileName,
             @RequestParam(required = false) List<String> tag) {
-
         log.info("url upload");
         log.debug(tag);
 //        Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
@@ -179,7 +198,6 @@ public class FilesController {
         }
     }
 
-    // AWS S3
     @RequestMapping(value = "/sample/{id}/file/upload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String uploadFile(
@@ -187,7 +205,6 @@ public class FilesController {
             @RequestParam MultipartFile file,
             @RequestParam(value = "name", required = false) String fileName,
             @RequestParam(required = false) List<String> tag) {
-
         log.info("file upload");
         log.debug(tag);
         try {
@@ -197,7 +214,6 @@ public class FilesController {
         }
     }
 
-    // AWS S3
     @RequestMapping(value = "sample/{id}/file/delete", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String deleteFile(
@@ -210,7 +226,6 @@ public class FilesController {
         }
     }
 
-    // AWS S3
     @RequestMapping(value = "/sample/{id}/ls", method = RequestMethod.GET)
     public String sampleLs(
             @PathVariable Integer id,

@@ -1,6 +1,7 @@
 package pl.intelliseq.genetraps.api.dx.helpers;
 
 import com.amazonaws.HttpMethod;
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
@@ -79,7 +80,6 @@ public class AWSApiProcessManager {
             int bytesRead;
             while((bytesRead = in.read(buffer)) != -1) {
                 streamContentLength += bytesRead;
-
             }
             log.info(streamContentLength);
         } catch (IOException e) {
@@ -87,18 +87,6 @@ public class AWSApiProcessManager {
         }
 
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream())) {
-//            URL urll = new URL(url);
-//            log.info(url);
-//            HttpsURLConnection conn = (HttpsURLConnection) urll.openConnection();
-////            if(conn instanceof HttpURLConnection)
-//                conn.setRequestMethod("GET");
-//                log.info(conn.getContentLengthLong());
-//            BufferedInputStream in = new BufferedInputStream(conn.getInputStream());
-//            File file = new File(System.currentTimeMillis() + "urlupload");
-//            try (OutputStream outputStream = new FileOutputStream(file)) {
-//                IOUtils.copy(in, outputStream);
-//            }
-//            log.info(file.length());
 
             TransferManager tm = TransferManagerBuilder.standard()
                     .withS3Client(s3Client)
@@ -203,7 +191,7 @@ public class AWSApiProcessManager {
                         value = values.getString(i);
                         if (value.isEmpty()) continue;
                         if (value.charAt(0) == '/') {
-                            values.put(i, getAWSUrl(value.substring(1)));
+                            values.put(i, getAWSFullPath(value.substring(1)));
                         }
                     }
                     workflowInputs.put(key, values);
@@ -211,7 +199,7 @@ public class AWSApiProcessManager {
                     value = workflowInputs.getString(key);
                     if (value.isEmpty()) continue;
                     if (value.charAt(0) == '/') {
-                        workflowInputs.put(key, getAWSUrl(value.substring(1)));
+                        workflowInputs.put(key, getAWSFullPath(value.substring(1)));
                     }
                 }
             }
@@ -251,7 +239,7 @@ public class AWSApiProcessManager {
         }
     }
 
-    private String getAWSUrl(String fileName) throws InterruptedException {
+    private String getAWSFullPath(String fileName) throws InterruptedException {
 
         try {
             if(s3Client.doesObjectExist(env.getProperty("bucket.default"), fileName))
@@ -266,16 +254,40 @@ public class AWSApiProcessManager {
 
     public JsonNode runGetJobStatus(String jobId) throws InterruptedException {
 
-        JsonNode response = getJobWithLabelJobId(jobId);
+        JsonNode response = getJobWithLabel("jobId", jobId);
         if(response.get("totalResultsCount").asInt() == 0)
             return new ObjectMapper().createObjectNode().put("id", "No job was found");
         ObjectNode jobsExtractedFromBigJson = (ObjectNode) response.get("results").get(0);
         return jobsExtractedFromBigJson.put("id", jobId);
     }
 
+    public JsonNode runAbortJob(String jobId) throws InterruptedException {
+
+        ObjectNode response = (ObjectNode) getJobWithLabel("jobId", jobId);
+        if(response.get("totalResultsCount").asInt() == 0)
+            return new ObjectMapper().createObjectNode().put("id", "No job was found");
+        String jobCromwellId = response.get("results").get(0).get("id").asText();
+
+        try {
+            HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                    .post(String.format("%s/%s/abort", env.getProperty("cromwell.server"), jobCromwellId))
+                    .header("accept", "application/json")
+                    .asJson();
+            response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
+            if (responseUnirest.getStatus() / 100 != 2)
+                throw new InterruptedException(response.toString());
+            if(response.get("status").asText().equals("error") || response.get("status").asText().equals("fail"))
+                throw new InterruptedException(response.get("message").asText());
+        } catch (UnirestException | IOException e) {
+            throw new InterruptedException(e.getMessage());
+        }
+
+        return response.put("id", jobId);
+    }
+
     public JsonNode runGetJobOutputs(String jobId) throws InterruptedException {
 
-        ObjectNode response = (ObjectNode) getJobWithLabelJobId(jobId);
+        ObjectNode response = (ObjectNode) getJobWithLabel("jobId", jobId);
         if(response.get("totalResultsCount").asInt() == 0)
             return new ObjectMapper().createObjectNode().put("id", "No job was found");
         String jobCromwellId = response.get("results").get(0).get("id").asText();
@@ -304,7 +316,7 @@ public class AWSApiProcessManager {
 
     public JsonNode runGetJobOutputsDownloadLinks(String jobId, String sub) throws InterruptedException {
 
-        ObjectNode response = (ObjectNode) getJobWithLabelJobId(jobId);
+        ObjectNode response = (ObjectNode) getJobWithLabel("jobId", jobId);
         if(response.get("totalResultsCount").asInt() == 0)
             return new ObjectMapper().createObjectNode().put("id", "No job was found");
         String jobCromwellId = response.get("results").get(0).get("id").asText();
@@ -336,7 +348,7 @@ public class AWSApiProcessManager {
                 continue;
             }
             String outputLink = response.get(outputKey).asText();
-            outputLink = outputLink.substring(outputLink.indexOf(bucketName) + 5);
+            outputLink = outputLink.substring(outputLink.indexOf(bucketName) + bucketName.length() + 1);
             expiration.setTime(expiration.getTime() + expTimeMillis);
             GeneratePresignedUrlRequest generatePresignedUrlRequest =
                     new GeneratePresignedUrlRequest(bucketName, outputLink)
@@ -349,6 +361,99 @@ public class AWSApiProcessManager {
         return response.without(outputsNotWithSubstring);
     }
 
+    public JsonNode runGetJobLogs(String jobId) throws InterruptedException {
+
+        JsonNode response = getJobWithLabel("jobId", jobId);
+        if(response.get("totalResultsCount").asInt() == 0)
+            return new ObjectMapper().createObjectNode().put("id", "No job was found");
+        String jobCromwellId = response.get("results").get(0).get("id").asText();
+
+        try {
+            HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                    .get(String.format("%s/%s/metadata", env.getProperty("cromwell.server"), jobCromwellId))
+                    .header("accept", "application/json")
+                    .asJson();
+            response = new ObjectMapper().readValue(responseUnirest.getRawBody(), JsonNode.class).get("calls");
+            if (responseUnirest.getStatus() / 100 != 2)
+                throw new InterruptedException(response.toString());
+        } catch (UnirestException | IOException e) {
+            throw new InterruptedException(e.getMessage());
+        }
+
+        String bucketName = env.getProperty("bucket.default");
+
+        List<String> unnecessaryKeys = Arrays.asList("attempt", "shardIndex");
+        ObjectNode failedWorkflowsLogsLinks = new ObjectMapper().createObjectNode();
+        // an hour
+        long expTimeMillis = 1000 * 60 * 60;
+
+        for (Iterator<Map.Entry<String, JsonNode>> workflowsMetadataIt = response.fields(); workflowsMetadataIt.hasNext(); ) {
+            String workflowName = workflowsMetadataIt.next().getKey();
+            JsonNode workflowMetadata = response.get(workflowName).get(0);
+            if(!workflowMetadata.has("executionStatus") || !workflowMetadata.get("executionStatus").asText().equals("Failed"))
+                continue;
+            String workflowCromwellId;
+            if(workflowMetadata.has("jobId"))
+                workflowCromwellId = workflowMetadata.get("jobId").asText();
+            else if(workflowMetadata.has("subWorkflowId"))
+                workflowCromwellId = workflowMetadata.get("subWorkflowId").asText();
+            else
+                continue;
+
+            // json with jsons of logs for a bunch of related workflows
+            ObjectNode responseLogs;
+            try {
+                HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                        .get(String.format("%s/%s/logs", env.getProperty("cromwell.server"), workflowCromwellId))
+                        .header("accept", "application/json")
+                        .asJson();
+                responseLogs = (ObjectNode) new ObjectMapper().readValue(responseUnirest.getRawBody(), JsonNode.class).get("calls");
+                if (responseUnirest.getStatus() / 100 != 2)
+                    throw new InterruptedException(responseLogs.toString());
+            } catch (UnirestException | IOException e) {
+                throw new InterruptedException(e.getMessage());
+            }
+
+            for (Iterator<Map.Entry<String, JsonNode>> it = responseLogs.fields(); it.hasNext(); ) {
+                // json with logs for one of the workflows
+                String workflowLogsName = it.next().getKey();
+                ObjectNode workflowLogs = (ObjectNode) responseLogs.get(workflowLogsName).get(0);
+                if(workflowLogs.has("stderr")) {
+                    String logLink = workflowLogs.get("stderr").asText();
+                    logLink = getAWSKeyFromS3BucketKeyFormat(bucketName, logLink);
+                    workflowLogs.put("stderr", getAWSPresignedUrl(bucketName, logLink, expTimeMillis));
+                }
+                if(workflowLogs.has("stdout")) {
+                    String logLink = workflowLogs.get("stdout").asText();
+                    logLink = getAWSKeyFromS3BucketKeyFormat(bucketName, logLink);
+                    workflowLogs.put("stdout", getAWSPresignedUrl(bucketName, logLink, expTimeMillis));
+                }
+                responseLogs.set(workflowLogsName, workflowLogs.remove(unnecessaryKeys));
+//                log.info("--      " + workflowLogs);
+            }
+//            log.info(responseLogs.toString());
+            failedWorkflowsLogsLinks.set(workflowName, responseLogs);
+        }
+//        log.info("Final Result:     " + failedWorkflowsLogsLinks.toString());
+        return failedWorkflowsLogsLinks.put("id", jobId);
+    }
+
+    private String getAWSPresignedUrl(String bucketName, String objectLink, long expTimeMillis) {
+
+        java.util.Date expiration = new java.util.Date();
+        expiration.setTime(expiration.getTime() + expTimeMillis);
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, objectLink)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+        return s3Client.generatePresignedUrl(generatePresignedUrlRequest).toString().replaceAll("%2F", "/");
+    }
+
+    private String getAWSKeyFromS3BucketKeyFormat(String bucketName, String s3bucketkeyformatkey) {
+
+        return s3bucketkeyformatkey.substring(s3bucketkeyformatkey.indexOf(bucketName) + bucketName.length() + 1);
+    }
+
     public JsonNode runGetJobsForSample(String sampleId) throws InterruptedException {
 
         ObjectNode jobs = new ObjectMapper().createObjectNode();
@@ -359,24 +464,24 @@ public class AWSApiProcessManager {
         for(String jobId : jobsFromDB) {
 
             log.info(jobId);
-            response = getJobWithLabelJobId(jobId);
+            response = getJobWithLabel("jobId", jobId);
             if(response.get("totalResultsCount").asInt() == 0)
                 continue;
             jobCount += response.get("totalResultsCount").asInt();
-            jobs.set(jobId, ((ObjectNode) getJobWithLabelJobId(jobId).get("results").get(0)).without("id"));
+            jobs.set(jobId, ((ObjectNode) getJobWithLabel("jobId", jobId).get("results").get(0)).without("id"));
         }
         jobs.put("count", jobCount);
 
         return jobs;
     }
 
-    private JsonNode getJobWithLabelJobId(String jobId) throws InterruptedException {
+    private JsonNode getJobWithLabel(String label, String value) throws InterruptedException {
 
         try {
             HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
                     .get(String.format("%s/query", env.getProperty("cromwell.server")))
                     .header("accept", "application/json")
-                    .queryString("label", String.format("jobId:%s", jobId))
+                    .queryString("label", String.format("%s:%s", label, value))
                     .asJson();
             JsonNode response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
             if (responseUnirest.getStatus() / 100 != 2)
