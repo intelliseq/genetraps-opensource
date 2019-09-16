@@ -78,6 +78,10 @@ curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/
 curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/status"
 ```
 
+```bash
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/abort"
+```
+
 **Job's outputs**
 ```bash
 curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/output"
@@ -93,7 +97,7 @@ curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/
 **Logs
 Generate temporary links to download**  
 ```bash
-curl -H "Authorization: Bearer $TOKEN" "localhost:8086/job/$JOBID/logs/download/links"
+curl -H "Authorization: Bearer $TOKEN" "genetraps.intelliseq.pl:8086/job/$JOBID/logs/download/links"
 ```
 
 **List all jobs associated with a sample**
