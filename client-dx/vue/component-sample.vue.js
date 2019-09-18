@@ -4,7 +4,7 @@ const sampleComponent = {
   <v-flex ma-1>
   <v-card>
     <v-list two-line subheader>
-      <v-subheader inset>Samples</v-subheader>
+      <v-subheader inset>Sample {{$route.params.id}}</v-subheader>
         <v-list-tile v-for="(value, key) in sample.properties" :key="key" avatar @click="">
             <v-list-tile-avatar>
               <v-icon>label</v-icon>
@@ -19,6 +19,24 @@ const sampleComponent = {
               </v-btn>
             </v-list-tile-action>
           </v-list-tile>
+
+
+           <v-list-tile v-for="file in sample.files" avatar @click="">
+                      <v-list-tile-avatar>
+                        <v-icon>label</v-icon>
+                      </v-list-tile-avatar>
+                      <v-list-tile-content>
+                        <v-list-tile-title>{{ file.name }}</v-list-tile-title>
+                        <v-list-tile-sub-title>file</v-list-tile-sub-title>
+                      </v-list-tile-content>
+                      <v-list-tile-action>
+                        <v-btn icon>
+                          <v-icon color="grey lighten-1">info</v-icon>
+                        </v-btn>
+                      </v-list-tile-action>
+                    </v-list-tile>
+
+
           <v-list-tile>
           <v-list-tile-avatar>
             <v-icon color="green darken-2">add_circle</v-icon>
@@ -26,7 +44,18 @@ const sampleComponent = {
           <v-text-field @keyup.enter="add" v-model="newKey" label="Property Name"></v-text-field></td>
           <v-text-field @keyup.enter="add" v-model="newValue" label="Property Value"></v-text-field>
           </v-list-tile>
+
+
+           <v-list-tile>
+          <v-list-tile-avatar>
+          <v-icon color="green darken-2">attach_file</v-icon> </v-list-tile-avatar>
+          <input type="file" v-bind="files" multiple @change="handleFilesUpload"/>
+          <button @click="submitFiles">Submit</button>
+         </v-list-tile>
+
+
         </v-list>
+
   </v-card>
   </v-flex>
   </v-layout>
@@ -36,10 +65,12 @@ const sampleComponent = {
       return {
         newKey: undefined,
         newValue: undefined,
+        files: {}
       }
     },
     computed: {
-      ...Vuex.mapState('sample', ['sample'])
+      ...Vuex.mapState('sample', ['sample']),
+      ...Vuex.mapState(['currentSampleId'])
     },
     methods: {
       add(){
@@ -48,13 +79,48 @@ const sampleComponent = {
          this.newNumber = undefined;
          console.log(this.sample)
       },
-      putProperties: function (event) {
-        //logger.debug("vue.welcome.createSample")
-        //store.dispatch('sample/createSample')
-      },
+
+       submitFiles(){
+
+             let formData = new FormData();
+
+               for( var i = 0; i < this.files.length; i++ ){
+                 let file = this.files[i];
+
+                 formData.append('files[' + i + ']', file);
+                 Vue.set(this.sample.files, "file", file)
+
+                 Vue.set(this.sample.files, i, file)
+               }
+
+               /*
+                 Make the request to the POST /multiple-files URL
+               */
+
+//                axios.post( '/sample/{id}/file/upload',
+//                  formData,
+//                  {
+//                    headers: {
+//                        'Content-Type': 'multipart/form-data'
+//                    }
+//                  }
+//                ).then(function(){
+//                  console.log('SUCCESS!!');
+//                })
+//                .catch(function(){
+//                  console.log('FAILURE!!');
+//                });
+
+             },
+
+             handleFilesUpload(event){
+               this.files = event.target.files
+               console.log(this.files)
+             }
 
     },
     created: function () {
       logger.debug("vue.sample.created")
+      logger.debug(this.currentSampleId)
     }
 }

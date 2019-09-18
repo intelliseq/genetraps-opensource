@@ -1,13 +1,13 @@
 const store = new Vuex.Store({
     state: {
-        waitingVisibility: false,
+        waitComponentVisibility: false,
         toolbarVisibility: false,
         buttonColor: 'teal lighten-2',
         buttonColors: {
           'samples':'teal lighten-2',
           'panels':'teal lighten-2',
         },
-        waitingText: "waiting"
+        waitingText: "waiting",
     },
     mutations: {
       setButtonColors(state, route) {
@@ -16,9 +16,9 @@ const store = new Vuex.Store({
           state.buttonColors.panels = "teal lighten-2"
         }
       },
-      setWaitingVisibility(state, waitingVisibility) {
-        state.waitingVisibility = waitingVisibility
-        logger.debug("setWaitingVisibility")
+      setWaitComponentVisibility(state, waitComponentVisibility) {
+        state.waitComponentVisibility = waitComponentVisibility
+        logger.debug("setWaitComponentVisibility")
       },
       setWaitingText(state, waitingText) {
         state.waitingText = waitingText
@@ -26,7 +26,7 @@ const store = new Vuex.Store({
       setToolbarVisibility(state, toolbarVisibility) {
         state.toolbarVisibility = toolbarVisibility
         logger.debug("setToolbarVisibility")
-      },
+      }
     },
     modules: {
     	user: userModule,

@@ -23,6 +23,7 @@ const userModule = {
 			request({
 				waitingText: "Verifying user credentials",
 				endpoint: "user",
+				method: "post",
 				callback: function(data) {store.commit('user/setUserData', data)}
 			})
     },

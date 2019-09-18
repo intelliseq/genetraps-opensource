@@ -5,7 +5,7 @@ const samplesComponent = {
   <v-card>
     <v-list two-line subheader>
       <v-subheader inset>Samples</v-subheader>
-        <v-list-tile v-on:click="router.push('/sample')" v-for="sample in samples" :key="sample.id" avatar @click="">
+            <v-list-tile v-on:click="goToSample($event, sample.id)" v-for="sample in samples" :key="sample.id" avatar>
             <v-list-tile-avatar>
               <v-icon>assignment_ind</v-icon>
             </v-list-tile-avatar>
@@ -42,6 +42,9 @@ const samplesComponent = {
         logger.debug("vue.welcome.getSamples")
         store.dispatch('sample/getSamples')
       },
+      goToSample: function (event, id){
+        router.push({ path: `/sample/${id}`})
+      }
     },
     created: function () {
       logger.debug("vue.samples.created")

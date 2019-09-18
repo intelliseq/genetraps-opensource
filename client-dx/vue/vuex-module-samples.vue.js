@@ -8,9 +8,9 @@ const samplesModule = {
 			logger.debug("vue.vuex.samples.setSamples")
 			var samples = []
 			for (var key in samplesPrivileges) {
-    		if (samplesPrivileges.hasOwnProperty(key)) {
-					samples.push({id: key, access: samplesPrivileges[key]})
-    		}
+                if (samplesPrivileges.hasOwnProperty(key)) {
+                        samples.push({id: key, access: samplesPrivileges[key]})
+                        }
 			}
 			state.samples = samples
 	  }

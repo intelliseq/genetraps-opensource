@@ -1,7 +1,10 @@
 const sampleModule = {
 	namespaced: true,
 	state: {
-		sample: {properties: {"key1": "value1","key2": "value2"}}
+		sample: {
+		    properties: {"key1": "value1","key2": "value2"},
+		    files: {"file": "value"}
+		  }
   },
 	mutations: {
 	},
@@ -10,7 +13,7 @@ const sampleModule = {
 			logger.debug("vue.vuex.sample.createSample")
 			request({
 				waitingText: "Creating sample",
-				endpoint: "sample/new",
+				endpoint: "sample/create",
 				callback: function(data){console.log(data)}
 			})
 		},

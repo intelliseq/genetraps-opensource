@@ -1,5 +1,5 @@
 function request(params) {
-  logger.debug("request to:")
+  logger.debug("============== request to:")
 
   /* setting params */
   var waitingText = (params.waitingText === undefined) ? "Connecting with server..." : params.waitingText
@@ -22,7 +22,7 @@ function request(params) {
 
   /* setting waiting */
   store.commit('setWaitingText', waitingText)
-  store.commit('setWaitingVisibility', true)
+  store.commit('setWaitComponentVisibility', true)
 
   /* making request */
   axios({
@@ -36,11 +36,11 @@ function request(params) {
     headers: headers
   })
   .then(response => {
-    store.commit('setWaitingVisibility', false)
+    store.commit('setWaitComponentVisibility', false)
     callback(response.data)
   })
   .catch(error => {
-    store.commit('setWaitingVisibility', false)
+    store.commit('setWaitComponentVisibility', false)
     errorCallback(error)
   })
 }
