@@ -241,11 +241,10 @@ public class FilesController {
         }
     }
 
-    //TODO: is there an equivalent in aws??
-//    @RequestMapping(value = "/sample/{id}/describe", method = RequestMethod.GET)
+//    @RequestMapping(value = "/job/{id}/metadata", method = RequestMethod.GET)
 //    public String describe(
 //            @PathVariable Integer id) {
-//        return dxApiProcessManager.JSONDescribe(id).toString();
+//        return dxApiProcessManager.getJobJSONMetadata(id).toString();
 //    }
 
     // creates and/or adds properties a specified sample folder

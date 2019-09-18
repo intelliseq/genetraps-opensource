@@ -50,9 +50,9 @@ public class FilesManager {
         else {
             List<Integer> sampleIds = new ArrayList<>();
             for (S3ObjectSummary sampleSummary : sampleSummaries) {
-                if(sampleSummary.getKey().matches(".*/([1-9])/")) {
-//                    log.info(sampleSummary.getKey());
-                    sampleIds.add(Integer.parseInt(sampleSummary.getKey().replaceFirst(".*([1-9]).*", "$1")));
+                if(sampleSummary.getKey().matches("samples/([0-9]+)/")) {
+                    log.info(sampleSummary.getKey());
+                    sampleIds.add(Integer.parseInt(sampleSummary.getKey().replaceFirst(".*([0-9]+).*", "$1")));
                 }
             }
             return sampleIds;

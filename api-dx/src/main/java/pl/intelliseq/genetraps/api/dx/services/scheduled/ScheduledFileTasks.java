@@ -4,11 +4,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.log4j.Log4j2;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,12 +21,14 @@ import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Component
@@ -75,41 +79,52 @@ public class ScheduledFileTasks {
                     RowCallbackHandler rowHandler = resultSet -> {
                         try {
                             // query to cromwell to get details about job with 'jobId' as a label
-                            HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", resultSet.getString("JobID"));
+                            HttpResponse<com.mashape.unirest.http.JsonNode> response = getCromwellJobWithLabel("jobId", resultSet.getString("JobID"));
 
                             // extract job details from the response
                             // id, name, status
-                            JSONObject jobDetails = getJobDetails(response);
+                            JsonNode jobDetails = getJobDetails(response);
+                            String cromwellJobId = getCromwellJobId(jobDetails);
+                            String workflowName = getWorkflowName(jobDetails);
 
                             // check status of job execution
                             String jobStatus = getJobStatus(jobDetails);
                             if (!jobStatus.equals("Succeeded")) {
                                 if(jobStatus.equals("Failed")) {
 //                                    moveToDebugWhenJobFailed();
+                                    //TODO: transfer not delete error contents
+                                    deleteAllObjectsWithPrefix(bucket, String.format("%s/%s/%s/", env.getProperty("cromwell.execution.folder"), workflowName, cromwellJobId));
                                     throw new Exception("Job execution - failed");
                                 }
                                 else
+                                    log.info(cromwellJobId + ": job still running probably");
                                     return;
                             }
-
-                            String cromwellJobId = getCromwellJobId(jobDetails);
 
                             // get the outputs of the job's workflow
 //                            response = getCromwellJobOutputs(cromwellJobId);
 
-                            JSONObject availableOutputs = getAvailableOuputsForJob(env.getProperty("bucket.default"), env.getProperty("cromwell.execution.folder"), getWorkflowName(jobDetails), cromwellJobId);
-                            JSONObject requestedOutputs = getRequestedOutputsForJob(resultSet);
+//                            JSONObject availableOutputs = getAvailableOuputsForJob(env.getProperty("bucket.default"), env.getProperty("cromwell.execution.folder"), getWorkflowName(jobDetails), cromwellJobId);
+                            JsonNode availableOutputs = getOutputsForJob(cromwellJobId);
+                            JsonNode requestedOutputs;
+                            try {
+                                requestedOutputs = getRequestedOutputsForJob(resultSet);
+                            } catch (SQLException | IOException e) {
+                                log.info(e.toString());
+                                return;
+                            }
 
                             // move the requested outputs to sample directory with given sampleId
-                            if(requestedOutputs.length() == 0) {
-                                moveAllObjects(bucket, availableOutputs, resultSet.getString("SampleID"));
+                            if(requestedOutputs.size() == 0) {
+                                moveAllOutputsToSample(bucket, availableOutputs, resultSet.getString("SampleI"), workflowName, jobId);
+//                                moveAllObjects(bucket, availableOutputs, resultSet.getString("SampleID"));
                             }
                             else {
-                                moveObjectsWithJSON(bucket, availableOutputs, requestedOutputs, resultSet.getString("SampleID"));
+                                moveReqOutputsToSample(bucket, availableOutputs, requestedOutputs, resultSet.getString("SampleID"), workflowName, jobId);
                             }
 
                             // delete remaining outputs of a workflow
-                            deleteAllObjectsWithPrefix(bucket, String.format("%s/%s/%s/", env.getProperty("cromwell.execution.folder"), jobDetails.getString("name"), cromwellJobId));
+                            deleteAllObjectsWithPrefix(bucket, String.format("%s/%s/%s/", env.getProperty("cromwell.execution.folder"), workflowName, cromwellJobId));
 
                             log.info(resultSet.getInt("JobStatus"));
                             // update job status in db to successful (1)
@@ -140,21 +155,9 @@ public class ScheduledFileTasks {
         }
     }
 
-    private void moveAllObjects(String bucket, JSONObject availableObjects, String destinationSampleId) {
+    private HttpResponse<com.mashape.unirest.http.JsonNode> getCromwellJobWithLabel(String label, String key) throws Exception {
 
-        Iterator<String> allObjectsIt = availableObjects.keys();
-        String object, objectKey;
-        while (allObjectsIt.hasNext()) {
-            object = allObjectsIt.next();
-            objectKey = availableObjects.getString(object).replaceFirst(".*/(cromwell-execution/.*)", "$1");
-            s3Client.copyObject(bucket, objectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, object));
-            s3Client.deleteObject(bucket, objectKey);
-        }
-    }
-
-    private HttpResponse<JsonNode> getCromwellJobWithLabel(String label, String key) throws Exception {
-
-        HttpResponse<JsonNode> response = Unirest
+        HttpResponse<com.mashape.unirest.http.JsonNode> response = Unirest
                 .get(String.format("%s/query?label=%s:%s", env.getProperty("cromwell.server"), label, key))
                 .header("accept", "application/json")
                 .asJson();
@@ -163,71 +166,75 @@ public class ScheduledFileTasks {
         return response;
     }
 
-    private JSONObject getJobDetails(HttpResponse<JsonNode> response) {
+    private JsonNode getJobDetails(HttpResponse<com.mashape.unirest.http.JsonNode> response) throws IOException {
 
-        return response.getBody().getObject().getJSONArray("results").getJSONObject(0);
+        return new ObjectMapper().readValue(response.getRawBody(), ObjectNode.class).get("results").get(0);
+
+//        return response.getBody().getObject().getJSONArray("results").getJSONObject(0);
     }
 
-    private String getJobStatus(JSONObject jobDetails) {
+    private String getCromwellJobId(JsonNode jobDetails) {
 
-        return jobDetails.getString("status");
+        return jobDetails.get("id").asText();
     }
 
-    private String getCromwellJobId(JSONObject jobDetails) {
+    private String getJobStatus(JsonNode jobDetails) {
 
-        return jobDetails.getString("id");
+        return jobDetails.get("status").asText();
     }
 
-    private String getWorkflowName(JSONObject jobDetails) {
+    private String getWorkflowName(JsonNode jobDetails) {
 
-        return jobDetails.getString("name");
+        return jobDetails.get("name").asText();
     }
 
-    private HttpResponse<JsonNode> getCromwellJobOutputs(String cromwellJobId) throws Exception {
-
-        HttpResponse<JsonNode> response = Unirest
-                .get(String.format("%s/%s/outputs", env.getProperty("cromwell.server"), cromwellJobId))
-                .header("accept", "application/json")
-                .asJson();
-        if (response.getStatus() / 100 != 2)
-            throw new Exception(response.getStatusText());
-        return response;
-    }
-
-    private JSONObject getAvailableOuputsForJob(String bucket, String cromwellExecutionFolder, String workflowName, String jobId) {
-
-        List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(bucket, String.format("%s/%s/%s/", cromwellExecutionFolder, workflowName, jobId)).getObjectSummaries();
-//            log.info(dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir));
-        JSONObject objects = new JSONObject();
-        String objectKey;
-        for (S3ObjectSummary object : objectSummaries) {
-            objectKey = object.getKey();
-            if(objectKey.matches(".*/"))    continue;       // omits id of directories
-            objects.put(objectKey.substring(objectKey.lastIndexOf("/") + 1), String.format("/%s", objectKey));
+    private JsonNode getOutputsForJob(String cromwellJobId) throws InterruptedException {
+        ObjectNode response;
+        try {
+            HttpResponse<com.mashape.unirest.http.JsonNode> responseUnirest = Unirest
+                    .get(String.format("%s/%s/outputs", env.getProperty("cromwell.server"), cromwellJobId))
+                    .header("accept", "application/json")
+                    .asJson();
+            response = new ObjectMapper().readValue(responseUnirest.getRawBody(), ObjectNode.class);
+            if (responseUnirest.getStatus() / 100 != 2)
+                throw new InterruptedException(response.toString());
+        } catch (UnirestException | IOException e) {
+            throw new InterruptedException(e.getMessage());
         }
-
-        return objects;
+        return response.get("outputs");
     }
 
-    private JSONObject getRequestedOutputsForJob(ResultSet resultSet) throws SQLException {
+    private JsonNode getRequestedOutputsForJob(ResultSet resultSet) throws SQLException, IOException {
 
-        return new JSONObject(resultSet.getString("Output"));
+        return new ObjectMapper().readValue(resultSet.getString("Output"), JsonNode.class);
     }
 
-    private void moveObjectsWithJSON(String bucket, JSONObject availableObjects, JSONObject requestedObjects, String destinationSampleId) {
+    private void moveAllOutputsToSample(String bucket, JsonNode availableOutputs, String destinationSampleId, String workflowName, String jobId) {
 
-        Iterator<String> reqObjectsIt = requestedObjects.keys();
-        String requestedObject, reqObjectKey, newName;
-        while (reqObjectsIt.hasNext()) {
-            requestedObject = reqObjectsIt.next();
-            reqObjectKey = availableObjects.getString(requestedObject).replaceFirst(".*/(cromwell-execution/.*)", "$1");
-            newName = requestedObjects.getString(requestedObject);  // newName is a value of pair where requestedObject is key
-            s3Client.copyObject(bucket, reqObjectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, newName.isEmpty() ? requestedObject : newName));
-            s3Client.deleteObject(bucket, reqObjectKey);
+        for (Iterator<Map.Entry<String, JsonNode>> it = availableOutputs.fields(); it.hasNext(); ) {
+            String outputKey = it.next().getKey();
+            String outputLinkKey = availableOutputs.get(outputKey).asText();
+            outputLinkKey = outputLinkKey.substring(outputLinkKey.indexOf(bucket) + bucket.length() + 1);
+            s3Client.copyObject(bucket, outputLinkKey, bucket, String.format("%s/%s/%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, workflowName, jobId, outputLinkKey.substring(outputLinkKey.lastIndexOf('/') + 1)));
+            s3Client.deleteObject(bucket, outputLinkKey);
         }
     }
 
-    public void deleteAllObjectsWithPrefix(String bucket, String prefix) {
+    private void moveReqOutputsToSample(String bucket, JsonNode availableOutputs, JsonNode requestedObjects, String destinationSampleId, String workflowName, String jobId) {
+
+        for (Iterator<Map.Entry<String, JsonNode>> it = availableOutputs.fields(); it.hasNext(); ) {
+            String outputKey = it.next().getKey();
+            if(!requestedObjects.has(outputKey))
+                continue;
+            String outputLinkKey = availableOutputs.get(outputKey).asText();
+            String newName = requestedObjects.get(outputKey).asText();
+            outputLinkKey = outputLinkKey.substring(outputLinkKey.indexOf(bucket) + bucket.length() + 1);
+            s3Client.copyObject(bucket, outputLinkKey, bucket, String.format("%s/%s/%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, workflowName, jobId, newName.isEmpty() ?  outputLinkKey.substring(outputLinkKey.lastIndexOf('/') + 1) : newName));
+            s3Client.deleteObject(bucket, outputLinkKey);
+        }
+    }
+
+    private void deleteAllObjectsWithPrefix(String bucket, String prefix) {
 
         List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(env.getProperty("bucket.default"), prefix).getObjectSummaries();
         List<String> objects = new ArrayList<>();
@@ -237,36 +244,75 @@ public class ScheduledFileTasks {
         s3Client.deleteObjects(new DeleteObjectsRequest(bucket).withKeys(objects.toArray(new String[0])));
     }
 
-    private void moveToDebug(String sourceBucket, String debugFolder, String errorMessage, String jobId) throws Exception {
-
-        HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", jobId);
-        JSONObject jobDetails = getJobDetails(response);
-        String cromwellJobId = getCromwellJobId(jobDetails);
-        response = getCromwellJobOutputs(cromwellJobId);
-
-        JSONObject objectsToMove = response.getBody().getObject().getJSONObject("outputs");
-
-        Iterator<String> movedObjects = objectsToMove.keys();
-        String outputLink, outputKey;
-
-        while (movedObjects.hasNext()) {
-            outputLink = movedObjects.next();
-            outputKey = objectsToMove.getString(outputLink).replaceFirst(".*/(cromwell-execution/.*)", "$1");
-            log.info(outputKey);
-            //TODO: not all outputs are listed in Outputs of workflow details, need modification...
-            try {
-                s3Client.copyObject(sourceBucket, outputKey, sourceBucket, String.format("%s/%s", debugFolder, outputKey));
-                s3Client.deleteObject(sourceBucket, outputKey);
-            } catch (Exception e) {
-                log.info("err");
-            }
-        }
-        // TODO: put to finally
-        s3Client.putObject(sourceBucket, String.format("%s/%s/%s", debugFolder, jobId, "log.err"), errorMessage);
-    }
+//    private void moveToDebug(String sourceBucket, String debugFolder, String errorMessage, String jobId) throws Exception {
+//
+//        HttpResponse<JsonNode> response = getCromwellJobWithLabel("jobId", jobId);
+//        JSONObject jobDetails = getJobDetails(response);
+//        String cromwellJobId = getCromwellJobId(jobDetails);
+//        response = getCromwellJobOutputs(cromwellJobId);
+//
+//        JSONObject objectsToMove = response.getBody().getObject().getJSONObject("outputs");
+//
+//        Iterator<String> movedObjects = objectsToMove.keys();
+//        String outputLink, outputKey;
+//
+//        while (movedObjects.hasNext()) {
+//            outputLink = movedObjects.next();
+//            outputKey = objectsToMove.getString(outputLink).replaceFirst(".*/(cromwell-execution/.*)", "$1");
+//            log.info(outputKey);
+//            //TODO: not all outputs are listed in Outputs of workflow details, need modification...
+//            try {
+//                s3Client.copyObject(sourceBucket, outputKey, sourceBucket, String.format("%s/%s", debugFolder, outputKey));
+//                s3Client.deleteObject(sourceBucket, outputKey);
+//            } catch (Exception e) {
+//                log.info("err");
+//            }
+//        }
+//        // TODO: put to finally
+//        s3Client.putObject(sourceBucket, String.format("%s/%s/%s", debugFolder, jobId, "log.err"), errorMessage);
+//    }
 
     private void moveToDebugSimple(String bucket, String jobId, String debugFolder, String errorMessage) {
 
         s3Client.putObject(bucket, String.format("%s/%s/%s", debugFolder, jobId, "log.err"), errorMessage);
     }
+
+
+//    private void moveAllObjects(String bucket, JSONObject availableObjects, String destinationSampleId) {
+//
+//        Iterator<String> allObjectsIt = availableObjects.keys();
+//        String object, objectKey;
+//        while (allObjectsIt.hasNext()) {
+//            object = allObjectsIt.next();
+//            objectKey = availableObjects.getString(object).replaceFirst(".*/(cromwell-execution/.*)", "$1");
+//            s3Client.copyObject(bucket, objectKey, bucket, String.format("%s/%s/%s", env.getProperty("samples.folder"), destinationSampleId, object));
+//            s3Client.deleteObject(bucket, objectKey);
+//        }
+//    }
+
+//    private HttpResponse<JsonNode> getCromwellJobOutputs(String cromwellJobId) throws Exception {
+//
+//        HttpResponse<com.mashape.unirest.http.JsonNode> response = Unirest
+//                .get(String.format("%s/%s/outputs", env.getProperty("cromwell.server"), cromwellJobId))
+//                .header("accept", "application/json")
+//                .asJson();
+//        if (response.getStatus() / 100 != 2)
+//            throw new Exception(response.getStatusText());
+//        return response;
+//    }
+
+//    private JSONObject getAvailableOuputsForJob(String bucket, String cromwellExecutionFolder, String workflowName, String jobId) {
+//
+//        List<S3ObjectSummary> objectSummaries = s3Client.listObjectsV2(bucket, String.format("%s/%s/%s/", cromwellExecutionFolder, workflowName, jobId)).getObjectSummaries();
+////            log.info(dir.isEmpty() ? String.format("samples/%s/", sampleId) : String.format("samples/%s/%s/", sampleId, dir));
+//        JSONObject objects = new JSONObject();
+//        String objectKey;
+//        for (S3ObjectSummary object : objectSummaries) {
+//            objectKey = object.getKey();
+//            if(objectKey.matches(".*/"))    continue;       // omits id of directories
+//            objects.put(objectKey.substring(objectKey.lastIndexOf("/") + 1), String.format("/%s", objectKey));
+//        }
+//
+//        return objects;
+//    }
 }
