@@ -1,7 +1,6 @@
-package pl.intelliseq.genetraps.api.dx.helpers;
+package pl.intelliseq.genetraps.api.dx.helpers.aws_manager;
 
 import com.amazonaws.HttpMethod;
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
@@ -16,7 +15,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +22,18 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
+import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
+import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Log4j2
-public class AWSApiProcessManager {
+public class AWSApiProcessManagerImpl implements pl.intelliseq.genetraps.api.dx.helpers.aws_manager.AWSApiProcessManager {
 
     @Autowired
     private Environment env;
@@ -49,16 +48,12 @@ public class AWSApiProcessManager {
     final private AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
 //    final private TransferManager s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();         // ok? or maybe local
 
-    public void runCreateSample(Integer sampleId) {
+    public Integer runCreateSample(Integer sampleId) {
 
         String bucketName = env.getProperty("bucket.default");
+        String propertiesFolder = String.format("%s/%s", env.getProperty("samples.folder"), env.getProperty("properties.folder"));
         s3Client.putObject(bucketName, String.format("%s/%s/", env.getProperty("samples.folder"), sampleId), "");
-    }
-
-    public Integer runCreateSampl(Integer sampleId) {
-
-        String bucketName = env.getProperty("bucket.default");
-        s3Client.putObject(bucketName, String.format("%s/%s/", env.getProperty("samples.folder"), sampleId), "");
+        s3Client.putObject(bucketName, String.format("%s/%s/", propertiesFolder, sampleId), "");
         return sampleId;
     }
 
@@ -373,6 +368,7 @@ public class AWSApiProcessManager {
                     .get(String.format("%s/%s/metadata", env.getProperty("cromwell.server"), jobCromwellId))
                     .header("accept", "application/json")
                     .asJson();
+            // readValue --> valueToTree(rawBody)
             response = new ObjectMapper().readValue(responseUnirest.getRawBody(), JsonNode.class).get("calls");
             if (responseUnirest.getStatus() / 100 != 2)
                 throw new InterruptedException(response.toString());
@@ -407,6 +403,7 @@ public class AWSApiProcessManager {
                         .get(String.format("%s/%s/logs", env.getProperty("cromwell.server"), workflowCromwellId))
                         .header("accept", "application/json")
                         .asJson();
+                // readValue --> valueToTree(rawBody)
                 responseLogs = (ObjectNode) new ObjectMapper().readValue(responseUnirest.getRawBody(), JsonNode.class).get("calls");
                 if (responseUnirest.getStatus() / 100 != 2)
                     throw new InterruptedException(responseLogs.toString());
@@ -534,18 +531,26 @@ public class AWSApiProcessManager {
     }
 
     // creates and/or adds new properties to a specified sample folder
-    public JsonNode propertiesPost(Integer sampleId, JsonNode propertiesToPost, boolean bePersistent) throws PropertiesException {
+    public ObjectNode propertiesPost(Integer sampleId, ObjectNode propertiesToPost, boolean bePersistent) throws PropertiesException {
 
+        log.info(propertiesToPost);
         String bucket = env.getProperty("bucket.default");
+        String propertiesFolder = String.format("%s/%s", env.getProperty("samples.folder"), env.getProperty("properties.folder"));
         StringBuilder builder = new StringBuilder();
         try {
             for (Iterator<Map.Entry<String, JsonNode>> it = propertiesToPost.fields(); it.hasNext(); ) {
                 String propertyKey = it.next().getKey();
-                if (!s3Client.doesObjectExist(bucket, String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey)))
-                    log.info(String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey) + " " + propertiesToPost.get(propertyKey).toString());
-//                    s3Client.putObject(bucket, String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey), propertiesToPost.get(propertyKey).toString());
+//                String propertyKey = it.next().getKey();
+//                String propertyValue = propertiesToPost.get(propertyKey).asText();
+//                propertiesToPost.remove(propertyKey);
+//                propertyKey = propertyKey.toUpperCase();
+//                propertiesToPost.put(propertyKey, propertyValue);
+                if (!s3Client.doesObjectExist(bucket, String.format("%s/%s/%s", propertiesFolder, sampleId, propertyKey))) {
+                    s3Client.putObject(bucket, String.format("%s/%s/%s", propertiesFolder, sampleId, propertyKey), propertiesToPost.get(propertyKey).asText());
+                }
                 else if(bePersistent)
-                    builder.append(System.lineSeparator()).append(propertyKey);
+                    // System.lineSeparator()
+                    builder.append(" ").append(propertyKey);
                 else
                     throw new PropertiesException(propertyKey);
             }
@@ -554,12 +559,11 @@ public class AWSApiProcessManager {
             }
         } catch (PropertiesException e) {
             if(bePersistent)
-                throw new PropertiesException(String.format("Adding new properties finished.%sFollowing properties couldn't be added: %s", System.lineSeparator(), e.getMessage()));
-            throw new PropertiesException(String.format("Adding properties interrupted.%sThe following property couldn't be added: %s", System.lineSeparator(), e.getMessage()));
+                throw new PropertiesException(String.format("Adding new properties finished if there were any. The following properties couldn't be added:%s", e.getMessage()));
+            throw new PropertiesException(String.format("Adding properties interrupted. The following property couldn't be added: %s", e.getMessage()));
         } catch (Exception e) {
             throw new PropertiesException(e.getMessage());
         }
-
         return propertiesToPost;
     }
 
@@ -567,39 +571,49 @@ public class AWSApiProcessManager {
     public JsonNode propertiesGet(Integer sampleId) throws PropertiesException {
 
         String bucket = env.getProperty("bucket.default");
-        try {
-            List<S3ObjectSummary> propertySummaries = s3Client.listObjectsV2(bucket, String.format("%s/%s/%s/", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"))).getObjectSummaries();
+        String propertiesFolder = String.format("%s/%s", env.getProperty("samples.folder"), env.getProperty("properties.folder"));
 
-            if (propertySummaries.isEmpty()) {
-                throw new PropertiesException("does not exist");
-            }
-            // dummy variable to tell if the folder exists -> throws an exception if it doesn't
+        List<S3ObjectSummary> propertySummaries;
+        if(s3Client.doesObjectExist(bucket, String.format("%s/%s/", propertiesFolder, sampleId)))
+            propertySummaries = s3Client.listObjectsV2(bucket, String.format("%s/%s/", propertiesFolder, sampleId)).getObjectSummaries();
+        else
+            throw new PropertiesException("Properties don't exist");
+
+        if (propertySummaries.isEmpty()) {
+            return new ObjectMapper().createObjectNode();
+        }
+        // dummy variable to tell if the folder exists -> throws an exception if it doesn't
+        try {
             ObjectNode properties = new ObjectMapper().createObjectNode();
             String propertyKey;
-            for(S3ObjectSummary property : propertySummaries) {
+            for (S3ObjectSummary property : propertySummaries) {
                 propertyKey = property.getKey();
-                if(propertyKey.matches(".*/"))  continue;
+                if (propertyKey.matches(".*/")) continue;
                 InputStream propertyData = s3Client.getObject(bucket, propertyKey).getObjectContent();
-                properties.put(propertyKey, IOUtils.toString(propertyData, StandardCharsets.UTF_8));
+//                properties.put(propertyKey, IOUtils.toString(propertyData, StandardCharsets.UTF_8));
+                properties.put(propertyKey.substring(propertyKey.lastIndexOf("/") + 1), new String(propertyData.readAllBytes()));
             }
             return properties;
-        } catch (Exception e) {
-            throw new PropertiesException(String.format("cannot exist, because sample: %d does not exist", sampleId));
+        } catch (IOException e) {
+            throw new PropertiesException("There occurred a problem while getting the properties");
         }
     }
 
     // changes/updates properties of a specified sample folder
-    public JsonNode propertiesPut(Integer sampleId, JsonNode propertiesToUpdate, boolean bePersistent) throws PropertiesException {
+    public ObjectNode propertiesPut(Integer sampleId, ObjectNode propertiesToUpdate, boolean bePersistent) throws PropertiesException {
 
         String bucket = env.getProperty("bucket.default");
+        String propertiesFolder = String.format("%s/%s", env.getProperty("samples.folder"), env.getProperty("properties.folder"));
         StringBuilder builder = new StringBuilder();
         try {
             for (Iterator<Map.Entry<String, JsonNode>> it = propertiesToUpdate.fields(); it.hasNext(); ) {
-                String propertyKey = it.next().getKey();
-                if (s3Client.doesObjectExist(bucket, String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey)))
-                    s3Client.putObject(bucket, String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey), propertiesToUpdate.get(propertyKey).toString());
+                String propertyKey = it.next().getKey().toUpperCase();
+                if (s3Client.doesObjectExist(bucket, String.format("%s/%s/%s", propertiesFolder, sampleId, propertyKey))) {
+                    s3Client.putObject(bucket, String.format("%s/%s/%s", propertiesFolder, sampleId, propertyKey), propertiesToUpdate.get(propertyKey).asText());
+                }
                 else if(bePersistent)
-                    builder.append(System.lineSeparator()).append(propertyKey);
+                    // System.lineSeparator()
+                    builder.append(" ").append(propertyKey);
                 else
                     throw new PropertiesException(propertyKey);
             }
@@ -608,28 +622,30 @@ public class AWSApiProcessManager {
             }
         } catch (PropertiesException e) {
             if(bePersistent)
-                throw new PropertiesException(String.format("Updating properties finished.%sFollowing properties couldn't be updated: %s", System.lineSeparator(), e.getMessage()));
-            throw new PropertiesException(String.format("Updating properties interrupted.%sThe following property couldn't be updated: %s", System.lineSeparator(), e.getMessage()));
+                throw new PropertiesException(String.format("Updating properties finished if there were any. The following properties couldn't be updated:%s", e.getMessage()));
+            throw new PropertiesException(String.format("Updating properties interrupted. The following property couldn't be updated: %s", e.getMessage()));
         } catch (Exception e) {
             throw new PropertiesException(e.getMessage());
         }
-
         return propertiesToUpdate;
     }
 
     // deletes properties of a specified sample folder
-    public JsonNode propertiesDelete(Integer sampleId, JsonNode propertiesToDelete, boolean bePersistent) throws PropertiesException {
+    public List<String> propertiesDelete(Integer sampleId, List<String> propertiesToDelete, boolean bePersistent) throws PropertiesException {
 
         String bucket = env.getProperty("bucket.default");
+        String propertiesFolder = String.format("%s/%s", env.getProperty("samples.folder"), env.getProperty("properties.folder"));
         StringBuilder builder = new StringBuilder();
         try {
-            for (Iterator<Map.Entry<String, JsonNode>> it = propertiesToDelete.fields(); it.hasNext(); ) {
-                String propertyKey = it.next().getKey();
-                if (s3Client.doesObjectExist(bucket, String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey)))
-                    log.info(String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey));
-//                    s3Client.deleteObject(bucket, String.format("%s/%s/%s/%s", env.getProperty("samples.folder"), sampleId, env.getProperty("properties.folder"), propertyKey));
-                else if(bePersistent)
-                    builder.append(System.lineSeparator()).append(propertyKey);
+            for(String propertyKey : propertiesToDelete) {
+//            for (int i = 0; i < propertiesToDelete.size(); i++) {
+//                String propertyKey = propertiesToDelete.get(i).toUpperCase();
+//                propertiesToDelete.set(i, propertyKey);
+                if (s3Client.doesObjectExist(bucket, String.format("%s/%s/%s", propertiesFolder, sampleId, propertyKey))) {
+                    s3Client.deleteObject(bucket, String.format("%s/%s/%s", propertiesFolder, sampleId, propertyKey));
+                } else if (bePersistent)
+                    // System.lineSeparator()
+                    builder.append(" ").append(propertyKey);
                 else
                     throw new PropertiesException(propertyKey);
             }
@@ -638,12 +654,11 @@ public class AWSApiProcessManager {
             }
         } catch (PropertiesException e) {
             if(bePersistent)
-                throw new PropertiesException(String.format("Deleting properties finished.%sFollowing properties couldn't be deleted: %s", System.lineSeparator(), e.getMessage()));
-            throw new PropertiesException(String.format("Deleting properties interrupted.%sThe following property couldn't be deleted: %s", System.lineSeparator(), e.getMessage()));
+                throw new PropertiesException(String.format("Deleting properties finished if there were any. The following properties couldn't be deleted:%s", e.getMessage()));
+            throw new PropertiesException(String.format("Deleting properties interrupted. The following property couldn't be deleted: %s", e.getMessage()));
         } catch (Exception e) {
             throw new PropertiesException(e.getMessage());
         }
-
         return propertiesToDelete;
     }
 }

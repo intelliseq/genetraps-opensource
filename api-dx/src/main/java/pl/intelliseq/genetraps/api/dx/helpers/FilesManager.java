@@ -6,10 +6,9 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import pl.intelliseq.genetraps.api.dx.helpers.aws_manager.AWSApiProcessManager;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,8 +18,9 @@ import java.util.stream.IntStream;
  */
 @Log4j2
 public class FilesManager {
+
     @Autowired
-    private AWSApiProcessManager processManager;
+    private AWSApiProcessManager awsApiProcessManager;
 
     @Autowired
     private Environment env;
@@ -34,8 +34,7 @@ public class FilesManager {
         if (list.contains(counter.get()) || list.size() != counter.get() - 1) {
             counter.set(getLowestFreeIndex(list));
         }
-//        processManager.runMkDir(counter.get());
-        processManager.runCreateSample(counter.get());
+        awsApiProcessManager.runCreateSample(counter.get());
         return counter.getAndIncrement();
     }
 
@@ -51,10 +50,11 @@ public class FilesManager {
             List<Integer> sampleIds = new ArrayList<>();
             for (S3ObjectSummary sampleSummary : sampleSummaries) {
                 if(sampleSummary.getKey().matches("samples/([0-9]+)/")) {
-                    log.info(sampleSummary.getKey());
-                    sampleIds.add(Integer.parseInt(sampleSummary.getKey().replaceFirst(".*([0-9]+).*", "$1")));
+                    Integer id = Integer.parseInt(sampleSummary.getKey().replaceFirst("samples/([0-9]+)/", "$1"));
+                    sampleIds.add(id);
                 }
             }
+            Collections.sort(sampleIds);
             return sampleIds;
         }
     }
@@ -84,18 +84,3 @@ public class FilesManager {
         return index;
     }
 }
-
-// DX
-//    public List<Integer> getNumericDirectories() {
-//        try {
-//            return DXContainer.getInstance(env.getProperty("dx-project"))
-//                    .listFolder("/samples")
-//                    .getSubfolders()
-//                    .stream()
-//                    .map(s -> Integer.parseInt(s.substring(9)))
-//                    .sorted()
-//                    .collect(Collectors.toList());
-//        } catch (ResourceNotFoundException e) {
-//            return new LinkedList<>();
-//        }
-//    }

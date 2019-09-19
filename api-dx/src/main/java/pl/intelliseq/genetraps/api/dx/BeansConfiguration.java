@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.util.FileCopyUtils;
 import pl.intelliseq.genetraps.api.dx.helpers.*;
+import pl.intelliseq.genetraps.api.dx.helpers.aws_manager.AWSApiProcessManagerImpl;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -48,7 +49,7 @@ public class BeansConfiguration {
     }
 
     @Bean
-    AWSApiProcessManager awsApiProcessManager() { return new AWSApiProcessManager(); }
+    AWSApiProcessManagerImpl awsApiProcessManager() { return new AWSApiProcessManagerImpl(); }
 
     @Bean
     AuroraDBManager auroraDBManager() {

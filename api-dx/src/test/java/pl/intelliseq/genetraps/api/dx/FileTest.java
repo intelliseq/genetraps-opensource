@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
-import pl.intelliseq.genetraps.api.dx.helpers.AWSApiProcessManager;
+import pl.intelliseq.genetraps.api.dx.helpers.aws_manager.AWSApiProcessManagerImpl;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 
 import static org.testng.Assert.assertEquals;
@@ -24,7 +24,7 @@ import static org.testng.Assert.assertEquals;
 public class FileTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
-    private AWSApiProcessManager awsApiProcessManager;
+    private AWSApiProcessManagerImpl awsApiProcessManagerImpl;
 
     @Autowired
     private FilesManager filesManager;
@@ -54,11 +54,11 @@ public class FileTest extends AbstractTestNGSpringContextTests {
     public void testDeleteFile() throws InterruptedException {
 
         Integer id = filesManager.getLowestFreeIndex(filesManager.getNumericDirectories());
-        Integer sampleId = awsApiProcessManager.runCreateSampl(id);
+        Integer sampleId = awsApiProcessManagerImpl.runCreateSample(id);
         s3Client.putObject(bucket, String.format("%s/%s/test", samplesFolder, sampleId), "testDeleteFile");
-        assertEquals(awsApiProcessManager.runSampleLs(sampleId, "").length(), 1);
-        log.info(awsApiProcessManager.runDeleteFile(sampleId, String.format("%s/%s/%s", samplesFolder, sampleId, testFileName)));
-        assertEquals(awsApiProcessManager.runSampleLs(sampleId, "").length(), 0);
-        log.info(awsApiProcessManager.runDeleteFile(sampleId, String.format("%s/%s/", samplesFolder, sampleId)));
+        assertEquals(awsApiProcessManagerImpl.runSampleLs(sampleId, "").length(), 1);
+        log.info(awsApiProcessManagerImpl.runDeleteFile(sampleId, String.format("%s/%s/%s", samplesFolder, sampleId, testFileName)));
+        assertEquals(awsApiProcessManagerImpl.runSampleLs(sampleId, "").length(), 0);
+        log.info(awsApiProcessManagerImpl.runDeleteFile(sampleId, String.format("%s/%s/", samplesFolder, sampleId)));
     }
 }

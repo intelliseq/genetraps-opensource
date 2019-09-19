@@ -1,23 +1,23 @@
 package pl.intelliseq.genetraps.api.dx.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.intelliseq.genetraps.api.dx.exceptions.PropertiesException;
-import pl.intelliseq.genetraps.api.dx.helpers.AWSApiProcessManager;
+import pl.intelliseq.genetraps.api.dx.helpers.aws_manager.AWSApiProcessManagerImpl;
 import pl.intelliseq.genetraps.api.dx.helpers.AuroraDBManager;
 import pl.intelliseq.genetraps.api.dx.helpers.DxApiProcessManager;
 import pl.intelliseq.genetraps.api.dx.helpers.FilesManager;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -28,7 +28,7 @@ public class FilesController {
     private DxApiProcessManager dxApiProcessManager;
 
     @Autowired
-    private AWSApiProcessManager awsApiProcessManager;
+    private AWSApiProcessManagerImpl awsApiProcessManagerImpl;
 
     @Autowired
     private FilesManager filesManager;
@@ -89,12 +89,13 @@ public class FilesController {
     public String wdl(
             @ApiIgnore OAuth2Authentication auth,
             @RequestParam String workflowUrl,
+            // JSONObject --> Map<String, Object>
             @RequestParam JSONObject workflowInputs,
             @RequestParam JSONObject labels,
             @RequestParam(name = "req-out", required = false, defaultValue = "{}") JSONObject requestedOutputs) {
         try {
             Integer userId = Integer.valueOf(auth.getUserAuthentication().getPrincipal().toString());
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs)).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManagerImpl.runWdl(userId, workflowUrl, workflowInputs, labels, requestedOutputs)).toString();
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -107,7 +108,7 @@ public class FilesController {
         log.info("get job status");
         log.info(id);
         try {
-            return awsApiProcessManager.runGetJobStatus(id).toString();
+            return awsApiProcessManagerImpl.runGetJobStatus(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job status").put("err", e.getMessage()).toString();
         }
@@ -120,7 +121,7 @@ public class FilesController {
         log.info("abort job");
         log.info(id);
         try {
-            return awsApiProcessManager.runAbortJob(id).toString();
+            return awsApiProcessManagerImpl.runAbortJob(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to abort the job").put("err", e.getMessage()).toString();
         }
@@ -133,7 +134,7 @@ public class FilesController {
         log.info("get job output download");
         log.info(id);
         try {
-            return awsApiProcessManager.runGetJobOutputs(id).toString();
+            return awsApiProcessManagerImpl.runGetJobOutputs(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job output").put("err", e.getMessage()).toString();
         }
@@ -148,7 +149,7 @@ public class FilesController {
         log.info("get job output download links");
         log.info(id);
         try {
-            return awsApiProcessManager.runGetJobOutputsDownloadLinks(id, sub).toString();
+            return awsApiProcessManagerImpl.runGetJobOutputsDownloadLinks(id, sub).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job output").put("err", e.getMessage()).toString();
         }
@@ -161,7 +162,7 @@ public class FilesController {
         log.info("get job logs download");
         log.info(id);
         try {
-            return awsApiProcessManager.runGetJobLogs(id).toString();
+            return awsApiProcessManagerImpl.runGetJobLogs(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", "Error while trying to get the job logs").put("err", e.getMessage()).toString();
         }
@@ -173,7 +174,7 @@ public class FilesController {
             @PathVariable String id) {
         log.info("get sample jobs");
         try {
-            return awsApiProcessManager.runGetJobsForSample(id).toString();
+            return awsApiProcessManagerImpl.runGetJobsForSample(id).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -193,7 +194,7 @@ public class FilesController {
 //        log.debug(userId);
 
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runUrlFetch(url, id, fileName, tag)).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManagerImpl.runUrlFetch(url, id, fileName, tag)).toString();
         } catch (InterruptedException e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -209,7 +210,7 @@ public class FilesController {
         log.info("file upload");
         log.debug(tag);
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runFileUpload(file, id, fileName, tag)).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManagerImpl.runFileUpload(file, id, fileName, tag)).toString();
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -221,7 +222,7 @@ public class FilesController {
             @PathVariable Integer id,
             @RequestParam(name = "path") String fileRelPath) {
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.runDeleteFile(id, fileRelPath)).toString();
+            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManagerImpl.runDeleteFile(id, fileRelPath)).toString();
         } catch (Exception e) {
             return new ObjectMapper().createObjectNode().put("id", e.getMessage()).toString();
         }
@@ -233,7 +234,7 @@ public class FilesController {
 //            @RequestParam(required = false, defaultValue = "false") boolean byNames,
             @RequestParam(required = false, defaultValue = "")  String dir) {
         try {
-            return awsApiProcessManager.runSampleLs(id, dir).toString();
+            return awsApiProcessManagerImpl.runSampleLs(id, dir).toString();
         } catch (InterruptedException e) {
             // if error, returns err message with key: /error
             // normal keys doesn't start with '/' at the beginning
@@ -252,13 +253,19 @@ public class FilesController {
     @ResponseStatus(HttpStatus.CREATED)
     public String samplePropertiesPost(
             @PathVariable Integer id,
-            @RequestBody JsonNode properties,
-            @RequestParam boolean persist) {
+            @RequestParam String properties,
+            @RequestParam(required = false, defaultValue = "false") boolean persist) {
+        ObjectNode propertiesJson;
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesPost(id, properties, persist).toString()).toString();
+            propertiesJson = new ObjectMapper().readValue(properties, ObjectNode.class);
+        } catch (IOException e) {
+            // ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).put("id", "There may be a problem with parameters supplied").toString();
+        }
+        try {
+            return new ObjectMapper().createObjectNode().set("id", awsApiProcessManagerImpl.propertiesPost(id, propertiesJson, persist)).toString();
         } catch (PropertiesException e) {
-//            return new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.getMessage()).toString();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.getMessage()).toString()).toString();
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).set("id", propertiesJson).toString();
         }
     }
 
@@ -266,33 +273,41 @@ public class FilesController {
     public String samplePropertiesGet(
             @PathVariable Integer id) {
         try {
-            return awsApiProcessManager.propertiesGet(id).toString();
+            return awsApiProcessManagerImpl.propertiesGet(id).toString();
         } catch (PropertiesException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()).toString();
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).put("id", "Something went wrong when you tri").toString();
         }
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.PUT)
     public String samplePropertiesPut(
             @PathVariable Integer id,
-            @RequestBody JsonNode properties,
-            @RequestParam boolean persist) {
+            @RequestParam String properties,
+            @RequestParam(required = false, defaultValue = "false") boolean persist) {
+        ObjectNode propertiesJson;
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesPut(id, properties, persist).toString()).toString();
+            propertiesJson = new ObjectMapper().readValue(properties, ObjectNode.class);
+        } catch (IOException e) {
+            // ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).put("id", "There may be a problem with parameters supplied").toString();
+        }
+        try {
+            return new ObjectMapper().createObjectNode().set("id", awsApiProcessManagerImpl.propertiesPut(id, propertiesJson, persist)).toString();
         } catch (PropertiesException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.getMessage()).toString()).toString();
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).set("id", propertiesJson).toString();
         }
     }
 
     @RequestMapping(value = "/sample/{id}/properties", method = RequestMethod.DELETE)
     public String samplePropertiesDelete(
             @PathVariable Integer id,
-            @RequestBody JsonNode properties,
-            @RequestParam boolean persist) {
+            @RequestParam(name = "property") List<String> properties,
+            @RequestParam(required = false, defaultValue = "false") boolean persist) {
+
         try {
-            return new ObjectMapper().createObjectNode().put("id", awsApiProcessManager.propertiesDelete(id, properties, persist).toString()).toString();
+            return new ObjectMapper().createObjectNode().put("id", Arrays.toString(awsApiProcessManagerImpl.propertiesDelete(id, properties, persist).toArray())).toString();
         } catch (PropertiesException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ObjectMapper().createObjectNode().put("id", properties.toString()).put("err", e.getMessage()).toString()).toString();
+            return new ObjectMapper().createObjectNode().put("err", e.getMessage()).put("id", Arrays.toString(properties.toArray())).toString();
         }
     }
 
