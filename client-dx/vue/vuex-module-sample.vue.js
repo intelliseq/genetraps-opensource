@@ -3,11 +3,14 @@ const sampleModule = {
 	state: {
 		sample: {
 		    properties: {"key1": "value1","key2": "value2"},
-		    files: {"file": "value"}
+		    files: {}
 		  }
   },
 	mutations: {
-	},
+    setFiles (state, files) {
+      state.files = files
+    }
+  },
   actions: {
 		createSample({commit}) {
 			logger.debug("vue.vuex.sample.createSample")

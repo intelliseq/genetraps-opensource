@@ -21,7 +21,7 @@ const sampleComponent = {
           </v-list-tile>
 
 
-           <v-list-tile v-for="file in sample.files" avatar @click="">
+<!--           <v-list-tile v-for="file in sample.files" avatar @click="">
                       <v-list-tile-avatar>
                         <v-icon>label</v-icon>
                       </v-list-tile-avatar>
@@ -34,7 +34,7 @@ const sampleComponent = {
                           <v-icon color="grey lighten-1">info</v-icon>
                         </v-btn>
                       </v-list-tile-action>
-                    </v-list-tile>
+                    </v-list-tile> -->
 
 
           <v-list-tile>
@@ -47,15 +47,21 @@ const sampleComponent = {
 
 
            <v-list-tile>
-          <v-list-tile-avatar>
-          <v-icon color="green darken-2">attach_file</v-icon> </v-list-tile-avatar>
-          <input type="file" v-bind="files" multiple @change="handleFilesUpload"/>
+          <v-list-tile-avatar><v-icon color="green darken-2">attach_file</v-icon> </v-list-tile-avatar>
+          <input type="file" multiple @change="handleFilesUpload"></input>
           <button @click="submitFiles">Submit</button>
          </v-list-tile>
 
 
-        </v-list>
 
+
+        </v-list>
+        <v-list>
+        <div v-for="file in files">
+          PLIK:{{file.name}}
+        </div>
+
+        </v-list>
   </v-card>
   </v-flex>
   </v-layout>
@@ -65,12 +71,11 @@ const sampleComponent = {
       return {
         newKey: undefined,
         newValue: undefined,
-        files: {}
+        files: []
       }
     },
     computed: {
-      ...Vuex.mapState('sample', ['sample']),
-      ...Vuex.mapState(['currentSampleId'])
+      ...Vuex.mapState('sample', ['sample'])
     },
     methods: {
       add(){
@@ -88,9 +93,9 @@ const sampleComponent = {
                  let file = this.files[i];
 
                  formData.append('files[' + i + ']', file);
-                 Vue.set(this.sample.files, "file", file)
+                 //Vue.set(this.sample.files, "file", file)
 
-                 Vue.set(this.sample.files, i, file)
+                 //Vue.set(this.sample.files, i, file)
                }
 
                /*
@@ -114,8 +119,18 @@ const sampleComponent = {
              },
 
              handleFilesUpload(event){
-               this.files = event.target.files
-               console.log(this.files)
+               var files = []
+               for (i = 0; i < event.target.files.length; i++) {
+                 var file = {}
+                 file["name"] = event.target.files[i].name
+                 file["file"] = event.target.files[i];
+                 files.push(file)
+               }
+               this.files = files
+               //this.sample.files = files;
+               //console.log(event.target.files)
+               //console.log(event.target.files[0])
+               console.log("success")
              }
 
     },
