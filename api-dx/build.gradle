@@ -119,3 +119,21 @@ bootRun {
             'spring.profiles.active': propertyDrivenProfiles
     ]
 }
+
+test {
+    systemProperties = [
+            'spring.profiles.active': propertyDrivenProfiles
+    ]
+}
+
+classes << {
+    FileTree tree =
+            fileTree(dir: "build/resources/main").
+                    include("application.properties")
+
+    tree.each { File file ->
+        file.append('\nspring.profiles.active=' + propertyDrivenProfiles);
+    }
+
+    println "Classes append finished"
+}
