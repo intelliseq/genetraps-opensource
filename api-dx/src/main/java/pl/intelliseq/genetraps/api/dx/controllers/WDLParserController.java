@@ -11,21 +11,21 @@ import pl.intelliseq.genetraps.api.dx.helpers.WDLParserManager;
 public class WDLParserController {
 
     @Autowired
-    WDLParserManager WDLParserManager;
+    WDLParserManager wdlParserManager;
 
     @RequestMapping(value = "/wdl/{name}/info", method = RequestMethod.GET)
     public String getSpecificWDL(
             @PathVariable String name) {
-        return WDLParserManager.getData(name).toString();
+        return wdlParserManager.getData(name).toString();
     }
 
     @RequestMapping(value = "/wdl/info", method = RequestMethod.GET)
     public String getAllWDLs() {
-        return WDLParserManager.getData().toString();
+        return wdlParserManager.getData().toString();
     }
 
     @RequestMapping(value = "/wdl/update", method = RequestMethod.GET)
     public void updateWDLData() {
-        WDLParserManager.collectData();
+        wdlParserManager.collectData();
     }
 }

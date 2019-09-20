@@ -96,3 +96,44 @@ docker {
 wrapper() {
     gradleVersion = '4.7'
 }
+
+def prodProfiles='prod'
+def devProfiles='dev'
+def testProfiles='test'
+def propertyDrivenProfiles;
+
+if (project.hasProperty('prod')) {
+    propertyDrivenProfiles = prodProfiles
+    apply from: rootProject.file('gradle/profile_prod.gradle');
+} else if (project.hasProperty('dev')) {
+    propertyDrivenProfiles = devProfiles
+    apply from: rootProject.file('gradle/profile_dev.gradle');
+} else {
+    propertyDrivenProfiles = testProfiles
+    apply from: rootProject.file('gradle/profile_test.gradle');
+}
+println 'Using profile: "' + propertyDrivenProfiles + '" for ' + project.getName()
+
+bootRun {
+    systemProperties = [
+            'spring.profiles.active': propertyDrivenProfiles
+    ]
+}
+
+test {
+    systemProperties = [
+            'spring.profiles.active': propertyDrivenProfiles
+    ]
+}
+
+classes << {
+    FileTree tree =
+            fileTree(dir: "build/resources/main").
+                    include("application.properties")
+
+    tree.each { File file ->
+        file.append('\nspring.profiles.active=' + propertyDrivenProfiles);
+    }
+
+    println "Classes append finished"
+}

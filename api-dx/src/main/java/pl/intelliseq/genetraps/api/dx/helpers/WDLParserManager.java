@@ -10,6 +10,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import pl.intelliseq.genetraps.api.dx.Profiles;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -38,6 +39,9 @@ public class WDLParserManager {
 
     @Value("${fileGet-ref}")
     String filePathRef;
+
+    @Value("${spring.profiles.active}")
+    String activeProfile;
 
     private JsonNode data;
 
@@ -206,6 +210,7 @@ public class WDLParserManager {
     @PostConstruct
     public void collectData(){
         Pattern isWdlFile = Pattern.compile(".*\\.wdl");
+        Pattern latestPattern = Pattern.compile(".*latest");
         StringBuilder path;
         ObjectNode node = new ObjectMapper().createObjectNode();
 
@@ -221,18 +226,24 @@ public class WDLParserManager {
 
             // finding latest version in directory
             double highestVersion=0.0;
+            Boolean hasLatest = false;
+            String latestPath = null;
             for (JsonNode versionNode: wdlVersions){
                 String versionPath = remover(versionNode.get("path").toString());
-                try{
+                if(activeProfile != Profiles.PROD && latestPattern.matcher(versionPath).matches()){
+                    latestPath=versionPath;
+                    hasLatest=true;
+                    break;
+                }
+                else {
                     double versionNumber = Double.parseDouble(remover(versionNode.get("name").toString()).substring(1));
-                    if (versionNumber>highestVersion) {
+                    if (versionNumber > highestVersion) {
                         filePath = versionPath;
-                        highestVersion=versionNumber;
+                        highestVersion = versionNumber;
                     }
-                } catch(NumberFormatException e){
-                    log.error(String.format("Error when parsing version of file: %s", filePath));
                 }
             }
+            if(hasLatest) filePath=latestPath;
 
             path = (new StringBuilder(pathPrefix)).append(filePath).append(pathSuffix);
 
