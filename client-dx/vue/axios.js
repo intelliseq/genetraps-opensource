@@ -37,10 +37,12 @@ function request(params) {
   })
   .then(response => {
     store.commit('setWaitComponentVisibility', false)
+    console.log(response)
     callback(response.data)
   })
   .catch(error => {
     store.commit('setWaitComponentVisibility', false)
+    alert(JSON.stringify(error.response.data));
     errorCallback(error)
   })
 }
