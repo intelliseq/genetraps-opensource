@@ -1,3 +1,4 @@
+logger.debug("Initializing store...")
 const store = new Vuex.Store({
     state: {
         waitComponentVisibility: false,
@@ -35,3 +36,5 @@ const store = new Vuex.Store({
       samples: samplesModule,
     },
 })
+logger.debug("Finished store initialization...")
+logger.debug(store)

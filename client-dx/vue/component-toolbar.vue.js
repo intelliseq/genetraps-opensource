@@ -3,7 +3,7 @@ const toolbarComponent = {
   <v-toolbar color="teal lighten-3" dark height="50px" max-height="50px" style="padding: 0!important">
 
     <v-flex xs12 sm2 md2 hidden-xs-only>
-      <v-img v-on:click="store.commit('setToolbarVisibility', false); router.push('/')" src="images/logo-white.svg" max-height="40px" aspect-ratio="1" contain></v-img>
+      <v-img v-on:click="setToolbarVisibilityToFalse()" src="images/logo-white.svg" max-height="40px" aspect-ratio="1" contain></v-img>
     </v-flex>
     <!--store.commit("setToolbarVisibility", true)-->
     <!--window.location.href = 'http://localhost:8080'-->
@@ -40,6 +40,10 @@ const toolbarComponent = {
         logger.debug("vue.toolbar.showSamples")
         store.dispatch('samples/showSamples')
       },
+      setToolbarVisibilityToFalse(event) {
+        store.commit('setToolbarVisibility', false)
+        router.push('/')
+      }
     },
     created: function () {
       logger.debug("vue.wait.created")

@@ -7,7 +7,7 @@ function request(params) {
   var endpoint = (params.endpoint === undefined) ? "hello" : params.endpoint
   var callback = (params.callback === undefined) ? function(data){} : params.callback
   var errorCallback = (params.errorCallback === undefined) ? function(error) {
-    console.log(error)
+    logger.debug(error)
   } : params.errorCallback
   var service = (params.service === undefined) ? "API_DX" : params.service
   var reqData = (params.reqData === undefined) ? {} : params.reqData
@@ -37,11 +37,13 @@ function request(params) {
   })
   .then(response => {
     store.commit('setWaitComponentVisibility', false)
-    console.log(response)
+    logger.debug("Succesfull response")
+    //console.log(response)
     callback(response.data)
   })
   .catch(error => {
     store.commit('setWaitComponentVisibility', false)
+    logger.debug("Error response")
     alert(JSON.stringify(error.response.data));
     errorCallback(error)
   })
