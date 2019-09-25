@@ -43,7 +43,7 @@ const samplesComponent = {
         store.dispatch('sample/getSamples')
       },
       goToSample: function (event, id){
-        router.push({ path: `/sample/${id}`})
+        router.push({ path: `/sample/${id}`}).catch(err => {})
       }
     },
     created: function () {

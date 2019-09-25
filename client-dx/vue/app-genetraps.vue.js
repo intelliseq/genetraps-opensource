@@ -27,13 +27,13 @@ const app = new Vue({
     logger.debug("vue.app.mounted")
     if(this.$cookies.get("cookies_necessary") == null) {
       logger.debug("vue.app no agreement for cookies")
-      this.$router.push("/cookies")
+      this.$router.push("/cookies").catch(err => {})
     } else {
       if(this.$cookies.get("cookies_statistics") != null) {
         loadGoogleAnalytics()
       }
       if(this.$cookies.get("refresh_token") == null) {
-        this.$router.push("/login")
+        this.$router.push("/login").catch(err => {})
       } else {
         store.dispatch('security/loginWithRefreshToken')
       }

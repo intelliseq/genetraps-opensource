@@ -38,7 +38,7 @@ const securityModule = {
 				callback: function(data) {
 					logger.debug("vue.app.loginWithRefreshToken succesfull login")
 					store.dispatch('security/login', data)
-					router.push("/")
+					router.push("/").catch(err => {})
 				} // calback:
 			}) // request()
     },
@@ -64,7 +64,7 @@ const securityModule = {
 				}, // calback:
 				errorCallback: function(error) {
 					logger.debug("vue.app.loginWithRefreshToken succesfull failure")
-					router.push("/login")
+					router.push("/login").catch(err => {})
 				}
 			}) // request()
     } // loginWithRefreshToken()

@@ -30,7 +30,7 @@ const samplesModule = {
 			logger.debug("vue.vuex.sample.showSamples")
 			store.dispatch("samples/getSamples")
 			store.commit("setToolbarVisibility", true)
-			router.push("/samples")
-		},
+			router.push("/samples").catch(err => {})
+		}
 	}
 }

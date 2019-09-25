@@ -42,7 +42,7 @@ const toolbarComponent = {
       },
       setToolbarVisibilityToFalse(event) {
         store.commit('setToolbarVisibility', false)
-        router.push('/')
+        router.push('/').catch(err => {})
       }
     },
     created: function () {

@@ -21,7 +21,7 @@ const cookiesComponent = {
             </v-layout>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" flat v-on:click.prevent="setCookies">Agree</v-btn>
-          <v-layout>
+          </v-layout>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -56,7 +56,7 @@ const cookiesComponent = {
                 this.$cookies.set("cookies_statistics", true)
                 loadGoogleAnalytics()
               }
-              this.$router.push("/login")
+              this.$router.push("/login").catch(err => {})
             }
         }
 }
